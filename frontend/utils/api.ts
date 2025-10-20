@@ -1,0 +1,26 @@
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
+
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+
+const api = axios.create({
+  baseURL: `${API_URL}/api`,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add auth token to requests
+api.interceptors.request.use(async (config) => {
+  try {
+    const token = await SecureStore.getItemAsync('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (error) {
+    console.error('Error getting token:', error);
+  }
+  return config;
+});
+
+export default api;
