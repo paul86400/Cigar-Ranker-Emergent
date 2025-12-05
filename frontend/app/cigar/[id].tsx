@@ -391,32 +391,47 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#333',
   },
-  ratingStars: {
+  sliderContainer: {
+    gap: 16,
+  },
+  ratingDisplay: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  ratingButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#1a1a1a',
-    borderWidth: 1,
-    borderColor: '#333',
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    backgroundColor: '#1a1a1a',
+    padding: 20,
+    borderRadius: 12,
   },
-  ratingButtonActive: {
-    backgroundColor: '#8B4513',
-    borderColor: '#8B4513',
-  },
-  ratingButtonText: {
-    color: '#888',
-    fontSize: 14,
+  ratingValue: {
+    fontSize: 48,
     fontWeight: 'bold',
-  },
-  ratingButtonTextActive: {
     color: '#fff',
+  },
+  slider: {
+    width: '100%',
+    height: 40,
+  },
+  sliderLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+  },
+  sliderLabel: {
+    fontSize: 12,
+    color: '#888',
+  },
+  submitRatingButton: {
+    backgroundColor: '#8B4513',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  submitRatingButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   actionButtons: {
     padding: 20,
