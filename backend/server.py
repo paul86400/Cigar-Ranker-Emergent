@@ -495,7 +495,7 @@ async def remove_favorite(cigar_id: str, user_id: str = Depends(get_current_user
 @api_router.get("/favorites")
 async def get_favorites(user_id: str = Depends(get_current_user)):
     """Get user's favorite cigars"""
-    user = await db.users.find_one({"_id": ObjectId(user_id)})
+    user = await db.users.find_one({"_id": ObjectId(user_id)}, {"favorites": 1})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
@@ -503,10 +503,14 @@ async def get_favorites(user_id: str = Depends(get_current_user)):
     if not favorite_ids:
         return []
     
-    # Get cigar details
+    # Get cigar details with projection
+    projection = {
+        "name": 1, "brand": 1, "image": 1, "strength": 1, 
+        "origin": 1, "average_rating": 1, "rating_count": 1, "price_range": 1
+    }
     cigars = await db.cigars.find({
         "_id": {"$in": [ObjectId(cid) for cid in favorite_ids]}
-    }).to_list(1000)
+    }, projection).limit(100).to_list(100)
     
     return [serialize_doc(cigar) for cigar in cigars]
 
