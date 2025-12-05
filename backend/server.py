@@ -582,6 +582,20 @@ async def seed_database():
     count = await db.cigars.count_documents({})
     if count == 0:
         logger.info("Seeding database with comprehensive cigar collection...")
-        sample_cigars = get_cigar_seed_data()
-        await db.cigars.insert_many(sample_cigars)
-        logger.info(f"Seeded {len(sample_cigars)} cigars successfully")
+        
+        # Get curated cigars (45 premium cigars with details)
+        curated_cigars = get_cigar_seed_data()
+        
+        # Get generated cigars (1000 varied cigars)
+        generated_cigars = get_generated_cigars()
+        
+        # Combine both
+        all_cigars = curated_cigars + generated_cigars
+        
+        # Insert in batches for better performance
+        batch_size = 100
+        for i in range(0, len(all_cigars), batch_size):
+            batch = all_cigars[i:i+batch_size]
+            await db.cigars.insert_many(batch)
+        
+        logger.info(f"Seeded {len(all_cigars)} cigars successfully ({len(curated_cigars)} curated + {len(generated_cigars)} generated)")
