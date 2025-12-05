@@ -169,8 +169,10 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   closeButton: {
-    padding: 16,
-    marginLeft: -16,
+    paddingVertical: 16,
+    paddingLeft: 24,
+    paddingRight: 16,
+    marginLeft: -24,
   },
   headerTitle: {
     fontSize: 18,
