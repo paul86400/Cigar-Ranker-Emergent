@@ -269,6 +269,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
   },
+  backButton: {
+    padding: 8,
+    marginLeft: -8,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
