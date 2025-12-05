@@ -145,7 +145,7 @@ export default function CigarDetailsScreen() {
         <TouchableOpacity 
           onPress={() => router.push('/(tabs)')}
           style={styles.backButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
         >
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
