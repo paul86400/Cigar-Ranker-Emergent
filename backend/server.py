@@ -223,7 +223,12 @@ async def search_cigars(
             price_query["$lte"] = max_price
         query["price_range"] = price_query
     
-    cigars = await db.cigars.find(query).limit(50).to_list(50)
+    # Optimized query with projection to fetch only necessary fields
+    projection = {
+        "name": 1, "brand": 1, "image": 1, "strength": 1, 
+        "origin": 1, "average_rating": 1, "rating_count": 1, "price_range": 1
+    }
+    cigars = await db.cigars.find(query, projection).limit(50).to_list(50)
     return [serialize_doc(cigar) for cigar in cigars]
 
 
