@@ -142,7 +142,11 @@ export default function CigarDetailsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push('/(tabs)')}>
+        <TouchableOpacity 
+          onPress={() => router.push('/(tabs)')}
+          style={styles.backButton}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <TouchableOpacity onPress={toggleFavorite}>
