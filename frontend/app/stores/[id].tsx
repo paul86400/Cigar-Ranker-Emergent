@@ -50,7 +50,11 @@ export default function StoresScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push('/(tabs)')}>
+        <TouchableOpacity 
+          onPress={() => router.push('/(tabs)')}
+          style={styles.backButton}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Where to Buy</Text>
@@ -139,6 +143,10 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
+  },
+  backButton: {
+    padding: 8,
+    marginLeft: -8,
   },
   headerTitle: {
     fontSize: 18,
