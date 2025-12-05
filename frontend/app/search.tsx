@@ -217,6 +217,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
+  closeButton: {
+    padding: 8,
+    marginLeft: -8,
+  },
   content: {
     flex: 1,
     padding: 16,
