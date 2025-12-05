@@ -214,26 +214,33 @@ export default function CigarDetailsScreen() {
 
         <View style={styles.rateSection}>
           <Text style={styles.sectionTitle}>Rate this cigar</Text>
-          <View style={styles.ratingStars}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
-              <TouchableOpacity
-                key={value}
-                style={[
-                  styles.ratingButton,
-                  userRating >= value && styles.ratingButtonActive,
-                ]}
-                onPress={() => handleRating(value)}
-              >
-                <Text
-                  style={[
-                    styles.ratingButtonText,
-                    userRating >= value && styles.ratingButtonTextActive,
-                  ]}
-                >
-                  {value}
-                </Text>
-              </TouchableOpacity>
-            ))}
+          <View style={styles.sliderContainer}>
+            <View style={styles.ratingDisplay}>
+              <Text style={styles.ratingValue}>{userRating.toFixed(1)}</Text>
+              <Ionicons name="star" size={32} color="#FFD700" />
+            </View>
+            <Slider
+              style={styles.slider}
+              minimumValue={1}
+              maximumValue={10}
+              step={0.1}
+              value={userRating}
+              onValueChange={(value) => setUserRating(value)}
+              minimumTrackTintColor="#8B4513"
+              maximumTrackTintColor="#333"
+              thumbTintColor="#8B4513"
+            />
+            <View style={styles.sliderLabels}>
+              <Text style={styles.sliderLabel}>1.0</Text>
+              <Text style={styles.sliderLabel}>5.5</Text>
+              <Text style={styles.sliderLabel}>10.0</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.submitRatingButton}
+              onPress={() => handleRating(userRating)}
+            >
+              <Text style={styles.submitRatingButtonText}>Submit Rating</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
