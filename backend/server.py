@@ -27,6 +27,7 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
 # Import cigar images
 from cigar_images_data import MONTECRISTO_IMAGE, PADRON_IMAGE, ARTURO_IMAGE, COHIBA_IMAGE, LIGA_IMAGE
 from cigar_seed_data import get_cigar_seed_data
+from generate_cigars import get_generated_cigars
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
