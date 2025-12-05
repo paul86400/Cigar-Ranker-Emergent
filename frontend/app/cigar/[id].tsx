@@ -270,8 +270,10 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   backButton: {
-    padding: 16,
-    marginLeft: -16,
+    paddingVertical: 16,
+    paddingLeft: 24,
+    paddingRight: 16,
+    marginLeft: -24,
   },
   loadingContainer: {
     flex: 1,
