@@ -53,7 +53,7 @@ export default function StoresScreen() {
         <TouchableOpacity 
           onPress={() => router.push('/(tabs)')}
           style={styles.backButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
         >
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
@@ -145,8 +145,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#333',
   },
   backButton: {
-    padding: 8,
-    marginLeft: -8,
+    padding: 16,
+    marginLeft: -16,
   },
   headerTitle: {
     fontSize: 18,
