@@ -584,7 +584,7 @@ async def seed_database():
             {
                 "name": "Montecristo No. 2",
                 "brand": "Montecristo",
-                "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+                "image": MONTECRISTO_IMAGE,
                 "images": [],
                 "strength": "Medium",
                 "flavor_notes": ["Cocoa", "Coffee", "Cedar"],
@@ -602,7 +602,7 @@ async def seed_database():
             {
                 "name": "Padron 1964 Anniversary",
                 "brand": "Padron",
-                "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+                "image": PADRON_IMAGE,
                 "images": [],
                 "strength": "Full",
                 "flavor_notes": ["Chocolate", "Coffee", "Nuts"],
@@ -620,7 +620,7 @@ async def seed_database():
             {
                 "name": "Arturo Fuente Opus X",
                 "brand": "Arturo Fuente",
-                "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+                "image": ARTURO_IMAGE,
                 "images": [],
                 "strength": "Full",
                 "flavor_notes": ["Spice", "Leather", "Pepper"],
@@ -638,7 +638,7 @@ async def seed_database():
             {
                 "name": "Cohiba Behike 52",
                 "brand": "Cohiba",
-                "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+                "image": COHIBA_IMAGE,
                 "images": [],
                 "strength": "Medium-Full",
                 "flavor_notes": ["Honey", "Wood", "Floral"],
@@ -656,7 +656,7 @@ async def seed_database():
             {
                 "name": "Drew Estate Liga Privada No. 9",
                 "brand": "Drew Estate",
-                "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+                "image": LIGA_IMAGE,
                 "images": [],
                 "strength": "Full",
                 "flavor_notes": ["Cocoa", "Earth", "Espresso"],
