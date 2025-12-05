@@ -168,6 +168,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
   },
+  closeButton: {
+    padding: 8,
+    marginLeft: -8,
+  },
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
