@@ -387,7 +387,8 @@ async def create_rating(rating_data: RatingCreate, user_id: str = Depends(get_cu
 @api_router.get("/ratings/cigar/{cigar_id}")
 async def get_cigar_ratings(cigar_id: str):
     """Get all ratings for a cigar"""
-    ratings = await db.ratings.find({"cigar_id": cigar_id}).to_list(1000)
+    projection = {"user_id": 1, "rating": 1, "created_at": 1}
+    ratings = await db.ratings.find({"cigar_id": cigar_id}, projection).limit(100).to_list(100)
     return [serialize_doc(rating) for rating in ratings]
 
 
