@@ -428,12 +428,16 @@ async def create_comment(comment_data: CommentCreate, user_id: str = Depends(get
 @api_router.get("/comments/{cigar_id}")
 async def get_comments(cigar_id: str):
     """Get all comments for a cigar (nested structure)"""
-    # Get all comments for this cigar
-    all_comments = await db.comments.find({"cigar_id": cigar_id}).sort("created_at", -1).to_list(1000)
+    # Get all comments for this cigar with projection
+    projection = {"user_id": 1, "text": 1, "parent_id": 1, "images": 1, "created_at": 1}
+    all_comments = await db.comments.find({"cigar_id": cigar_id}, projection).sort("created_at", -1).limit(100).to_list(100)
     
-    # Get user info for all comments
+    # Get user info for all comments with projection
     user_ids = list(set([c['user_id'] for c in all_comments]))
-    users = await db.users.find({"_id": {"$in": [ObjectId(uid) for uid in user_ids]}}).to_list(1000)
+    users = await db.users.find(
+        {"_id": {"$in": [ObjectId(uid) for uid in user_ids]}}, 
+        {"username": 1}
+    ).to_list(len(user_ids))
     user_map = {str(u['_id']): u['username'] for u in users}
     
     # Build comment tree
