@@ -245,6 +245,20 @@ export default function CigarDetailsScreen() {
             style={styles.image}
             resizeMode="contain"
           />
+          <TouchableOpacity 
+            style={styles.uploadButton}
+            onPress={handleUploadImage}
+            disabled={uploadingImage}
+          >
+            {uploadingImage ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <>
+                <Ionicons name="camera" size={20} color="#fff" />
+                <Text style={styles.uploadButtonText}>Change Photo</Text>
+              </>
+            )}
+          </TouchableOpacity>
         </View>
 
         <View style={styles.infoSection}>
