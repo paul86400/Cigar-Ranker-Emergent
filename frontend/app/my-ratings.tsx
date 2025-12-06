@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    gap: 12,
+    justifyContent: 'center',
     marginBottom: 20,
   },
   statBox: {
@@ -267,6 +267,13 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 12,
     alignItems: 'center',
+  },
+  statBoxSingle: {
+    backgroundColor: '#1a1a1a',
+    padding: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+    minWidth: 200,
   },
   statValue: {
     fontSize: 32,
