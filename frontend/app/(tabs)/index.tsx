@@ -157,10 +157,7 @@ export default function HomeScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.headerTitle}>CIGAR</Text>
-          <Text style={styles.headerSubtitle}>RANKER</Text>
-        </View>
+        <Text style={styles.headerTitle}>Cigar Ranker</Text>
         <TouchableOpacity 
           onPress={() => router.push('/search')}
           style={styles.advancedSearchButton}
