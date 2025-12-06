@@ -409,6 +409,43 @@ async def get_user_rating(cigar_id: str, user_id: str = Depends(get_current_user
     return None
 
 
+@api_router.get("/ratings/my-ratings")
+async def get_my_ratings(user_id: str = Depends(get_current_user)):
+    """Get all ratings by the current user with cigar details"""
+    # Use aggregation to join ratings with cigar details
+    pipeline = [
+        {"$match": {"user_id": user_id}},
+        {"$sort": {"created_at": -1}},
+        {
+            "$lookup": {
+                "from": "cigars",
+                "let": {"cigar_id_str": {"$toString": "$cigar_id"}},
+                "pipeline": [
+                    {"$match": {"$expr": {"$eq": [{"$toString": "$_id"}, "$$cigar_id_str"]}}}
+                ],
+                "as": "cigar_details"
+            }
+        },
+        {"$unwind": "$cigar_details"},
+        {
+            "$project": {
+                "rating": 1,
+                "created_at": 1,
+                "cigar_id": 1,
+                "cigar_name": "$cigar_details.name",
+                "cigar_brand": "$cigar_details.brand",
+                "cigar_image": "$cigar_details.image",
+                "cigar_strength": "$cigar_details.strength",
+                "cigar_origin": "$cigar_details.origin",
+                "average_rating": "$cigar_details.average_rating"
+            }
+        }
+    ]
+    
+    ratings = await db.ratings.aggregate(pipeline).to_list(1000)
+    return [serialize_doc(rating) for rating in ratings]
+
+
 # ==================== Comment Endpoints ====================
 
 @api_router.post("/comments")
