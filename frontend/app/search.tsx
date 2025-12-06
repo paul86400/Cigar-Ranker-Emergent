@@ -248,10 +248,10 @@ const styles = StyleSheet.create({
     outlineStyle: 'none',
   },
   minPriceInput: {
-    flex: 0.7,
+    flex: 0.6,
   },
   maxPriceInput: {
-    flex: 1,
+    flex: 0.9,
   },
   optionsRow: {
     flexDirection: 'row',
