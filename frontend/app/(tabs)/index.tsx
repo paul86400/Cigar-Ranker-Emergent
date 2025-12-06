@@ -186,6 +186,13 @@ export default function HomeScreen() {
         </View>
         
         <TouchableOpacity
+          style={styles.addCigarButton}
+          onPress={() => router.push('/add-cigar')}
+        >
+          <Ionicons name="add" size={24} color="#fff" />
+        </TouchableOpacity>
+        
+        <TouchableOpacity
           style={styles.searchButton}
           onPress={handleSearch}
         >
