@@ -748,6 +748,7 @@ async def get_comments(cigar_id: str):
 async def get_my_comments(user_id: str = Depends(get_current_user)):
     """Get all comments by the current user with cigar details"""
     import sys
+    print(f"[MY-COMMENTS] Fetching comments for user: {user_id}", flush=True)
     print(f"[MY-COMMENTS] Fetching comments for user: {user_id}", file=sys.stderr, flush=True)
     
     # Use aggregation to join comments with cigar details
