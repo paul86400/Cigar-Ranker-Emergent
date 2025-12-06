@@ -524,8 +524,9 @@ async def get_favorites(user_id: str = Depends(get_current_user)):
 
 @api_router.get("/stores/{cigar_id}")
 async def get_store_prices(cigar_id: str):
-    """Get store prices for a cigar"""
-    # For MVP, return mock data for the three stores
+    """Get store prices for a cigar - makes real API calls to retailers"""
+    from price_scraper import PriceScraper
+    
     cigar = await db.cigars.find_one({"_id": ObjectId(cigar_id)})
     if not cigar:
         raise HTTPException(status_code=404, detail="Cigar not found")
@@ -533,27 +534,40 @@ async def get_store_prices(cigar_id: str):
     cigar_name = cigar.get('name', '')
     brand = cigar.get('brand', '')
     
-    # Mock store data (in production, this would scrape or use APIs)
-    stores = [
-        {
-            "store_name": "Cigars International",
-            "price": 8.99,
-            "url": f"https://www.cigarsinternational.com/search/?q={cigar_name.replace(' ', '+')}",
-            "in_stock": True
-        },
-        {
-            "store_name": "Neptune Cigar",
-            "price": 9.49,
-            "url": f"https://www.neptunecigar.com/search?q={cigar_name.replace(' ', '+')}",
-            "in_stock": True
-        },
-        {
-            "store_name": "Atlantic Cigar",
-            "price": 8.75,
-            "url": f"https://www.atlanticcigar.com/search.asp?keyword={cigar_name.replace(' ', '+')}",
-            "in_stock": False
-        }
-    ]
+    print(f"🔍 Fetching real prices for: {brand} {cigar_name}")
+    
+    # Use the price scraper to get real-time prices
+    scraper = PriceScraper()
+    stores = await scraper.get_all_prices(cigar_name, brand)
+    
+    # If no prices found, return fallback with search URLs
+    if not stores or all(not store.get('price') for store in stores):
+        print("⚠️  No prices found, returning search URLs as fallback")
+        stores = [
+            {
+                "store_name": "Cigars International",
+                "price": None,
+                "url": f"https://www.cigarsinternational.com/search/?q={cigar_name.replace(' ', '+')}",
+                "in_stock": False
+            },
+            {
+                "store_name": "Neptune Cigar",
+                "price": None,
+                "url": f"https://www.neptunecigar.com/search?q={cigar_name.replace(' ', '+')}",
+                "in_stock": False
+            },
+            {
+                "store_name": "Atlantic Cigar",
+                "price": None,
+                "url": f"https://www.atlanticcigar.com/search.asp?keyword={cigar_name.replace(' ', '+')}",
+                "in_stock": False
+            }
+        ]
+    else:
+        print(f"✅ Found {len([s for s in stores if s.get('price')])} prices")
+        for store in stores:
+            if store.get('price'):
+                print(f"  - {store['store_name']}: ${store['price']} ({store['url']})")
     
     return stores
 
