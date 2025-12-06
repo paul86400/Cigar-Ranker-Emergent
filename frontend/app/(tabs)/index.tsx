@@ -6,12 +6,13 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   Image,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../utils/api';
 
@@ -29,9 +30,11 @@ interface Cigar {
 export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
   const [cigars, setCigars] = useState<Cigar[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadCigars();
@@ -39,10 +42,16 @@ export default function HomeScreen() {
 
   const loadCigars = async () => {
     try {
+      setError(null);
+      setLoading(true);
+      console.log('Loading cigars...');
       const response = await api.get('/cigars/search');
+      console.log(`Loaded ${response.data.length} cigars`);
       setCigars(response.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading cigars:', error);
+      setError('Failed to load cigars. Please try again.');
+      Alert.alert('Error', 'Failed to load cigars. Please check your connection.');
     } finally {
       setLoading(false);
     }
@@ -55,10 +64,12 @@ export default function HomeScreen() {
     }
     try {
       setLoading(true);
+      setError(null);
       const response = await api.get(`/cigars/search?q=${searchQuery}`);
       setCigars(response.data);
     } catch (error) {
       console.error('Error searching:', error);
+      setError('Search failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -72,8 +83,9 @@ export default function HomeScreen() {
     >
       <View style={styles.cigarImageContainer}>
         <Image
-          source={{ uri: `data:image/png;base64,${cigar.image}` }}
+          source={{ uri: `data:image/jpeg;base64,${cigar.image}` }}
           style={styles.cigarImage}
+          resizeMode="contain"
         />
       </View>
       <View style={styles.cigarInfo}>
@@ -93,7 +105,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Cigar Ranker</Text>
         <TouchableOpacity onPress={() => router.push('/search')}>
@@ -124,14 +136,29 @@ export default function HomeScreen() {
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#8B4513" />
+          <Text style={styles.loadingText}>Loading cigars...</Text>
+        </View>
+      ) : error ? (
+        <View style={styles.errorContainer}>
+          <Ionicons name="warning-outline" size={48} color="#FF6B6B" />
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={loadCigars}>
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : cigars.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Ionicons name="search-outline" size={48} color="#888" />
+          <Text style={styles.emptyText}>No cigars found</Text>
+          <Text style={styles.emptySubtext}>Try a different search term</Text>
         </View>
       ) : (
-        <ScrollView style={styles.cigarList}>
+        <ScrollView style={styles.cigarList} contentContainerStyle={styles.cigarListContent}>
           <Text style={styles.sectionTitle}>Popular Cigars</Text>
           {cigars.map(renderCigarCard)}
         </ScrollView>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -144,7 +171,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
   },
@@ -185,10 +213,59 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    gap: 16,
+  },
+  loadingText: {
+    color: '#888',
+    fontSize: 16,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+    gap: 16,
+  },
+  errorText: {
+    color: '#FF6B6B',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  retryButton: {
+    backgroundColor: '#8B4513',
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginTop: 16,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+    gap: 8,
+  },
+  emptyText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 16,
+  },
+  emptySubtext: {
+    color: '#888',
+    fontSize: 14,
   },
   cigarList: {
     flex: 1,
+  },
+  cigarListContent: {
     padding: 16,
+    paddingBottom: 32,
   },
   sectionTitle: {
     fontSize: 20,
@@ -210,11 +287,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
   },
   cigarImage: {
-    width: 60,
-    height: 60,
-    resizeMode: 'contain',
+    width: '100%',
+    height: '100%',
   },
   cigarInfo: {
     flex: 1,
