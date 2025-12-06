@@ -735,6 +735,8 @@ async def get_comments(cigar_id: str):
 @api_router.get("/comments/my-comments")
 async def get_my_comments(user_id: str = Depends(get_current_user)):
     """Get all comments by the current user with cigar details"""
+    logging.info(f"Fetching comments for user: {user_id}")
+    
     # Use aggregation to join comments with cigar details
     pipeline = [
         {"$match": {"user_id": user_id}},
@@ -766,6 +768,10 @@ async def get_my_comments(user_id: str = Depends(get_current_user)):
     ]
     
     comments = await db.comments.aggregate(pipeline).to_list(1000)
+    logging.info(f"Found {len(comments)} comments for user {user_id}")
+    if len(comments) > 0:
+        logging.info(f"First comment sample: {comments[0]}")
+    
     return [serialize_doc(comment) for comment in comments]
 
 
