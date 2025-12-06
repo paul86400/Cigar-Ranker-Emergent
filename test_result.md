@@ -200,15 +200,18 @@ backend:
 
   - task: "Store Price Comparison"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py, backend/models.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented store prices endpoint. Currently returns mock data for 3 stores (Cigars International, Neptune Cigar, Atlantic Cigar) with search URLs. Ready for real scraping integration."
+      - working: true
+        agent: "testing"
+        comment: "Store price comparison endpoint tested successfully. Returns mock price data for 3 stores as expected. API structure is correct and ready for real scraping integration."
 
 frontend:
   - task: "Navigation Structure (Bottom Tabs)"
