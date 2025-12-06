@@ -339,4 +339,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#4CAF50',
   },
+  cigarMenuButton: {
+    width: 32,
+    height: 32,
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+  },
+  cigarLine: {
+    width: 32,
+    height: 6,
+    backgroundColor: '#8B4513',
+    borderRadius: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+  },
 });
