@@ -71,7 +71,7 @@ export default function CameraScreen() {
               { text: 'OK', onPress: () => setScanResult(null) }
             ]);
           }
-        } catch (apiError: any) {
+        } catch (apiError) {
           console.error('API Error:', apiError);
           const errorMsg = apiError.response?.data?.detail || apiError.message || 'Failed to scan label';
           setScanResult(`Error: ${errorMsg}`);
