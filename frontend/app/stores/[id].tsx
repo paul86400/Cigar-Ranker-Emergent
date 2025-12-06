@@ -86,14 +86,20 @@ export default function StoresScreen() {
                   ) : (
                     <View style={[styles.stockBadge, styles.stockBadgeOut]}>
                       <Text style={[styles.stockText, styles.stockTextOut]}>
-                        Out of Stock
+                        Price not available
                       </Text>
                     </View>
                   )}
                 </View>
                 <View style={styles.priceContainer}>
-                  <Text style={styles.priceSymbol}>$</Text>
-                  <Text style={styles.price}>{store.price.toFixed(2)}</Text>
+                  {store.price ? (
+                    <>
+                      <Text style={styles.priceSymbol}>$</Text>
+                      <Text style={styles.price}>{store.price.toFixed(2)}</Text>
+                    </>
+                  ) : (
+                    <Text style={styles.priceUnavailable}>—</Text>
+                  )}
                 </View>
               </View>
 
