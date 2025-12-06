@@ -78,7 +78,7 @@ export default function CameraScreen() {
           Alert.alert('Error', errorMsg);
         }
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error picking image:', error);
       const errorMsg = error.message || 'Failed to pick image';
       setScanResult(`Error: ${errorMsg}`);
