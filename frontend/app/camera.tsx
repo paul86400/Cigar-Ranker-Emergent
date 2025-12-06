@@ -108,7 +108,7 @@ export default function CameraScreen() {
           <Ionicons name="camera-outline" size={80} color="#8B4513" />
           <Text style={styles.webTitle}>Camera not available on web</Text>
           <Text style={styles.webSubtitle}>
-            Upload an image of your cigar's label or barcode to identify it
+            Upload an image of your cigar&apos;s label or barcode to identify it
           </Text>
           
           <TouchableOpacity
