@@ -101,6 +101,22 @@ export default function LoginScreen() {
           <Text style={styles.title}>Welcome Back</Text>
           <Text style={styles.subtitle}>Sign in to continue</Text>
 
+          {error && !success && (
+            <View style={styles.errorContainer}>
+              <Ionicons name="alert-circle" size={24} color="#FF3B30" />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          )}
+
+          {success && (
+            <View style={styles.successContainer}>
+              <Ionicons name="checkmark-circle" size={48} color="#4CAF50" />
+              <Text style={styles.successTitle}>Login Successful!</Text>
+              <Text style={styles.successText}>Redirecting to home...</Text>
+            </View>
+          )}
+
+          {!success && (
           <View style={styles.form}>
             <View style={styles.inputContainer}>
               <Ionicons name="mail" size={20} color="#888" />
