@@ -448,15 +448,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   imageContainer: {
-    height: 250,
+    height: 400,
     backgroundColor: '#1a1a1a',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
   },
   image: {
-    width: 200,
-    height: 200,
+    width: '100%',
+    height: '100%',
     resizeMode: 'contain',
   },
   uploadButton: {
