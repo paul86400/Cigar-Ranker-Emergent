@@ -1,0 +1,73 @@
+{
+  "summary": {
+    "passed": 8,
+    "total": 9,
+    "success_rate": 0.8888888888888888
+  },
+  "results": [
+    {
+      "test": "Registration with Valid Data",
+      "success": true,
+      "details": "User registered successfully. ID: 693377d2218b2ced616645cf",
+      "error": "",
+      "timestamp": "2025-12-06T00:24:50.462205"
+    },
+    {
+      "test": "Registration with Duplicate Email",
+      "success": true,
+      "details": "Correctly rejected duplicate email",
+      "error": "",
+      "timestamp": "2025-12-06T00:24:50.755765"
+    },
+    {
+      "test": "Registration with Duplicate Username",
+      "success": true,
+      "details": "Correctly rejected duplicate username",
+      "error": "",
+      "timestamp": "2025-12-06T00:24:51.035368"
+    },
+    {
+      "test": "Registration with Missing Fields",
+      "success": true,
+      "details": "All 4 missing field cases handled correctly",
+      "error": "",
+      "timestamp": "2025-12-06T00:24:51.096360"
+    },
+    {
+      "test": "Registration with Invalid Email Format",
+      "success": false,
+      "details": "",
+      "error": "Only 0/5 invalid emails rejected",
+      "timestamp": "2025-12-06T00:24:52.282996"
+    },
+    {
+      "test": "Registration with Short Password",
+      "success": true,
+      "details": "Short password accepted (no validation implemented)",
+      "error": "",
+      "timestamp": "2025-12-06T00:24:52.512286"
+    },
+    {
+      "test": "Login with Registered User",
+      "success": true,
+      "details": "Login successful with correct user data",
+      "error": "",
+      "timestamp": "2025-12-06T00:24:52.975847"
+    },
+    {
+      "test": "JWT Token Validation",
+      "success": true,
+      "details": "JWT token validation successful",
+      "error": "",
+      "timestamp": "2025-12-06T00:24:52.983061"
+    },
+    {
+      "test": "Invalid Token Access",
+      "success": true,
+      "details": "Invalid token correctly rejected",
+      "error": "",
+      "timestamp": "2025-12-06T00:24:53.028428"
+    }
+  ],
+  "timestamp": "2025-12-06T00:24:53.028575"
+}
