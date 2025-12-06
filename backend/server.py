@@ -248,6 +248,65 @@ async def get_cigar(cigar_id: str):
     return serialize_doc(cigar)
 
 
+@api_router.post("/cigars/{cigar_id}/upload-image")
+async def upload_cigar_image(
+    cigar_id: str,
+    file: UploadFile = File(...),
+    user_id: str = Depends(get_current_user)
+):
+    """Upload and update cigar image (replaces existing image for all users)"""
+    try:
+        # Verify cigar exists
+        cigar = await db.cigars.find_one({"_id": ObjectId(cigar_id)})
+        if not cigar:
+            raise HTTPException(status_code=404, detail="Cigar not found")
+        
+        # Read the uploaded file
+        contents = await file.read()
+        
+        # Open image and resize if needed (max 800px width to keep size reasonable)
+        image = Image.open(BytesIO(contents))
+        
+        # Convert to RGB if needed (handles RGBA, P, etc.)
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+        
+        # Resize if too large (maintain aspect ratio)
+        max_width = 800
+        if image.width > max_width:
+            ratio = max_width / image.width
+            new_height = int(image.height * ratio)
+            image = image.resize((max_width, new_height), Image.Resampling.LANCZOS)
+        
+        # Convert to base64
+        buffered = BytesIO()
+        image.save(buffered, format="JPEG", quality=85)
+        img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        
+        # Update cigar image in database
+        result = await db.cigars.update_one(
+            {"_id": ObjectId(cigar_id)},
+            {"$set": {
+                "image": img_base64,
+                "image_updated_by": user_id,
+                "image_updated_at": datetime.utcnow()
+            }}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=500, detail="Failed to update image")
+        
+        return {
+            "success": True,
+            "message": "Image updated successfully",
+            "image": img_base64
+        }
+        
+    except Exception as e:
+        logging.error(f"Error uploading image: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to upload image: {str(e)}")
+
+
 @api_router.post("/cigars", response_model=CigarResponse)
 async def create_cigar(cigar_data: CigarCreate, user_id: str = Depends(get_current_user)):
     """Create a new cigar entry (admin/authorized users)"""
