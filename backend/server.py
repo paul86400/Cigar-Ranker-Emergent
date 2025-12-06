@@ -518,7 +518,7 @@ async def create_rating(rating_data: RatingCreate, user_id: str = Depends(get_cu
     
     result = await db.ratings.aggregate(pipeline).to_list(1)
     if result:
-        avg_rating = round(result[0]['avg_rating'], 1)
+        avg_rating = round(result[0]['avg_rating'], 2)
         count = result[0]['count']
         
         await db.cigars.update_one(
