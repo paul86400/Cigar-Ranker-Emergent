@@ -44,7 +44,8 @@ export default function MyCommentsScreen() {
       setLoading(true);
       setError(null);
       console.log('Fetching my comments...');
-      const response = await api.get('/comments/my-comments');
+      // TEMPORARY: Use test endpoint
+      const response = await api.get('/comments/test-comments');
       console.log('My comments response:', response.data);
       console.log('Number of comments:', response.data?.length || 0);
       setComments(response.data);
