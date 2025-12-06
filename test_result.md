@@ -213,6 +213,18 @@ backend:
         agent: "testing"
         comment: "Store price comparison endpoint tested successfully. Returns mock price data for 3 stores as expected. API structure is correct and ready for real scraping integration."
 
+  - task: "User-Submitted Cigars (Add Cigar)"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented /cigars/add endpoint allowing authenticated users to add cigars to database. Includes duplicate detection (case-insensitive brand+name check) that returns existing cigar ID if found. Returns improved error messages for duplicates including brand, name, and cigar_id."
+
 frontend:
   - task: "Navigation Structure (Bottom Tabs)"
     implemented: true
