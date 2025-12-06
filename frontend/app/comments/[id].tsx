@@ -31,6 +31,7 @@ export default function CommentsScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [commentText, setCommentText] = useState('');
