@@ -240,6 +240,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#4CAF50',
   },
+  priceUnavailable: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#666',
+  },
   visitButton: {
     flexDirection: 'row',
     backgroundColor: '#8B4513',
