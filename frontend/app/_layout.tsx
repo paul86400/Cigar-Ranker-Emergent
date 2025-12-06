@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Image, StyleSheet, Animated } from 'react-native';
 import { Stack } from 'expo-router';
 import { AuthProvider } from '../contexts/AuthContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -10,12 +10,30 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [appIsReady, setAppIsReady] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     async function prepare() {
       try {
-        // Simulate loading time to show splash screen (minimum 2 seconds)
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Fade in animation
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }).start();
+
+        // Wait for minimum display time (2 seconds after fade in)
+        await new Promise(resolve => setTimeout(resolve, 2800));
+        
+        // Fade out animation
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 600,
+          useNativeDriver: true,
+        }).start(() => {
+          setShowSplash(false);
+        });
       } catch (e) {
         console.warn(e);
       } finally {
@@ -27,20 +45,22 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if (appIsReady) {
-      // Hide the splash screen after app is ready
+    if (appIsReady && !showSplash) {
+      // Hide the native splash screen after our custom one is done
       SplashScreen.hideAsync();
     }
-  }, [appIsReady]);
+  }, [appIsReady, showSplash]);
 
-  if (!appIsReady) {
+  if (showSplash) {
     return (
       <View style={styles.splashContainer}>
-        <Image
-          source={require('../assets/splash.png')}
-          style={styles.splashImage}
-          resizeMode="cover"
-        />
+        <Animated.View style={[styles.splashImageContainer, { opacity: fadeAnim }]}>
+          <Image
+            source={require('../assets/splash.png')}
+            style={styles.splashImage}
+            resizeMode="cover"
+          />
+        </Animated.View>
       </View>
     );
   }
