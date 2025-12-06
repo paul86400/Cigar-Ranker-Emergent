@@ -230,6 +230,14 @@ export default function CigarDetailsScreen() {
 
         <View style={styles.rateSection}>
           <Text style={styles.sectionTitle}>Rate this cigar</Text>
+          
+          {ratingSubmitted && (
+            <View style={styles.successBanner}>
+              <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />
+              <Text style={styles.successBannerText}>Rating submitted successfully!</Text>
+            </View>
+          )}
+          
           <View style={styles.sliderContainer}>
             <View style={styles.ratingDisplay}>
               <Text style={styles.ratingValue}>{userRating.toFixed(1)}</Text>
