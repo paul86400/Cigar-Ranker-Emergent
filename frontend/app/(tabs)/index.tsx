@@ -157,7 +157,7 @@ export default function HomeScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Cigar Ranker</Text>
+        <Text style={styles.headerTitle}>Cigar Ranker v1.0.1</Text>
         <TouchableOpacity 
           onPress={() => router.push('/add-cigar')}
           style={styles.addButton}
