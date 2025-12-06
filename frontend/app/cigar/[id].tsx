@@ -162,8 +162,9 @@ export default function CigarDetailsScreen() {
       <ScrollView style={styles.content}>
         <View style={styles.imageContainer}>
           <Image
-            source={{ uri: `data:image/png;base64,${cigar.image}` }}
+            source={{ uri: `data:image/jpeg;base64,${cigar.image}` }}
             style={styles.image}
+            resizeMode="contain"
           />
         </View>
 
