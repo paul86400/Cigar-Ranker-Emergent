@@ -104,26 +104,13 @@ export default function StoresScreen() {
               </View>
 
               <TouchableOpacity
-                style={[
-                  styles.visitButton,
-                  !store.in_stock && styles.visitButtonDisabled,
-                ]}
+                style={styles.visitButton}
                 onPress={() => handleOpenStore(store.url)}
-                disabled={!store.in_stock}
               >
-                <Text
-                  style={[
-                    styles.visitButtonText,
-                    !store.in_stock && styles.visitButtonTextDisabled,
-                  ]}
-                >
-                  {store.in_stock ? 'View on Website' : 'Check Website'}
+                <Text style={styles.visitButtonText}>
+                  {store.in_stock && store.price ? 'View on Website' : 'Search on Website'}
                 </Text>
-                <Ionicons 
-                  name="open-outline" 
-                  size={20} 
-                  color={store.in_stock ? "#fff" : "#888"} 
-                />
+                <Ionicons name="open-outline" size={20} color="#fff" />
               </TouchableOpacity>
             </View>
           ))}
