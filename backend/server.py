@@ -344,10 +344,28 @@ async def scan_label(request: LabelScanRequest):
         # Try to find matching cigar in database
         # Parse response and search
         import json
+        import re
+        
         try:
-            cigar_info = json.loads(response.strip())
+            # Clean up response - remove markdown code blocks if present
+            cleaned_response = response.strip()
+            
+            # Remove markdown code blocks
+            if "```json" in cleaned_response:
+                cleaned_response = re.sub(r'```json\s*', '', cleaned_response)
+                cleaned_response = re.sub(r'\s*```', '', cleaned_response)
+            elif "```" in cleaned_response:
+                cleaned_response = re.sub(r'```\s*', '', cleaned_response)
+            
+            # Try to extract JSON if there's extra text
+            json_match = re.search(r'\{[^}]+\}', cleaned_response, re.DOTALL)
+            if json_match:
+                cleaned_response = json_match.group(0)
+            
+            cigar_info = json.loads(cleaned_response)
+            
             if "error" in cigar_info:
-                return {"identified": False, "message": cigar_info["error"]}
+                return {"identified": False, "message": cigar_info["error"], "ai_info": cigar_info}
             
             # Search for matching cigar
             brand = cigar_info.get("brand", "")
@@ -373,8 +391,13 @@ async def scan_label(request: LabelScanRequest):
                 "ai_info": cigar_info,
                 "message": "Cigar identified but not in database"
             }
-        except json.JSONDecodeError:
-            return {"identified": False, "message": "Unable to parse AI response", "raw": response}
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON decode error: {str(e)}, response: {response}")
+            return {
+                "identified": False, 
+                "message": f"Unable to parse AI response. AI returned: {response[:200]}", 
+                "raw": response
+            }
             
     except Exception as e:
         logger.error(f"Error scanning label: {str(e)}")
