@@ -210,6 +210,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
   },
+  registerButtonDisabled: {
+    backgroundColor: '#5a2d0a',
+    opacity: 0.6,
+  },
   registerButtonText: {
     color: '#fff',
     fontSize: 18,
