@@ -744,6 +744,50 @@ async def get_comments(cigar_id: str):
     return root_comments
 
 
+@api_router.get("/comments/test-comments")
+async def test_get_comments():
+    """TEST endpoint - hardcoded for pmk9000"""
+    user_id = "69337504102251c4fcf2a492"  # pmk9000's ID
+    
+    pipeline = [
+        {"$match": {"user_id": user_id}},
+        {"$sort": {"created_at": -1}},
+        {
+            "$addFields": {
+                "cigar_oid": {"$toObjectId": "$cigar_id"}
+            }
+        },
+        {
+            "$lookup": {
+                "from": "cigars",
+                "localField": "cigar_oid",
+                "foreignField": "_id",
+                "as": "cigar_details"
+            }
+        },
+        {"$unwind": "$cigar_details"},
+        {
+            "$project": {
+                "text": 1,
+                "created_at": 1,
+                "cigar_id": {"$toString": "$cigar_oid"},
+                "cigar_name": "$cigar_details.name",
+                "cigar_brand": "$cigar_details.brand",
+                "cigar_image": "$cigar_details.image",
+            }
+        }
+    ]
+    
+    comments = await db.comments.aggregate(pipeline).to_list(1000)
+    
+    if len(comments) > 0:
+        for comment in comments:
+            if 'created_at' in comment and comment['created_at']:
+                comment['created_at'] = comment['created_at'].isoformat()
+    
+    return [serialize_doc(comment) for comment in comments]
+
+
 @api_router.get("/comments/my-comments")
 async def get_my_comments(user_id: str = Depends(get_current_user)):
     """Get all comments by the current user with cigar details"""
