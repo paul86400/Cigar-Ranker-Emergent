@@ -91,7 +91,7 @@ export default function MyRatingsScreen() {
             <Text style={styles.yourRatingLabel}>Your Rating:</Text>
             <View style={styles.ratingBadge}>
               <Ionicons name="star" size={16} color="#FFD700" />
-              <Text style={styles.ratingValue}>{rating.rating.toFixed(1)}</Text>
+              <Text style={styles.ratingValue}>{rating.rating.toFixed(2)}</Text>
             </View>
           </View>
           
@@ -100,7 +100,7 @@ export default function MyRatingsScreen() {
 
         {rating.average_rating && (
           <Text style={styles.avgRating}>
-            Community Avg: {rating.average_rating.toFixed(1)} ★
+            Community Avg: {rating.average_rating.toFixed(2)} ★
           </Text>
         )}
       </View>
