@@ -79,14 +79,14 @@ export default function StoresScreen() {
               <View style={styles.storeHeader}>
                 <View style={styles.storeInfo}>
                   <Text style={styles.storeName}>{store.store_name}</Text>
-                  {store.in_stock ? (
+                  {store.in_stock && store.price ? (
                     <View style={styles.stockBadge}>
-                      <Text style={styles.stockText}>In Stock</Text>
+                      <Text style={styles.stockText}>Price Found</Text>
                     </View>
                   ) : (
                     <View style={[styles.stockBadge, styles.stockBadgeOut]}>
                       <Text style={[styles.stockText, styles.stockTextOut]}>
-                        Price not available
+                        Check Retailer
                       </Text>
                     </View>
                   )}
