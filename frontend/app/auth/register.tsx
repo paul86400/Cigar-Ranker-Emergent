@@ -24,48 +24,67 @@ export default function RegisterScreen() {
   const [success, setSuccess] = useState(false);
 
   const handleRegister = async () => {
+    console.log('=== REGISTRATION FLOW START ===');
     console.log('Register button clicked');
     console.log('Username:', username, 'Email:', email, 'Password length:', password.length);
     
     if (!username || !email || !password) {
+      console.log('❌ Validation failed: Missing fields');
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     // Basic email validation
     if (!email.includes('@')) {
+      console.log('❌ Validation failed: Invalid email format');
       Alert.alert('Error', 'Please enter a valid email address');
       return;
     }
 
     // Basic password validation
     if (password.length < 6) {
+      console.log('❌ Validation failed: Password too short');
       Alert.alert('Error', 'Password must be at least 6 characters');
       return;
     }
 
+    console.log('✅ Validation passed');
+
     try {
       setLoading(true);
-      console.log('Calling register API...');
+      console.log('⏳ Calling register API...');
+      console.log('API endpoint: /auth/register');
+      console.log('Payload:', { username: username.trim(), email: email.trim().toLowerCase() });
+      
       await register(username.trim(), email.trim().toLowerCase(), password);
-      console.log('Registration successful!');
+      
+      console.log('✅ Registration successful!');
+      console.log('Setting success state to true...');
       
       // Show success state
       setSuccess(true);
+      console.log('Success state set to:', true);
       
       // Wait a moment to show the success message, then navigate
       setTimeout(() => {
-        console.log('Navigating to home...');
+        console.log('⏰ Timeout complete - Navigating to home...');
         router.replace('/(tabs)');
       }, 2000);
       
     } catch (error: any) {
-      console.error('Registration error:', error);
+      console.error('❌ Registration error caught:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
       setSuccess(false);
       const errorMessage = error.response?.data?.detail || error.message || 'Registration failed. Please try again.';
       Alert.alert('Registration Failed', errorMessage);
     } finally {
+      console.log('Finally block - setting loading to false');
       setLoading(false);
+      console.log('=== REGISTRATION FLOW END ===');
     }
   };
 
