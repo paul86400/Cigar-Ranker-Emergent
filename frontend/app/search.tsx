@@ -172,7 +172,7 @@ export default function AdvancedSearchScreen() {
           <Text style={styles.label}>Price Range</Text>
           <View style={styles.priceRow}>
             <TextInput
-              style={[styles.input, { flex: 1 }]}
+              style={[styles.input, styles.minPriceInput]}
               placeholder="Min $"
               placeholderTextColor="#888"
               value={minPrice}
@@ -181,7 +181,7 @@ export default function AdvancedSearchScreen() {
             />
             <Text style={styles.priceSeparator}>-</Text>
             <TextInput
-              style={[styles.input, { flex: 1 }]}
+              style={[styles.input, styles.maxPriceInput]}
               placeholder="Max $"
               placeholderTextColor="#888"
               value={maxPrice}
