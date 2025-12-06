@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: '900',
-    color: '#fff',
+    color: '#8B4513',
     letterSpacing: 2,
   },
   searchContainer: {
