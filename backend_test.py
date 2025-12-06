@@ -17,26 +17,40 @@ class CigarRankerTester:
     def __init__(self):
         self.base_url = BACKEND_URL
         self.session = requests.Session()
-        self.test_results = []
         self.auth_token = None
+        self.test_user_id = None
+        self.results = []
         
-    def log_test(self, test_name, success, details="", error=""):
-        """Log test results"""
-        result = {
+    def log_result(self, test_name: str, success: bool, message: str, details: Any = None):
+        """Log test result"""
+        status = "✅ PASS" if success else "❌ FAIL"
+        print(f"{status} {test_name}: {message}")
+        if details and not success:
+            print(f"   Details: {details}")
+        
+        self.results.append({
             "test": test_name,
             "success": success,
-            "details": details,
-            "error": error,
-            "timestamp": datetime.now().isoformat()
-        }
-        self.test_results.append(result)
-        status = "✅ PASS" if success else "❌ FAIL"
-        print(f"{status} {test_name}")
-        if details:
-            print(f"   Details: {details}")
-        if error:
-            print(f"   Error: {error}")
-        print()
+            "message": message,
+            "details": details
+        })
+    
+    def make_request(self, method: str, endpoint: str, **kwargs) -> requests.Response:
+        """Make HTTP request with proper error handling"""
+        url = f"{self.base_url}{endpoint}"
+        
+        # Add auth header if token exists
+        if self.auth_token:
+            if 'headers' not in kwargs:
+                kwargs['headers'] = {}
+            kwargs['headers']['Authorization'] = f"Bearer {self.auth_token}"
+        
+        try:
+            response = self.session.request(method, url, timeout=30, **kwargs)
+            return response
+        except requests.exceptions.RequestException as e:
+            print(f"Request failed: {e}")
+            raise
 
     def test_registration_valid_data(self):
         """Test user registration with valid data"""
