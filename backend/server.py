@@ -329,6 +329,13 @@ async def upload_cigar_image_base64(
         image_data = base64.b64decode(image_base64)
         image = Image.open(BytesIO(image_data))
         
+        # Handle EXIF orientation to prevent rotation issues
+        try:
+            from PIL import ImageOps
+            image = ImageOps.exif_transpose(image)
+        except Exception:
+            pass  # If no EXIF data, just continue
+        
         # Convert to RGB if needed
         if image.mode != 'RGB':
             image = image.convert('RGB')
