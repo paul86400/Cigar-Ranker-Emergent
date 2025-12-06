@@ -117,11 +117,13 @@ export default function StoresScreen() {
                     !store.in_stock && styles.visitButtonTextDisabled,
                   ]}
                 >
-                  {store.in_stock ? 'Visit Store' : 'Out of Stock'}
+                  {store.in_stock ? 'View on Website' : 'Check Website'}
                 </Text>
-                {store.in_stock && (
-                  <Ionicons name="open-outline" size={20} color="#fff" />
-                )}
+                <Ionicons 
+                  name="open-outline" 
+                  size={20} 
+                  color={store.in_stock ? "#fff" : "#888"} 
+                />
               </TouchableOpacity>
             </View>
           ))}
