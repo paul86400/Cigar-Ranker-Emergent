@@ -263,6 +263,20 @@ const styles = StyleSheet.create({
   eyeButton: {
     padding: 8,
   },
+  passwordContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  passwordInput: {
+    flex: 1,
+    height: 56,
+    color: '#fff',
+    fontSize: 16,
+  },
+  eyeButton: {
+    padding: 8,
+  },
   registerButton: {
     backgroundColor: '#8B4513',
     borderRadius: 12,
