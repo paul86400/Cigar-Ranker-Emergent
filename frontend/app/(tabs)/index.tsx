@@ -156,13 +156,13 @@ export default function HomeScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Cigar Ranker v1.0.1</Text>
+      <View style={[styles.header, { backgroundColor: '#FF0000' }]}>
+        <Text style={[styles.headerTitle, { color: '#FFFFFF' }]}>🔴 NEW CODE v1.0.1 🔴</Text>
         <TouchableOpacity 
           onPress={() => router.push('/add-cigar')}
           style={styles.addButton}
         >
-          <Ionicons name="add-circle" size={28} color="#8B4513" />
+          <Ionicons name="add-circle" size={28} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
 
