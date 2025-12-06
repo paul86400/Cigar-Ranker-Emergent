@@ -372,8 +372,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "User-Submitted Cigars (Add Cigar)"
     - "Add Cigar Screen with FAB"
+    - "AI Label Recognition (OpenAI Vision)"
+    - "Rating System"
+    - "Comments System (Reddit-style)"
+    - "Favorites System"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
