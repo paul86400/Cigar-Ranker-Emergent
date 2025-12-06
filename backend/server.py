@@ -233,7 +233,8 @@ async def search_cigars(
         "name": 1, "brand": 1, "image": 1, "strength": 1, 
         "origin": 1, "average_rating": 1, "rating_count": 1, "price_range": 1
     }
-    cigars = await db.cigars.find(query, projection).limit(50).to_list(50)
+    # Sort by average_rating descending (highest rating first)
+    cigars = await db.cigars.find(query, projection).sort("average_rating", -1).limit(50).to_list(50)
     return [serialize_doc(cigar) for cigar in cigars]
 
 
