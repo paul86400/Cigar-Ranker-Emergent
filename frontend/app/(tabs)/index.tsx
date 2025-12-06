@@ -239,10 +239,23 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#333',
   },
+  titleContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '900',
     color: '#fff',
+    letterSpacing: 3,
+    lineHeight: 28,
+  },
+  headerSubtitle: {
+    fontSize: 28,
+    fontWeight: '900',
+    color: '#8B4513',
+    letterSpacing: 3,
+    lineHeight: 32,
   },
   searchContainer: {
     flexDirection: 'row',
