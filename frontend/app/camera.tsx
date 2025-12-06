@@ -22,6 +22,58 @@ export default function CameraScreen() {
   const [scanned, setScanned] = useState(false);
   const [scanning, setScanning] = useState(false);
 
+  // On web, camera doesn't work - show upload option instead
+  if (Platform.OS === 'web') {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity 
+            onPress={() => router.push('/(tabs)')}
+            style={styles.closeButton}
+            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+          >
+            <Ionicons name="close" size={28} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Identify Cigar</Text>
+          <View style={{ width: 28 }} />
+        </View>
+
+        <View style={styles.webContainer}>
+          <Ionicons name="camera-outline" size={80} color="#8B4513" />
+          <Text style={styles.webTitle}>Camera not available on web</Text>
+          <Text style={styles.webSubtitle}>
+            Upload an image of your cigar's label or barcode to identify it
+          </Text>
+          
+          <TouchableOpacity
+            style={styles.webUploadButton}
+            onPress={handlePickImage}
+            disabled={scanning}
+          >
+            <Ionicons name="cloud-upload" size={24} color="#fff" />
+            <Text style={styles.webUploadButtonText}>
+              {scanning ? 'Analyzing...' : 'Upload Image'}
+            </Text>
+          </TouchableOpacity>
+
+          {scanning && (
+            <View style={styles.scanningContainer}>
+              <ActivityIndicator size="small" color="#8B4513" />
+              <Text style={styles.scanningText}>Scanning image...</Text>
+            </View>
+          )}
+
+          <View style={styles.webNote}>
+            <Ionicons name="information-circle" size={20} color="#888" />
+            <Text style={styles.webNoteText}>
+              For full camera scanning, use Expo Go app on your mobile device
+            </Text>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   if (!permission) {
     return (
       <SafeAreaView style={styles.container}>
