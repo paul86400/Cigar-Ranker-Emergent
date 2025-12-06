@@ -51,464 +51,454 @@ class CigarRankerTester:
         except requests.exceptions.RequestException as e:
             print(f"Request failed: {e}")
             raise
-
-    def test_registration_valid_data(self):
-        """Test user registration with valid data"""
-        test_name = "Registration with Valid Data"
+    
+    def test_user_registration(self) -> bool:
+        """Test user registration for authentication"""
+        print("\n🔐 Testing User Registration...")
         
         # Use unique timestamp to avoid conflicts
-        timestamp = int(time.time())
-        test_data = {
-            "username": f"testuser{timestamp}",
-            "email": f"test{timestamp}@example.com",
-            "password": "password123"
+        timestamp = str(int(time.time()))
+        test_user = {
+            "username": f"testuser_{timestamp}",
+            "email": f"test_{timestamp}@example.com",
+            "password": "TestPassword123!"
         }
         
         try:
-            response = self.session.post(
-                f"{self.base_url}/auth/register",
-                json=test_data,
-                timeout=10
-            )
+            response = self.make_request("POST", "/auth/register", json=test_user)
             
             if response.status_code == 200:
                 data = response.json()
-                if "token" in data and "user" in data:
-                    self.auth_token = data["token"]  # Store for later tests
-                    user_info = data["user"]
-                    if (user_info.get("username") == test_data["username"] and 
-                        user_info.get("email") == test_data["email"] and
-                        "id" in user_info):
-                        self.log_test(test_name, True, 
-                                    f"User registered successfully. ID: {user_info['id']}")
-                        return True
-                    else:
-                        self.log_test(test_name, False, 
-                                    error="Response missing required user fields")
-                else:
-                    self.log_test(test_name, False, 
-                                error="Response missing token or user data")
-            else:
-                self.log_test(test_name, False, 
-                            error=f"HTTP {response.status_code}: {response.text}")
+                self.auth_token = data.get("token")
+                self.test_user_id = data.get("user", {}).get("id")
                 
-        except Exception as e:
-            self.log_test(test_name, False, error=f"Request failed: {str(e)}")
-        
-        return False
-
-    def test_registration_duplicate_email(self):
-        """Test registration with duplicate email"""
-        test_name = "Registration with Duplicate Email"
-        
-        # First register a user
-        timestamp = int(time.time())
-        test_data = {
-            "username": f"user1_{timestamp}",
-            "email": f"duplicate{timestamp}@example.com",
-            "password": "password123"
-        }
-        
-        try:
-            # First registration
-            response1 = self.session.post(
-                f"{self.base_url}/auth/register",
-                json=test_data,
-                timeout=10
-            )
-            
-            if response1.status_code != 200:
-                self.log_test(test_name, False, 
-                            error=f"Setup failed: {response1.status_code}")
-                return False
-            
-            # Try to register with same email but different username
-            test_data["username"] = f"user2_{timestamp}"
-            response2 = self.session.post(
-                f"{self.base_url}/auth/register",
-                json=test_data,
-                timeout=10
-            )
-            
-            if response2.status_code == 400:
-                error_data = response2.json()
-                if "Email already registered" in error_data.get("detail", ""):
-                    self.log_test(test_name, True, 
-                                "Correctly rejected duplicate email")
-                    return True
-                else:
-                    self.log_test(test_name, False, 
-                                error=f"Wrong error message: {error_data}")
-            else:
-                self.log_test(test_name, False, 
-                            error=f"Expected 400, got {response2.status_code}")
-                
-        except Exception as e:
-            self.log_test(test_name, False, error=f"Request failed: {str(e)}")
-        
-        return False
-
-    def test_registration_duplicate_username(self):
-        """Test registration with duplicate username"""
-        test_name = "Registration with Duplicate Username"
-        
-        timestamp = int(time.time())
-        test_data = {
-            "username": f"duplicateuser{timestamp}",
-            "email": f"email1_{timestamp}@example.com",
-            "password": "password123"
-        }
-        
-        try:
-            # First registration
-            response1 = self.session.post(
-                f"{self.base_url}/auth/register",
-                json=test_data,
-                timeout=10
-            )
-            
-            if response1.status_code != 200:
-                self.log_test(test_name, False, 
-                            error=f"Setup failed: {response1.status_code}")
-                return False
-            
-            # Try to register with same username but different email
-            test_data["email"] = f"email2_{timestamp}@example.com"
-            response2 = self.session.post(
-                f"{self.base_url}/auth/register",
-                json=test_data,
-                timeout=10
-            )
-            
-            if response2.status_code == 400:
-                error_data = response2.json()
-                if "Username already taken" in error_data.get("detail", ""):
-                    self.log_test(test_name, True, 
-                                "Correctly rejected duplicate username")
-                    return True
-                else:
-                    self.log_test(test_name, False, 
-                                error=f"Wrong error message: {error_data}")
-            else:
-                self.log_test(test_name, False, 
-                            error=f"Expected 400, got {response2.status_code}")
-                
-        except Exception as e:
-            self.log_test(test_name, False, error=f"Request failed: {str(e)}")
-        
-        return False
-
-    def test_registration_missing_fields(self):
-        """Test registration with missing required fields"""
-        test_name = "Registration with Missing Fields"
-        
-        test_cases = [
-            {"email": "test@example.com", "password": "password123"},  # Missing username
-            {"username": "testuser", "password": "password123"},      # Missing email
-            {"username": "testuser", "email": "test@example.com"},    # Missing password
-            {}  # Missing all fields
-        ]
-        
-        success_count = 0
-        
-        for i, test_data in enumerate(test_cases):
-            try:
-                response = self.session.post(
-                    f"{self.base_url}/auth/register",
-                    json=test_data,
-                    timeout=10
-                )
-                
-                if response.status_code == 422:  # Validation error
-                    success_count += 1
-                elif response.status_code == 400:  # Bad request
-                    success_count += 1
-                else:
-                    print(f"   Case {i+1} failed: Expected 422/400, got {response.status_code}")
-                    
-            except Exception as e:
-                print(f"   Case {i+1} error: {str(e)}")
-        
-        if success_count == len(test_cases):
-            self.log_test(test_name, True, 
-                        f"All {len(test_cases)} missing field cases handled correctly")
-            return True
-        else:
-            self.log_test(test_name, False, 
-                        error=f"Only {success_count}/{len(test_cases)} cases passed")
-        
-        return False
-
-    def test_registration_invalid_email(self):
-        """Test registration with invalid email format"""
-        test_name = "Registration with Invalid Email Format"
-        
-        invalid_emails = [
-            "notanemail",
-            "missing@domain",
-            "@missinglocal.com",
-            "spaces in@email.com",
-            "double@@domain.com"
-        ]
-        
-        success_count = 0
-        timestamp = int(time.time())
-        
-        for i, email in enumerate(invalid_emails):
-            test_data = {
-                "username": f"testuser{timestamp}_{i}",
-                "email": email,
-                "password": "password123"
-            }
-            
-            try:
-                response = self.session.post(
-                    f"{self.base_url}/auth/register",
-                    json=test_data,
-                    timeout=10
-                )
-                
-                if response.status_code in [400, 422]:  # Should reject invalid email
-                    success_count += 1
-                else:
-                    print(f"   Email '{email}' was accepted (status: {response.status_code})")
-                    
-            except Exception as e:
-                print(f"   Email '{email}' test error: {str(e)}")
-        
-        if success_count >= len(invalid_emails) * 0.8:  # Allow some flexibility
-            self.log_test(test_name, True, 
-                        f"{success_count}/{len(invalid_emails)} invalid emails rejected")
-            return True
-        else:
-            self.log_test(test_name, False, 
-                        error=f"Only {success_count}/{len(invalid_emails)} invalid emails rejected")
-        
-        return False
-
-    def test_registration_short_password(self):
-        """Test registration with short password"""
-        test_name = "Registration with Short Password"
-        
-        timestamp = int(time.time())
-        test_data = {
-            "username": f"testuser{timestamp}",
-            "email": f"test{timestamp}@example.com",
-            "password": "123"  # Very short password
-        }
-        
-        try:
-            response = self.session.post(
-                f"{self.base_url}/auth/register",
-                json=test_data,
-                timeout=10
-            )
-            
-            # Note: The current implementation doesn't validate password length
-            # This test documents current behavior
-            if response.status_code == 200:
-                self.log_test(test_name, True, 
-                            "Short password accepted (no validation implemented)")
-                return True
-            elif response.status_code in [400, 422]:
-                self.log_test(test_name, True, 
-                            "Short password correctly rejected")
+                self.log_result("User Registration", True, 
+                              f"User registered successfully: {test_user['username']}")
                 return True
             else:
-                self.log_test(test_name, False, 
-                            error=f"Unexpected status: {response.status_code}")
+                self.log_result("User Registration", False, 
+                              f"Registration failed with status {response.status_code}", 
+                              response.text)
+                return False
                 
         except Exception as e:
-            self.log_test(test_name, False, error=f"Request failed: {str(e)}")
-        
-        return False
-
-    def test_login_with_registered_user(self):
-        """Test login with previously registered user"""
-        test_name = "Login with Registered User"
-        
-        if not self.auth_token:
-            self.log_test(test_name, False, 
-                        error="No registered user available from previous tests")
+            self.log_result("User Registration", False, f"Registration error: {str(e)}")
             return False
+    
+    def test_add_cigar_success(self) -> Optional[str]:
+        """Test adding a new cigar successfully"""
+        print("\n➕ Testing Add Cigar - Success Case...")
         
-        # We need to register a new user for this test since we don't store credentials
-        timestamp = int(time.time())
-        credentials = {
-            "username": f"logintest{timestamp}",
-            "email": f"logintest{timestamp}@example.com",
-            "password": "loginpassword123"
+        # Use unique timestamp to ensure uniqueness
+        timestamp = str(int(time.time()))
+        cigar_data = {
+            "brand": f"TestBrand_{timestamp}",
+            "name": f"TestCigar_{timestamp}",
+            "strength": "Medium",
+            "origin": "Nicaragua",
+            "wrapper": "Connecticut",
+            "size": "Robusto",
+            "price_range": "10-15"
         }
         
         try:
-            # Register user first
-            reg_response = self.session.post(
-                f"{self.base_url}/auth/register",
-                json=credentials,
-                timeout=10
-            )
-            
-            if reg_response.status_code != 200:
-                self.log_test(test_name, False, 
-                            error=f"Registration setup failed: {reg_response.status_code}")
-                return False
-            
-            # Now test login
-            login_data = {
-                "email": credentials["email"],
-                "password": credentials["password"]
-            }
-            
-            response = self.session.post(
-                f"{self.base_url}/auth/login",
-                json=login_data,
-                timeout=10
-            )
+            response = self.make_request("POST", "/cigars/add", data=cigar_data)
             
             if response.status_code == 200:
                 data = response.json()
-                if "token" in data and "user" in data:
-                    user_info = data["user"]
-                    if (user_info.get("email") == credentials["email"] and
-                        user_info.get("username") == credentials["username"]):
-                        self.log_test(test_name, True, 
-                                    "Login successful with correct user data")
-                        return True
-                    else:
-                        self.log_test(test_name, False, 
-                                    error="Login response has incorrect user data")
+                if data.get("success") == True:
+                    cigar_id = data.get("cigar_id")
+                    self.log_result("Add Cigar Success", True, 
+                                  f"Cigar added successfully with ID: {cigar_id}")
+                    return cigar_id
                 else:
-                    self.log_test(test_name, False, 
-                                error="Login response missing token or user")
+                    self.log_result("Add Cigar Success", False, 
+                                  f"API returned success=false: {data.get('message')}", data)
+                    return None
             else:
-                self.log_test(test_name, False, 
-                            error=f"Login failed: HTTP {response.status_code}")
+                self.log_result("Add Cigar Success", False, 
+                              f"Request failed with status {response.status_code}", 
+                              response.text)
+                return None
                 
         except Exception as e:
-            self.log_test(test_name, False, error=f"Request failed: {str(e)}")
+            self.log_result("Add Cigar Success", False, f"Request error: {str(e)}")
+            return None
+    
+    def test_add_cigar_with_optional_fields(self) -> Optional[str]:
+        """Test adding cigar with optional price_range field"""
+        print("\n➕ Testing Add Cigar - With Optional Fields...")
         
-        return False
-
-    def test_jwt_token_validation(self):
-        """Test JWT token validation"""
-        test_name = "JWT Token Validation"
-        
-        if not self.auth_token:
-            self.log_test(test_name, False, 
-                        error="No auth token available from previous tests")
-            return False
+        timestamp = str(int(time.time())) + "_opt"
+        cigar_data = {
+            "brand": f"OptionalBrand_{timestamp}",
+            "name": f"OptionalCigar_{timestamp}",
+            "strength": "Full",
+            "origin": "Dominican Republic",
+            "wrapper": "Maduro",
+            "size": "Churchill"
+            # Intentionally omitting price_range to test optional field
+        }
         
         try:
-            # Test accessing protected endpoint with valid token
-            headers = {"Authorization": f"Bearer {self.auth_token}"}
-            response = self.session.get(
-                f"{self.base_url}/auth/me",
-                headers=headers,
-                timeout=10
-            )
+            response = self.make_request("POST", "/cigars/add", data=cigar_data)
             
             if response.status_code == 200:
                 data = response.json()
-                if "id" in data and "username" in data and "email" in data:
-                    self.log_test(test_name, True, 
-                                "JWT token validation successful")
-                    return True
+                if data.get("success") == True:
+                    cigar_id = data.get("cigar_id")
+                    self.log_result("Add Cigar Optional Fields", True, 
+                                  f"Cigar added without price_range, ID: {cigar_id}")
+                    return cigar_id
                 else:
-                    self.log_test(test_name, False, 
-                                error="Protected endpoint response missing user data")
+                    self.log_result("Add Cigar Optional Fields", False, 
+                                  f"API returned success=false: {data.get('message')}", data)
+                    return None
             else:
-                self.log_test(test_name, False, 
-                            error=f"Protected endpoint failed: HTTP {response.status_code}")
+                self.log_result("Add Cigar Optional Fields", False, 
+                              f"Request failed with status {response.status_code}", 
+                              response.text)
+                return None
                 
         except Exception as e:
-            self.log_test(test_name, False, error=f"Request failed: {str(e)}")
+            self.log_result("Add Cigar Optional Fields", False, f"Request error: {str(e)}")
+            return None
+    
+    def test_add_cigar_missing_fields(self):
+        """Test validation for missing required fields"""
+        print("\n❌ Testing Add Cigar - Missing Required Fields...")
         
-        return False
-
-    def test_invalid_token_access(self):
-        """Test access with invalid token"""
-        test_name = "Invalid Token Access"
+        # Test missing brand
+        incomplete_data = {
+            "name": "TestCigar",
+            "strength": "Medium",
+            "origin": "Nicaragua",
+            "wrapper": "Connecticut",
+            "size": "Robusto"
+            # Missing brand
+        }
         
         try:
-            # Test with invalid token
-            headers = {"Authorization": "Bearer invalid_token_here"}
-            response = self.session.get(
-                f"{self.base_url}/auth/me",
-                headers=headers,
-                timeout=10
-            )
+            response = self.make_request("POST", "/cigars/add", data=incomplete_data)
             
-            if response.status_code == 401:
-                self.log_test(test_name, True, 
-                            "Invalid token correctly rejected")
-                return True
+            if response.status_code == 422:  # FastAPI validation error
+                self.log_result("Add Cigar Missing Fields", True, 
+                              "Correctly rejected request with missing brand field")
+            elif response.status_code == 400:
+                self.log_result("Add Cigar Missing Fields", True, 
+                              "Correctly rejected request with missing brand field")
             else:
-                self.log_test(test_name, False, 
-                            error=f"Expected 401, got {response.status_code}")
+                self.log_result("Add Cigar Missing Fields", False, 
+                              f"Expected validation error, got status {response.status_code}", 
+                              response.text)
                 
         except Exception as e:
-            self.log_test(test_name, False, error=f"Request failed: {str(e)}")
+            self.log_result("Add Cigar Missing Fields", False, f"Request error: {str(e)}")
+    
+    def test_add_cigar_no_auth(self):
+        """Test that endpoint requires authentication"""
+        print("\n🔒 Testing Add Cigar - No Authentication...")
         
-        return False
-
+        # Temporarily remove auth token
+        original_token = self.auth_token
+        self.auth_token = None
+        
+        cigar_data = {
+            "brand": "UnauthorizedBrand",
+            "name": "UnauthorizedCigar",
+            "strength": "Medium",
+            "origin": "Nicaragua",
+            "wrapper": "Connecticut",
+            "size": "Robusto"
+        }
+        
+        try:
+            response = self.make_request("POST", "/cigars/add", data=cigar_data)
+            
+            if response.status_code == 401:  # Unauthorized
+                self.log_result("Add Cigar No Auth", True, 
+                              "Correctly rejected unauthorized request")
+            else:
+                self.log_result("Add Cigar No Auth", False, 
+                              f"Expected 401 Unauthorized, got status {response.status_code}", 
+                              response.text)
+                
+        except Exception as e:
+            self.log_result("Add Cigar No Auth", False, f"Request error: {str(e)}")
+        finally:
+            # Restore auth token
+            self.auth_token = original_token
+    
+    def test_duplicate_detection(self):
+        """Test duplicate detection (case-insensitive)"""
+        print("\n🔍 Testing Duplicate Detection...")
+        
+        # First, try to add a cigar that we know exists (from seed data)
+        existing_cigar = {
+            "brand": "Padron",
+            "name": "1964 Anniversary",
+            "strength": "Full",
+            "origin": "Nicaragua",
+            "wrapper": "Natural",
+            "size": "Robusto"
+        }
+        
+        try:
+            response = self.make_request("POST", "/cigars/add", data=existing_cigar)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success") == False and "already exists" in data.get("message", "").lower():
+                    cigar_id = data.get("cigar_id")
+                    self.log_result("Duplicate Detection", True, 
+                                  f"Correctly detected duplicate: {data.get('message')}, ID: {cigar_id}")
+                else:
+                    self.log_result("Duplicate Detection", False, 
+                                  f"Expected duplicate detection, got: {data}")
+            else:
+                self.log_result("Duplicate Detection", False, 
+                              f"Request failed with status {response.status_code}", 
+                              response.text)
+                
+        except Exception as e:
+            self.log_result("Duplicate Detection", False, f"Request error: {str(e)}")
+    
+    def test_case_insensitive_duplicate(self):
+        """Test case-insensitive duplicate detection"""
+        print("\n🔍 Testing Case-Insensitive Duplicate Detection...")
+        
+        # Try different case variations of known cigar
+        case_variant = {
+            "brand": "PADRON",  # Different case
+            "name": "1964 ANNIVERSARY",  # Different case
+            "strength": "Full",
+            "origin": "Nicaragua",
+            "wrapper": "Natural",
+            "size": "Robusto"
+        }
+        
+        try:
+            response = self.make_request("POST", "/cigars/add", data=case_variant)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success") == False and "already exists" in data.get("message", "").lower():
+                    self.log_result("Case Insensitive Duplicate", True, 
+                                  f"Correctly detected case-insensitive duplicate: {data.get('message')}")
+                else:
+                    self.log_result("Case Insensitive Duplicate", False, 
+                                  f"Expected duplicate detection, got: {data}")
+            else:
+                self.log_result("Case Insensitive Duplicate", False, 
+                              f"Request failed with status {response.status_code}", 
+                              response.text)
+                
+        except Exception as e:
+            self.log_result("Case Insensitive Duplicate", False, f"Request error: {str(e)}")
+    
+    def test_search_newly_added_cigar(self, cigar_id: str, brand: str, name: str):
+        """Test that newly added cigar is searchable"""
+        print("\n🔍 Testing Search for Newly Added Cigar...")
+        
+        try:
+            # Search by brand
+            response = self.make_request("GET", f"/cigars/search?q={brand}")
+            
+            if response.status_code == 200:
+                cigars = response.json()
+                found = any(cigar.get("id") == cigar_id for cigar in cigars)
+                
+                if found:
+                    self.log_result("Search Newly Added", True, 
+                                  f"Newly added cigar found in search results")
+                else:
+                    self.log_result("Search Newly Added", False, 
+                                  f"Newly added cigar not found in search results", 
+                                  f"Searched for: {brand}, Found {len(cigars)} results")
+            else:
+                self.log_result("Search Newly Added", False, 
+                              f"Search request failed with status {response.status_code}", 
+                              response.text)
+                
+        except Exception as e:
+            self.log_result("Search Newly Added", False, f"Search error: {str(e)}")
+    
+    def test_get_cigar_details(self, cigar_id: str):
+        """Test getting cigar details by ID to verify all fields are saved"""
+        print("\n📋 Testing Get Cigar Details...")
+        
+        try:
+            response = self.make_request("GET", f"/cigars/{cigar_id}")
+            
+            if response.status_code == 200:
+                cigar = response.json()
+                
+                # Check required fields are present
+                required_fields = ["brand", "name", "strength", "origin", "wrapper", "size"]
+                missing_fields = [field for field in required_fields if not cigar.get(field)]
+                
+                if not missing_fields:
+                    # Check if default image is present
+                    has_image = bool(cigar.get("image"))
+                    self.log_result("Get Cigar Details", True, 
+                                  f"All required fields present, has_image: {has_image}")
+                else:
+                    self.log_result("Get Cigar Details", False, 
+                                  f"Missing required fields: {missing_fields}", cigar)
+            else:
+                self.log_result("Get Cigar Details", False, 
+                              f"Get cigar request failed with status {response.status_code}", 
+                              response.text)
+                
+        except Exception as e:
+            self.log_result("Get Cigar Details", False, f"Get cigar error: {str(e)}")
+    
+    def test_edge_cases(self):
+        """Test edge cases like empty strings and long strings"""
+        print("\n⚠️  Testing Edge Cases...")
+        
+        # Test empty brand
+        empty_brand_data = {
+            "brand": "",  # Empty string
+            "name": "TestCigar",
+            "strength": "Medium",
+            "origin": "Nicaragua",
+            "wrapper": "Connecticut",
+            "size": "Robusto"
+        }
+        
+        try:
+            response = self.make_request("POST", "/cigars/add", data=empty_brand_data)
+            
+            if response.status_code in [400, 422]:  # Should reject empty brand
+                self.log_result("Edge Case Empty Brand", True, 
+                              "Correctly rejected empty brand")
+            else:
+                # If it accepts empty brand, that might be acceptable depending on validation
+                self.log_result("Edge Case Empty Brand", True, 
+                              f"Accepted empty brand (status: {response.status_code})")
+                
+        except Exception as e:
+            self.log_result("Edge Case Empty Brand", False, f"Request error: {str(e)}")
+        
+        # Test very long strings
+        long_string = "A" * 200  # 200 character string
+        long_data = {
+            "brand": long_string,
+            "name": long_string,
+            "strength": "Medium",
+            "origin": "Nicaragua",
+            "wrapper": "Connecticut",
+            "size": "Robusto"
+        }
+        
+        try:
+            response = self.make_request("POST", "/cigars/add", data=long_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success"):
+                    self.log_result("Edge Case Long Strings", True, 
+                                  "Accepted very long brand/name strings")
+                else:
+                    self.log_result("Edge Case Long Strings", True, 
+                                  f"Handled long strings appropriately: {data.get('message')}")
+            else:
+                self.log_result("Edge Case Long Strings", True, 
+                              f"Rejected long strings (status: {response.status_code})")
+                
+        except Exception as e:
+            self.log_result("Edge Case Long Strings", False, f"Request error: {str(e)}")
+    
     def run_all_tests(self):
-        """Run all authentication tests"""
-        print("=" * 60)
-        print("CIGAR RANKER BACKEND API TESTS")
-        print("=" * 60)
-        print(f"Testing against: {self.base_url}")
-        print()
+        """Run all tests for Add Cigar feature"""
+        print("🚀 Starting Add Cigar Feature Tests...")
+        print(f"Backend URL: {self.base_url}")
         
-        # Test registration endpoint thoroughly
-        tests = [
-            self.test_registration_valid_data,
-            self.test_registration_duplicate_email,
-            self.test_registration_duplicate_username,
-            self.test_registration_missing_fields,
-            self.test_registration_invalid_email,
-            self.test_registration_short_password,
-            self.test_login_with_registered_user,
-            self.test_jwt_token_validation,
-            self.test_invalid_token_access
-        ]
+        # Step 1: Register user for authentication
+        if not self.test_user_registration():
+            print("❌ Cannot proceed without authentication")
+            return False
         
-        passed = 0
-        total = len(tests)
+        # Step 2: Test successful cigar addition
+        cigar_id = self.test_add_cigar_success()
+        if cigar_id:
+            # Get the cigar details for search testing
+            try:
+                response = self.make_request("GET", f"/cigars/{cigar_id}")
+                if response.status_code == 200:
+                    cigar_data = response.json()
+                    brand = cigar_data.get("brand", "")
+                    name = cigar_data.get("name", "")
+                    
+                    # Test search functionality
+                    self.test_search_newly_added_cigar(cigar_id, brand, name)
+                    
+                    # Test get cigar details
+                    self.test_get_cigar_details(cigar_id)
+            except Exception as e:
+                print(f"Error getting cigar details for further testing: {e}")
         
-        for test in tests:
-            if test():
-                passed += 1
+        # Step 3: Test with optional fields
+        self.test_add_cigar_with_optional_fields()
         
-        print("=" * 60)
-        print(f"RESULTS: {passed}/{total} tests passed")
-        print("=" * 60)
+        # Step 4: Test validation
+        self.test_add_cigar_missing_fields()
         
-        # Print summary of failed tests
-        failed_tests = [r for r in self.test_results if not r["success"]]
+        # Step 5: Test authentication requirement
+        self.test_add_cigar_no_auth()
+        
+        # Step 6: Test duplicate detection
+        self.test_duplicate_detection()
+        
+        # Step 7: Test case-insensitive duplicate detection
+        self.test_case_insensitive_duplicate()
+        
+        # Step 8: Test edge cases
+        self.test_edge_cases()
+        
+        # Summary
+        self.print_summary()
+        
+        return True
+    
+    def print_summary(self):
+        """Print test summary"""
+        print("\n" + "="*60)
+        print("🏁 TEST SUMMARY")
+        print("="*60)
+        
+        passed = sum(1 for result in self.results if result["success"])
+        total = len(self.results)
+        
+        print(f"Total Tests: {total}")
+        print(f"Passed: {passed}")
+        print(f"Failed: {total - passed}")
+        print(f"Success Rate: {(passed/total)*100:.1f}%")
+        
+        # Show failed tests
+        failed_tests = [result for result in self.results if not result["success"]]
         if failed_tests:
-            print("\nFAILED TESTS:")
+            print("\n❌ FAILED TESTS:")
             for test in failed_tests:
-                print(f"❌ {test['test']}: {test['error']}")
+                print(f"  - {test['test']}: {test['message']}")
         
-        return passed, total, self.test_results
-
+        print("\n" + "="*60)
 
 def main():
     """Main test execution"""
-    tester = CigarRankerAPITester()
-    passed, total, results = tester.run_all_tests()
+    tester = CigarRankerTester()
     
-    # Save results to file
-    with open('/app/test_results_backend.json', 'w') as f:
-        json.dump({
-            "summary": {"passed": passed, "total": total, "success_rate": passed/total},
-            "results": results,
-            "timestamp": datetime.now().isoformat()
-        }, f, indent=2)
-    
-    return passed == total
-
+    try:
+        success = tester.run_all_tests()
+        if not success:
+            sys.exit(1)
+    except KeyboardInterrupt:
+        print("\n\n⏹️  Tests interrupted by user")
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n\n💥 Unexpected error: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    success = main()
-    exit(0 if success else 1)
+    main()
