@@ -244,6 +244,13 @@ const styles = StyleSheet.create({
     padding: 16,
     color: '#fff',
     fontSize: 16,
+    outlineStyle: 'none',
+  },
+  minPriceInput: {
+    flex: 0.7,
+  },
+  maxPriceInput: {
+    flex: 1,
   },
   optionsRow: {
     flexDirection: 'row',
