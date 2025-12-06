@@ -212,6 +212,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#fff',
   },
+  addCigarMenuItem: {
+    borderWidth: 2,
+    borderColor: '#4CAF50',
+  },
+  addCigarText: {
+    color: '#4CAF50',
+    fontWeight: 'bold',
+  },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
