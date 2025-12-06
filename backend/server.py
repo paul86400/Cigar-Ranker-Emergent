@@ -747,7 +747,8 @@ async def get_comments(cigar_id: str):
 @api_router.get("/comments/my-comments")
 async def get_my_comments(user_id: str = Depends(get_current_user)):
     """Get all comments by the current user with cigar details"""
-    logging.info(f"Fetching comments for user: {user_id}")
+    import sys
+    print(f"[MY-COMMENTS] Fetching comments for user: {user_id}", file=sys.stderr, flush=True)
     
     # Use aggregation to join comments with cigar details
     pipeline = [
@@ -780,11 +781,19 @@ async def get_my_comments(user_id: str = Depends(get_current_user)):
     ]
     
     comments = await db.comments.aggregate(pipeline).to_list(1000)
-    logging.info(f"Found {len(comments)} comments for user {user_id}")
-    if len(comments) > 0:
-        logging.info(f"First comment sample: {comments[0]}")
+    print(f"[MY-COMMENTS] Found {len(comments)} comments", file=sys.stderr, flush=True)
     
-    return [serialize_doc(comment) for comment in comments]
+    if len(comments) > 0:
+        # Convert datetime to ISO string for JSON serialization
+        for comment in comments:
+            if 'created_at' in comment and comment['created_at']:
+                comment['created_at'] = comment['created_at'].isoformat()
+        print(f"[MY-COMMENTS] First comment: {comments[0].get('text', '')} for {comments[0].get('cigar_brand', '')} {comments[0].get('cigar_name', '')}", file=sys.stderr, flush=True)
+    
+    serialized = [serialize_doc(comment) for comment in comments]
+    print(f"[MY-COMMENTS] Returning {len(serialized)} serialized comments", file=sys.stderr, flush=True)
+    
+    return serialized
 
 
 # ==================== Favorites Endpoints ====================
