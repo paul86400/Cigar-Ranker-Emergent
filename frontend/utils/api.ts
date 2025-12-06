@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -10,10 +11,18 @@ const api = axios.create({
   },
 });
 
+// Storage helper with web fallback
+async function getStoredToken(): Promise<string | null> {
+  if (Platform.OS === 'web') {
+    return localStorage.getItem('authToken');
+  }
+  return await SecureStore.getItemAsync('authToken');
+}
+
 // Add auth token to requests
 api.interceptors.request.use(async (config) => {
   try {
-    const token = await SecureStore.getItemAsync('authToken');
+    const token = await getStoredToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
