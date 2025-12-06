@@ -40,6 +40,7 @@ export default function CigarDetailsScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { user, refreshUser } = useAuth();
+  const insets = useSafeAreaInsets();
   const [cigar, setCigar] = useState<Cigar | null>(null);
   const [loading, setLoading] = useState(true);
   const [userRating, setUserRating] = useState<number>(0);
