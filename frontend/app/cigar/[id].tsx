@@ -222,11 +222,15 @@ export default function CigarDetailsScreen() {
         <View style={styles.flavorSection}>
           <Text style={styles.sectionTitle}>Flavor Notes</Text>
           <View style={styles.flavorNotes}>
-            {cigar.flavor_notes.map((note, index) => (
-              <View key={index} style={styles.flavorNote}>
-                <Text style={styles.flavorNoteText}>{note}</Text>
-              </View>
-            ))}
+            {cigar.flavor_notes && cigar.flavor_notes.length > 0 ? (
+              cigar.flavor_notes.map((note, index) => (
+                <View key={index} style={styles.flavorNote}>
+                  <Text style={styles.flavorNoteText}>{note}</Text>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.noDataText}>No flavor notes available</Text>
+            )}
           </View>
         </View>
 
