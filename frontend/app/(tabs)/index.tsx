@@ -423,7 +423,17 @@ const styles = StyleSheet.create({
   advancedSearchButton: {
     padding: 8,
   },
-  addButton: {
-    padding: 4,
+  fab: {
+    position: 'absolute',
+    right: 16,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#8B4513',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
+    elevation: 8,
+    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.3)',
   },
 });
