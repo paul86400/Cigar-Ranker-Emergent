@@ -155,81 +155,70 @@ export default function HomeScreen() {
   );
 
   return (
-    <>
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Cigar Ranker</Text>
-          <TouchableOpacity 
-            onPress={() => router.push('/search')}
-            style={styles.advancedSearchButton}
-          >
-            <Ionicons name="options-outline" size={24} color="#fff" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.searchContainer}>
-          <TouchableOpacity
-            style={styles.cameraButton}
-            onPress={() => router.push('/camera')}
-          >
-            <Ionicons name="camera" size={24} color="#fff" />
-          </TouchableOpacity>
-          
-          <View style={styles.searchBar}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search cigars..."
-              placeholderTextColor="#888"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              onSubmitEditing={handleSearch}
-            />
-          </View>
-          
-          <TouchableOpacity
-            style={styles.searchButton}
-            onPress={handleSearch}
-          >
-            <Ionicons name="search" size={24} color="#fff" />
-          </TouchableOpacity>
-        </View>
-
-        {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#8B4513" />
-            <Text style={styles.loadingText}>Loading cigars...</Text>
-          </View>
-        ) : error ? (
-          <View style={styles.errorContainer}>
-            <Ionicons name="warning-outline" size={48} color="#FF6B6B" />
-            <Text style={styles.errorText}>{error}</Text>
-            <TouchableOpacity style={styles.retryButton} onPress={loadCigars}>
-              <Text style={styles.retryButtonText}>Retry</Text>
-            </TouchableOpacity>
-          </View>
-        ) : cigars.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Ionicons name="search-outline" size={48} color="#888" />
-            <Text style={styles.emptyText}>No cigars found</Text>
-            <Text style={styles.emptySubtext}>Try a different search term</Text>
-          </View>
-        ) : (
-          <ScrollView style={styles.cigarList} contentContainerStyle={styles.cigarListContent}>
-            <Text style={styles.sectionTitle}>Popular Cigars</Text>
-            {cigars.map(renderCigarCard)}
-          </ScrollView>
-        )}
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Cigar Ranker</Text>
+        <TouchableOpacity 
+          onPress={() => router.push('/add-cigar')}
+          style={styles.addButton}
+        >
+          <Ionicons name="add-circle" size={28} color="#8B4513" />
+        </TouchableOpacity>
       </View>
-      
-      {/* Floating Action Button - positioned above bottom tab bar */}
-      <TouchableOpacity
-        style={[styles.fab, { bottom: insets.bottom + 80 }]}
-        onPress={() => router.push('/add-cigar')}
-        activeOpacity={0.8}
-      >
-        <Ionicons name="add" size={28} color="#fff" />
-      </TouchableOpacity>
-    </>
+
+      <View style={styles.searchContainer}>
+        <TouchableOpacity
+          style={styles.cameraButton}
+          onPress={() => router.push('/camera')}
+        >
+          <Ionicons name="camera" size={24} color="#fff" />
+        </TouchableOpacity>
+        
+        <View style={styles.searchBar}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search cigars..."
+            placeholderTextColor="#888"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onSubmitEditing={handleSearch}
+          />
+        </View>
+        
+        <TouchableOpacity
+          style={styles.searchButton}
+          onPress={handleSearch}
+        >
+          <Ionicons name="search" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
+
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#8B4513" />
+          <Text style={styles.loadingText}>Loading cigars...</Text>
+        </View>
+      ) : error ? (
+        <View style={styles.errorContainer}>
+          <Ionicons name="warning-outline" size={48} color="#FF6B6B" />
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={loadCigars}>
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : cigars.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Ionicons name="search-outline" size={48} color="#888" />
+          <Text style={styles.emptyText}>No cigars found</Text>
+          <Text style={styles.emptySubtext}>Try a different search term</Text>
+        </View>
+      ) : (
+        <ScrollView style={styles.cigarList} contentContainerStyle={styles.cigarListContent}>
+          <Text style={styles.sectionTitle}>Popular Cigars</Text>
+          {cigars.map(renderCigarCard)}
+        </ScrollView>
+      )}
+    </View>
   );
 }
 
