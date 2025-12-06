@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     width: 100,
   },
   maxPriceInput: {
-    flex: 1,
+    width: 100,
   },
   optionsRow: {
     flexDirection: 'row',
