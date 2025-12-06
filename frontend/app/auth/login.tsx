@@ -20,39 +20,68 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   const handleLogin = async () => {
+    console.log('=== LOGIN FLOW START ===');
     console.log('Login button clicked');
-    console.log('Email:', email, 'Password:', password);
+    console.log('Email:', email, 'Password length:', password.length);
+    
+    // Clear any previous errors
+    setError('');
     
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      console.log('❌ Validation failed: Missing fields');
+      setError('Please fill in all fields');
       return;
     }
 
     // Basic email validation
     if (!email.includes('@')) {
-      Alert.alert('Error', 'Please enter a valid email address');
+      console.log('❌ Validation failed: Invalid email format');
+      setError('Please enter a valid email address');
       return;
     }
 
+    console.log('✅ Validation passed');
+
     try {
       setLoading(true);
-      console.log('Calling login API...');
+      console.log('⏳ Calling login API...');
+      console.log('API endpoint: /auth/login');
+      console.log('Payload:', { email: email.trim().toLowerCase() });
+      
       await login(email.trim().toLowerCase(), password);
-      console.log('Login successful!');
-      Alert.alert('Success', 'Logged in successfully!', [
-        {
-          text: 'OK',
-          onPress: () => router.replace('/(tabs)')
-        }
-      ]);
+      
+      console.log('✅ Login successful!');
+      console.log('Setting success state to true...');
+      
+      // Show success state
+      setSuccess(true);
+      setError('');
+      console.log('Success state set to:', true);
+      
+      // Wait a moment to show the success message, then navigate
+      setTimeout(() => {
+        console.log('⏰ Timeout complete - Navigating to home...');
+        router.replace('/(tabs)');
+      }, 1500);
+      
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.error('❌ Login error caught:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      setSuccess(false);
       const errorMessage = error.response?.data?.detail || error.message || 'Login failed. Please check your credentials.';
-      Alert.alert('Login Failed', errorMessage);
+      setError(errorMessage);
     } finally {
+      console.log('Finally block - setting loading to false');
       setLoading(false);
+      console.log('=== LOGIN FLOW END ===');
     }
   };
 
