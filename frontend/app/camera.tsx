@@ -38,15 +38,28 @@ export default function CameraScreen() {
           image_base64: result.assets[0].base64,
         });
 
+        console.log('Scan response:', response.data);
+
         if (response.data.identified && response.data.cigar) {
           router.replace(`/cigar/${response.data.cigar.id}`);
         } else {
-          Alert.alert('Not Identified', response.data.message || 'Could not identify cigar from label');
+          // Show what AI detected even if not in database
+          let message = response.data.message || 'Could not identify cigar from label';
+          
+          if (response.data.ai_info) {
+            const ai = response.data.ai_info;
+            if (ai.brand || ai.name) {
+              message = `AI detected: ${ai.brand || 'Unknown'} ${ai.name || ''}\n\nThis cigar is not in our database yet.`;
+            }
+          }
+          
+          Alert.alert('Not in Database', message);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error picking image:', error);
-      Alert.alert('Error', 'Failed to scan label');
+      const errorMsg = error.response?.data?.detail || error.message || 'Failed to scan label';
+      Alert.alert('Error', errorMsg);
     } finally {
       setScanning(false);
     }
