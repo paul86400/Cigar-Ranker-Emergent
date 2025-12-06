@@ -22,17 +22,35 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    console.log('Login button clicked');
+    console.log('Email:', email, 'Password:', password);
+    
     if (!email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
+    // Basic email validation
+    if (!email.includes('@')) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+
     try {
       setLoading(true);
-      await login(email, password);
-      router.back();
+      console.log('Calling login API...');
+      await login(email.trim().toLowerCase(), password);
+      console.log('Login successful!');
+      Alert.alert('Success', 'Logged in successfully!', [
+        {
+          text: 'OK',
+          onPress: () => router.replace('/(tabs)')
+        }
+      ]);
     } catch (error: any) {
-      Alert.alert('Error', error.response?.data?.detail || 'Login failed');
+      console.error('Login error:', error);
+      const errorMessage = error.response?.data?.detail || error.message || 'Login failed. Please check your credentials.';
+      Alert.alert('Login Failed', errorMessage);
     } finally {
       setLoading(false);
     }
