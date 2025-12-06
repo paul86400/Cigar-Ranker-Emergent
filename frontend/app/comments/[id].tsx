@@ -158,29 +158,40 @@ export default function CommentsScreen() {
         )}
 
         <View style={[styles.inputContainer, { paddingBottom: insets.bottom }]}>
-          <TextInput
-            style={styles.input}
-            placeholder={user ? 'Write a comment...' : 'Sign in to comment'}
-            placeholderTextColor="#888"
-            value={commentText}
-            onChangeText={setCommentText}
-            multiline
-            editable={!!user}
-          />
-          <TouchableOpacity
-            style={[
-              styles.sendButton,
-              (!commentText.trim() || submitting) && styles.sendButtonDisabled,
-            ]}
-            onPress={handleSubmitComment}
-            disabled={!commentText.trim() || submitting}
-          >
-            {submitting ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Ionicons name="send" size={20} color="#fff" />
-            )}
-          </TouchableOpacity>
+          {!user ? (
+            <TouchableOpacity 
+              style={styles.signInPrompt}
+              onPress={() => router.push('/auth/login')}
+            >
+              <Ionicons name="log-in-outline" size={20} color="#8B4513" />
+              <Text style={styles.signInPromptText}>Sign in to comment</Text>
+            </TouchableOpacity>
+          ) : (
+            <>
+              <TextInput
+                style={styles.input}
+                placeholder="Write a comment..."
+                placeholderTextColor="#888"
+                value={commentText}
+                onChangeText={setCommentText}
+                multiline
+              />
+              <TouchableOpacity
+                style={[
+                  styles.sendButton,
+                  (!commentText.trim() || submitting) && styles.sendButtonDisabled,
+                ]}
+                onPress={handleSubmitComment}
+                disabled={!commentText.trim() || submitting}
+              >
+                {submitting ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Ionicons name="send" size={20} color="#fff" />
+                )}
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
