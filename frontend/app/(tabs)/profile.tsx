@@ -56,6 +56,21 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Actions</Text>
+
+          <TouchableOpacity 
+            style={[styles.menuItem, styles.addCigarMenuItem]}
+            onPress={() => router.push('/add-cigar')}
+          >
+            <View style={styles.menuItemLeft}>
+              <Ionicons name="add-circle" size={24} color="#4CAF50" />
+              <Text style={[styles.menuItemText, styles.addCigarText]}>Add a Cigar</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#4CAF50" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Settings</Text>
 
           <TouchableOpacity style={styles.menuItem}>
