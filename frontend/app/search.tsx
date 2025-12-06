@@ -34,7 +34,8 @@ export default function AdvancedSearchScreen() {
     if (size) params.append('size', size);
 
     // Navigate back to home with search params
-    router.back();
+    const paramString = params.toString();
+    router.push(`/(tabs)?${paramString}`);
   };
 
   const strengthOptions = ['Mild', 'Medium', 'Medium-Full', 'Full'];
