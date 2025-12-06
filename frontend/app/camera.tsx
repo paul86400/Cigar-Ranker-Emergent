@@ -25,41 +25,63 @@ export default function CameraScreen() {
 
   const handlePickImage = async () => {
     try {
+      console.log('Starting image picker...');
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.5,
         base64: true,
+        quality: 0.8,
       });
 
+      console.log('Image picker result:', result.canceled);
+
       if (!result.canceled && result.assets[0].base64) {
+        console.log('Image selected, starting scan...');
         setScanning(true);
-        const response = await api.post('/cigars/scan-label', {
-          image_base64: result.assets[0].base64,
-        });
+        setScanResult(null);
+        
+        try {
+          const response = await api.post('/cigars/scan-label', {
+            image_base64: result.assets[0].base64,
+          });
 
-        console.log('Scan response:', response.data);
+          console.log('Scan response received:', JSON.stringify(response.data, null, 2));
 
-        if (response.data.identified && response.data.cigar) {
-          router.replace(`/cigar/${response.data.cigar.id}`);
-        } else {
-          // Show what AI detected even if not in database
-          let message = response.data.message || 'Could not identify cigar from label';
-          
-          if (response.data.ai_info) {
-            const ai = response.data.ai_info;
-            if (ai.brand || ai.name) {
-              message = `AI detected: ${ai.brand || 'Unknown'} ${ai.name || ''}\n\nThis cigar is not in our database yet.`;
+          if (response.data.identified && response.data.cigar) {
+            console.log('Cigar found! ID:', response.data.cigar.id);
+            setScanResult(`Found: ${response.data.cigar.brand} ${response.data.cigar.name}`);
+            setTimeout(() => {
+              router.replace(`/cigar/${response.data.cigar.id}`);
+            }, 1000);
+          } else {
+            console.log('Cigar not in database');
+            // Show what AI detected even if not in database
+            let message = response.data.message || 'Could not identify cigar from label';
+            
+            if (response.data.ai_info) {
+              const ai = response.data.ai_info;
+              console.log('AI info:', ai);
+              if (ai.brand || ai.name) {
+                message = `AI detected:\n${ai.brand || 'Unknown'} ${ai.name || ''}\n\nThis cigar is not in our database yet.`;
+              }
             }
+            
+            setScanResult(message);
+            Alert.alert('Not in Database', message, [
+              { text: 'OK', onPress: () => setScanResult(null) }
+            ]);
           }
-          
-          Alert.alert('Not in Database', message);
+        } catch (apiError: any) {
+          console.error('API Error:', apiError);
+          const errorMsg = apiError.response?.data?.detail || apiError.message || 'Failed to scan label';
+          setScanResult(`Error: ${errorMsg}`);
+          Alert.alert('Error', errorMsg);
         }
       }
     } catch (error: any) {
       console.error('Error picking image:', error);
-      const errorMsg = error.response?.data?.detail || error.message || 'Failed to scan label';
+      const errorMsg = error.message || 'Failed to pick image';
+      setScanResult(`Error: ${errorMsg}`);
       Alert.alert('Error', errorMsg);
     } finally {
       setScanning(false);
