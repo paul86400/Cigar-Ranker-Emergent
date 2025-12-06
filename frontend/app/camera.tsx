@@ -129,6 +129,12 @@ export default function CameraScreen() {
             </View>
           )}
 
+          {scanResult && (
+            <View style={styles.scanResultContainer}>
+              <Text style={styles.scanResultText}>{scanResult}</Text>
+            </View>
+          )}
+
           <View style={styles.webNote}>
             <Ionicons name="information-circle" size={20} color="#888" />
             <Text style={styles.webNoteText}>
