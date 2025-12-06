@@ -670,11 +670,22 @@ async def get_my_ratings(user_id: str = Depends(get_current_user)):
 @api_router.post("/comments")
 async def create_comment(comment_data: CommentCreate, user_id: str = Depends(get_current_user)):
     """Create a comment"""
+    logging.info(f"Creating comment for user {user_id}, cigar {comment_data.cigar_id}")
+    logging.info(f"Comment text: {comment_data.text[:50]}...")
+    
     comment_doc = comment_data.model_dump()
     comment_doc['user_id'] = user_id
     comment_doc['created_at'] = datetime.utcnow()
     
+    logging.info(f"Comment doc to insert: {comment_doc}")
+    
     result = await db.comments.insert_one(comment_doc)
+    
+    logging.info(f"Comment inserted with ID: {result.inserted_id}")
+    
+    # Verify it was saved
+    saved_comment = await db.comments.find_one({"_id": result.inserted_id})
+    logging.info(f"Verification - comment exists in DB: {saved_comment is not None}")
     
     # Get user info
     user = await db.users.find_one({"_id": ObjectId(user_id)})
@@ -692,6 +703,7 @@ async def create_comment(comment_data: CommentCreate, user_id: str = Depends(get
         'replies': []
     }
     
+    logging.info(f"Returning response for comment {response['id']}")
     return response
 
 
