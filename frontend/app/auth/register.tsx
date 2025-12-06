@@ -21,10 +21,11 @@ export default function RegisterScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleRegister = async () => {
     console.log('Register button clicked');
-    console.log('Username:', username, 'Email:', email, 'Password:', password);
+    console.log('Username:', username, 'Email:', email, 'Password length:', password.length);
     
     if (!username || !email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
@@ -48,14 +49,19 @@ export default function RegisterScreen() {
       console.log('Calling register API...');
       await register(username.trim(), email.trim().toLowerCase(), password);
       console.log('Registration successful!');
-      Alert.alert('Success', 'Account created successfully!', [
-        {
-          text: 'OK',
-          onPress: () => router.replace('/(tabs)')
-        }
-      ]);
+      
+      // Show success state
+      setSuccess(true);
+      
+      // Wait a moment to show the success message, then navigate
+      setTimeout(() => {
+        console.log('Navigating to home...');
+        router.replace('/(tabs)');
+      }, 2000);
+      
     } catch (error: any) {
       console.error('Registration error:', error);
+      setSuccess(false);
       const errorMessage = error.response?.data?.detail || error.message || 'Registration failed. Please try again.';
       Alert.alert('Registration Failed', errorMessage);
     } finally {
