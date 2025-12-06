@@ -24,6 +24,7 @@ interface Store {
 export default function StoresScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  const insets = useSafeAreaInsets();
   const [stores, setStores] = useState<Store[]>([]);
   const [loading, setLoading] = useState(true);
 
