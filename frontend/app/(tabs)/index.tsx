@@ -63,6 +63,40 @@ export default function HomeScreen() {
     }
   };
 
+  const performAdvancedSearch = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Build query string from URL parameters
+      const queryParams = new URLSearchParams();
+      if (params.q) queryParams.append('q', params.q as string);
+      if (params.strength) queryParams.append('strength', params.strength as string);
+      if (params.origin) queryParams.append('origin', params.origin as string);
+      if (params.wrapper) queryParams.append('wrapper', params.wrapper as string);
+      if (params.size) queryParams.append('size', params.size as string);
+      if (params.min_price) queryParams.append('min_price', params.min_price as string);
+      if (params.max_price) queryParams.append('max_price', params.max_price as string);
+      
+      const queryString = queryParams.toString();
+      console.log('Performing advanced search:', queryString);
+      
+      const response = await api.get(`/cigars/search?${queryString}`);
+      console.log(`Found ${response.data.length} cigars`);
+      setCigars(response.data);
+      
+      // Update the search query display if there's a text search
+      if (params.q) {
+        setSearchQuery(params.q as string);
+      }
+    } catch (error) {
+      console.error('Error searching:', error);
+      setError('Search failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
       loadCigars();
