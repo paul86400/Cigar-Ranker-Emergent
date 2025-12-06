@@ -141,59 +141,95 @@ export default function CigarDetailsScreen() {
   };
 
   const handleUploadImage = async () => {
+    console.log('Upload image button clicked');
+    
     if (!user) {
       Alert.alert('Login Required', 'Please login to upload images');
       return;
     }
 
     try {
+      console.log('Requesting media library permissions...');
       // Request permissions
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      console.log('Permission status:', status);
+      
       if (status !== 'granted') {
         Alert.alert('Permission Denied', 'We need camera roll permissions to upload images');
         return;
       }
 
+      console.log('Launching image picker...');
       // Pick image
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.8,
+        base64: true,
       });
+
+      console.log('Image picker result:', result);
 
       if (!result.canceled && result.assets && result.assets[0]) {
         setUploadingImage(true);
-        const imageUri = result.assets[0].uri;
+        console.log('Image selected, preparing upload...');
+        
+        const imageAsset = result.assets[0];
+        
+        // For web, we need to handle it differently
+        if (Platform.OS === 'web') {
+          // Use base64 for web
+          if (imageAsset.base64) {
+            console.log('Uploading via base64 for web...');
+            const response = await api.post(`/cigars/${id}/upload-image-base64`, {
+              image_base64: imageAsset.base64,
+            });
 
-        // Create form data
-        const formData = new FormData();
-        const filename = imageUri.split('/').pop() || 'image.jpg';
-        const match = /\.(\w+)$/.exec(filename);
-        const type = match ? `image/${match[1]}` : 'image/jpeg';
+            if (response.data.success) {
+              setCigar(prev => prev ? { ...prev, image: response.data.image } : null);
+              Alert.alert('Success', 'Image updated successfully!');
+            } else {
+              Alert.alert('Error', response.data.message || 'Failed to upload image');
+            }
+          } else {
+            Alert.alert('Error', 'Could not read image data');
+          }
+        } else {
+          // Mobile: Use FormData
+          const imageUri = imageAsset.uri;
+          const formData = new FormData();
+          const filename = imageUri.split('/').pop() || 'image.jpg';
+          const match = /\.(\w+)$/.exec(filename);
+          const type = match ? `image/${match[1]}` : 'image/jpeg';
 
-        formData.append('file', {
-          uri: Platform.OS === 'web' ? imageUri : imageUri,
-          name: filename,
-          type: type,
-        } as any);
+          formData.append('file', {
+            uri: imageUri,
+            name: filename,
+            type: type,
+          } as any);
 
-        // Upload to backend
-        const response = await api.post(`/cigars/${id}/upload-image`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+          console.log('Uploading via FormData for mobile...');
+          const response = await api.post(`/cigars/${id}/upload-image`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
 
-        if (response.data.success) {
-          // Update local cigar data
-          setCigar(prev => prev ? { ...prev, image: response.data.image } : null);
-          Alert.alert('Success', 'Image updated successfully!');
+          if (response.data.success) {
+            setCigar(prev => prev ? { ...prev, image: response.data.image } : null);
+            Alert.alert('Success', 'Image updated successfully!');
+          } else {
+            Alert.alert('Error', response.data.message || 'Failed to upload image');
+          }
         }
+      } else {
+        console.log('Image picker was cancelled or no image selected');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading image:', error);
-      Alert.alert('Error', 'Failed to upload image. Please try again.');
+      console.error('Error details:', error.response?.data);
+      Alert.alert('Error', error.response?.data?.detail || error.message || 'Failed to upload image. Please try again.');
     } finally {
       setUploadingImage(false);
     }
