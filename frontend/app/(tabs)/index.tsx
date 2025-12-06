@@ -218,6 +218,15 @@ export default function HomeScreen() {
           {cigars.map(renderCigarCard)}
         </ScrollView>
       )}
+      
+      {/* Floating Action Button */}
+      <TouchableOpacity
+        style={[styles.fab, { bottom: insets.bottom + 16 }]}
+        onPress={() => router.push('/add-cigar')}
+        activeOpacity={0.8}
+      >
+        <Ionicons name="add" size={28} color="#fff" />
+      </TouchableOpacity>
     </View>
   );
 }
