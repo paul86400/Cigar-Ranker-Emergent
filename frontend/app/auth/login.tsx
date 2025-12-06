@@ -237,6 +237,7 @@ const styles = StyleSheet.create({
     height: 56,
     color: '#fff',
     fontSize: 16,
+    outlineStyle: 'none',
   },
   eyeButton: {
     padding: 8,
@@ -251,6 +252,7 @@ const styles = StyleSheet.create({
     height: 56,
     color: '#fff',
     fontSize: 16,
+    outlineStyle: 'none',
   },
   eyeButton: {
     padding: 8,
