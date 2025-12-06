@@ -111,6 +111,13 @@ export default function RegisterScreen() {
           <Text style={styles.title}>Create Account</Text>
           <Text style={styles.subtitle}>Join the cigar community</Text>
 
+          {error && !success && (
+            <View style={styles.errorContainer}>
+              <Ionicons name="alert-circle" size={24} color="#FF3B30" />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          )}
+
           {success && (
             <View style={styles.successContainer}>
               <Ionicons name="checkmark-circle" size={48} color="#4CAF50" />
