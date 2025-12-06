@@ -219,9 +219,9 @@ export default function HomeScreen() {
         </ScrollView>
       )}
       
-      {/* Floating Action Button */}
+      {/* Floating Action Button - positioned above bottom tab bar */}
       <TouchableOpacity
-        style={[styles.fab, { bottom: Math.max(insets.bottom, 16) + 16 }]}
+        style={[styles.fab, { bottom: insets.bottom + 80 }]}
         onPress={() => router.push('/add-cigar')}
         activeOpacity={0.8}
       >
