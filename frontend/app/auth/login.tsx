@@ -225,6 +225,7 @@ const styles = StyleSheet.create({
     height: 56,
     color: '#fff',
     fontSize: 16,
+    outlineStyle: 'none',
   },
   passwordContainer: {
     flex: 1,
