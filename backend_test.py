@@ -11,7 +11,7 @@ import os
 from datetime import datetime
 
 # Get backend URL from frontend .env
-BACKEND_URL = "https://smoke-scores.preview.emergentagent.com/api"
+BACKEND_URL = "https://stogie-rater.preview.emergentagent.com/api"
 
 class CigarRankerAPITester:
     def __init__(self):
