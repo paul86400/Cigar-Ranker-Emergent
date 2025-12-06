@@ -747,15 +747,17 @@ async def get_comments(cigar_id: str):
 @api_router.get("/comments/my-comments")
 async def get_my_comments(user_id: str = Depends(get_current_user)):
     """Get all comments by the current user with cigar details"""
-    # DEBUG: Log to file directly
-    with open('/tmp/my_comments_debug.txt', 'a') as f:
-        f.write(f"USER_ID: {user_id}\n")
-        f.write(f"USER_ID_TYPE: {type(user_id)}\n")
-        f.write(f"USER_ID_LEN: {len(user_id)}\n")
+    # Get username from user_id to use as backup
+    user = await db.users.find_one({"_id": ObjectId(user_id)})
+    username = user.get("username") if user else None
     
-    # Use aggregation to join comments with cigar details
+    # DEBUG: Try matching by BOTH user_id AND converting all comments to check
+    # First try direct match
     pipeline = [
-        {"$match": {"user_id": user_id}},
+        {"$match": {"$or": [
+            {"user_id": user_id},
+            {"user_id": str(ObjectId(user_id))} if len(user_id) == 24 else {"user_id": "nomatch"}
+        ]}},
         {"$sort": {"created_at": -1}},
         {
             "$addFields": {
