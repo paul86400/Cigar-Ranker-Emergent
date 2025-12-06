@@ -349,6 +349,18 @@ frontend:
         agent: "main"
         comment: "Implemented advanced search modal with filters: strength, origin, wrapper, size, price range. Button selections for each category."
 
+  - task: "Add Cigar Screen with FAB"
+    implemented: true
+    working: "NA"
+    file: "frontend/app/add-cigar.tsx, frontend/app/(tabs)/index.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented complete Add Cigar feature. Added FAB (Floating Action Button) on home screen positioned at bottom-right with proper mobile UX (56x56 size, brown color, elevation/shadow). FAB navigates to add-cigar form. Form includes fields: brand, name, strength (button options), origin, wrapper, size, price_range (optional). Form validates required fields and posts to /api/cigars/add. Improved duplicate handling with user-friendly alert showing two options: 'View Existing Cigar' or 'Go Back'."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
