@@ -119,8 +119,14 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.searchContainer}>
+        <TouchableOpacity
+          style={styles.cameraButton}
+          onPress={() => router.push('/camera')}
+        >
+          <Ionicons name="camera" size={24} color="#fff" />
+        </TouchableOpacity>
+        
         <View style={styles.searchBar}>
-          <Ionicons name="search" size={20} color="#888" />
           <TextInput
             style={styles.searchInput}
             placeholder="Search cigars..."
@@ -130,11 +136,12 @@ export default function HomeScreen() {
             onSubmitEditing={handleSearch}
           />
         </View>
+        
         <TouchableOpacity
-          style={styles.cameraButton}
-          onPress={() => router.push('/camera')}
+          style={styles.searchButton}
+          onPress={handleSearch}
         >
-          <Ionicons name="camera" size={24} color="#fff" />
+          <Ionicons name="search" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
