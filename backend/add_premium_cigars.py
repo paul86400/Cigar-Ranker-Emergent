@@ -592,11 +592,37 @@ async def add_cigars():
             skipped_count += 1
             continue
         
+        # Rename rating to average_rating and add missing fields
+        cigar_doc = cigar.copy()
+        if "rating" in cigar_doc:
+            cigar_doc["average_rating"] = cigar_doc.pop("rating")
+        
+        # Add missing required fields
+        if "flavor_notes" not in cigar_doc:
+            cigar_doc["flavor_notes"] = ["Leather", "Wood", "Spice"]
+        if "images" not in cigar_doc:
+            cigar_doc["images"] = []
+        if "image" not in cigar_doc:
+            # Use a placeholder image (1x1 transparent pixel)
+            cigar_doc["image"] = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+        if "price_range" not in cigar_doc:
+            cigar_doc["price_range"] = "15-20"
+        if "barcode" not in cigar_doc:
+            cigar_doc["barcode"] = ""
+        if "binder" not in cigar_doc:
+            cigar_doc["binder"] = "Mixed"
+        if "filler" not in cigar_doc:
+            cigar_doc["filler"] = "Mixed"
+        
+        # Format size field to match expected format
+        if "size" in cigar_doc and "length" in cigar_doc and "ring_gauge" in cigar_doc:
+            cigar_doc["size"] = f"{cigar_doc['size']} ({cigar_doc['length']} x {cigar_doc['ring_gauge']})"
+        
         # Add created_at timestamp
-        cigar["created_at"] = datetime.utcnow()
+        cigar_doc["created_at"] = datetime.utcnow()
         
         # Insert cigar
-        result = await db.cigars.insert_one(cigar)
+        result = await db.cigars.insert_one(cigar_doc)
         print(f"✅ Added: {cigar['brand']} {cigar['name']}")
         added_count += 1
     
