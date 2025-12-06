@@ -260,10 +260,15 @@ export default function CigarDetailsScreen() {
               <Text style={styles.sliderLabel}>10.0</Text>
             </View>
             <TouchableOpacity
-              style={styles.submitRatingButton}
+              style={[styles.submitRatingButton, submittingRating && styles.submitRatingButtonDisabled]}
               onPress={() => handleRating(userRating)}
+              disabled={submittingRating}
             >
-              <Text style={styles.submitRatingButtonText}>Submit Rating</Text>
+              {submittingRating ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.submitRatingButtonText}>Submit Rating</Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
