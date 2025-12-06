@@ -31,14 +31,20 @@ export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
+  const params = useLocalSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [cigars, setCigars] = useState<Cigar[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadCigars();
-  }, []);
+    // Check if there are advanced search parameters
+    if (params.q || params.strength || params.origin || params.wrapper || params.size || params.min_price || params.max_price) {
+      performAdvancedSearch();
+    } else {
+      loadCigars();
+    }
+  }, [params]);
 
   const loadCigars = async () => {
     try {
