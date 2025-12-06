@@ -227,6 +227,12 @@ export default function CameraScreen() {
           </View>
         )}
 
+        {scanResult && (
+          <View style={styles.scanResultContainer}>
+            <Text style={styles.scanResultText}>{scanResult}</Text>
+          </View>
+        )}
+
         <View style={styles.actionButtons}>
           <TouchableOpacity
             style={styles.galleryButton}
