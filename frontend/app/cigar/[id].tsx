@@ -322,7 +322,7 @@ export default function CigarDetailsScreen() {
           
           <View style={styles.sliderContainer}>
             <View style={styles.ratingDisplay}>
-              <Text style={styles.ratingValue}>{userRating.toFixed(1)}</Text>
+              <Text style={styles.ratingValue}>{userRating.toFixed(2)}</Text>
               <Ionicons name="star" size={32} color="#FFD700" />
             </View>
             <Slider
