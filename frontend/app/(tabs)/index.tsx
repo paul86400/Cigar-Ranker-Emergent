@@ -286,6 +286,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     outlineStyle: 'none',
+    overflow: 'hidden',
   },
   searchButton: {
     width: 48,
