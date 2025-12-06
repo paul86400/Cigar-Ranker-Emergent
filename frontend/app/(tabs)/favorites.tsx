@@ -122,7 +122,7 @@ export default function FavoritesScreen() {
               </View>
               <View style={styles.ratingContainer}>
                 <Ionicons name="star" size={16} color="#FFD700" />
-                <Text style={styles.rating}>{cigar.average_rating.toFixed(2)}</Text>
+                <Text style={styles.rating}>{cigar.average_rating.toFixed(1)}</Text>
               </View>
             </View>
           </TouchableOpacity>
