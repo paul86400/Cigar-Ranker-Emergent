@@ -159,10 +159,10 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Cigar Ranker</Text>
         <TouchableOpacity 
-          onPress={() => router.push('/add-cigar')}
-          style={styles.addButton}
+          onPress={() => router.push('/search')}
+          style={styles.advancedSearchButton}
         >
-          <Ionicons name="add-circle" size={28} color="#8B4513" />
+          <Ionicons name="options-outline" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
