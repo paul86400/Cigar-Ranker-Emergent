@@ -149,15 +149,18 @@ backend:
 
   - task: "Barcode Scanning"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented scan-barcode endpoint. Searches database by barcode. Sample barcodes added to seed data."
+      - working: true
+        agent: "testing"
+        comment: "Barcode scanning endpoint tested successfully. API accepts barcode input and responds correctly with appropriate format (found/not found structure)."
 
   - task: "Rating System"
     implemented: true
