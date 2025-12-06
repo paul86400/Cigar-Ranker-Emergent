@@ -85,18 +85,31 @@ export default function CigarDetailsScreen() {
     }
 
     try {
+      setSubmittingRating(true);
+      console.log('Submitting rating:', rating, 'for cigar:', id);
+      
       await api.post('/ratings', {
         cigar_id: id,
         rating: rating,
       });
+      
       setUserRating(rating);
+      setRatingSubmitted(true);
+      console.log('✅ Rating submitted successfully!');
       
       // Reload cigar to get updated average
-      loadCigarDetails();
-      Alert.alert('Success', 'Rating submitted!');
+      await loadCigarDetails();
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setRatingSubmitted(false);
+      }, 3000);
+      
     } catch (error) {
-      console.error('Error submitting rating:', error);
-      Alert.alert('Error', 'Failed to submit rating');
+      console.error('❌ Error submitting rating:', error);
+      Alert.alert('Error', 'Failed to submit rating. Please try again.');
+    } finally {
+      setSubmittingRating(false);
     }
   };
 
