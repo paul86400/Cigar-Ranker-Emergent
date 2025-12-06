@@ -229,4 +229,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
   },
+  successContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 32,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 16,
+    marginTop: 24,
+    borderWidth: 2,
+    borderColor: '#4CAF50',
+  },
+  successTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  successText: {
+    fontSize: 16,
+    color: '#888',
+    textAlign: 'center',
+  },
 });
