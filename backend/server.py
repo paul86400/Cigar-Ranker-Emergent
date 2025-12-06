@@ -463,11 +463,20 @@ async def create_comment(comment_data: CommentCreate, user_id: str = Depends(get
     # Get user info
     user = await db.users.find_one({"_id": ObjectId(user_id)})
     
-    comment_doc['id'] = str(result.inserted_id)
-    comment_doc['username'] = user['username']
-    comment_doc['replies'] = []
+    # Return a clean response object
+    response = {
+        'id': str(result.inserted_id),
+        'user_id': user_id,
+        'username': user['username'] if user else 'Unknown',
+        'cigar_id': comment_data.cigar_id,
+        'text': comment_data.text,
+        'parent_id': comment_data.parent_id,
+        'images': comment_data.images,
+        'created_at': comment_doc['created_at'].isoformat(),
+        'replies': []
+    }
     
-    return comment_doc
+    return response
 
 
 @api_router.get("/comments/{cigar_id}")
