@@ -76,6 +76,7 @@ function AppContent() {
       <Stack.Screen name="search" options={{ presentation: 'modal' }} />
       <Stack.Screen name="my-ratings" />
       <Stack.Screen name="my-comments" />
+      <Stack.Screen name="add-cigar" />
     </Stack>
   );
 }
