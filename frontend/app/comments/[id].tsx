@@ -344,4 +344,19 @@ const styles = StyleSheet.create({
   sendButtonDisabled: {
     backgroundColor: '#333',
   },
+  signInPrompt: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1a1a1a',
+    borderRadius: 24,
+    paddingVertical: 14,
+    gap: 8,
+  },
+  signInPromptText: {
+    color: '#8B4513',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
