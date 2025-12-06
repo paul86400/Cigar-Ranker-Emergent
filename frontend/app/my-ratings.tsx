@@ -147,15 +147,9 @@ export default function MyRatingsScreen() {
       ) : (
         <ScrollView style={styles.ratingsList} contentContainerStyle={styles.ratingsListContent}>
           <View style={styles.statsContainer}>
-            <View style={styles.statBox}>
+            <View style={styles.statBoxSingle}>
               <Text style={styles.statValue}>{ratings.length}</Text>
               <Text style={styles.statLabel}>Total Ratings</Text>
-            </View>
-            <View style={styles.statBox}>
-              <Text style={styles.statValue}>
-                {(ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length).toFixed(1)}
-              </Text>
-              <Text style={styles.statLabel}>Your Average</Text>
             </View>
           </View>
 
