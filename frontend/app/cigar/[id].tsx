@@ -43,6 +43,8 @@ export default function CigarDetailsScreen() {
   const [loading, setLoading] = useState(true);
   const [userRating, setUserRating] = useState<number>(0);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [ratingSubmitted, setRatingSubmitted] = useState(false);
+  const [submittingRating, setSubmittingRating] = useState(false);
 
   useEffect(() => {
     loadCigarDetails();
