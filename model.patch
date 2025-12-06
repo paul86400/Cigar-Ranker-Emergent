@@ -1,218 +1,223 @@
-diff --git a/additional_backend_test.py b/additional_backend_test.py
-new file mode 100644
-index 0000000..6b53e49
---- /dev/null
-+++ b/additional_backend_test.py
-@@ -0,0 +1,117 @@
-+#!/usr/bin/env python3
-+"""
-+Additional Backend API Tests for Cigar Ranker App
-+Tests other core endpoints beyond authentication
-+"""
-+
-+import requests
-+import json
-+import time
-+from datetime import datetime
-+
-+BACKEND_URL = "https://smoke-scores.preview.emergentagent.com/api"
-+
-+def test_cigar_search():
-+    """Test cigar search endpoint"""
-+    try:
-+        response = requests.get(f"{BACKEND_URL}/cigars/search", timeout=10)
-+        if response.status_code == 200:
-+            data = response.json()
-+            if isinstance(data, list) and len(data) > 0:
-+                print("✅ Cigar Search: Working - Found cigars in database")
-+                return True
-+            else:
-+                print("❌ Cigar Search: No cigars found in database")
-+                return False
-+        else:
-+            print(f"❌ Cigar Search: HTTP {response.status_code}")
-+            return False
-+    except Exception as e:
-+        print(f"❌ Cigar Search: Error - {str(e)}")
-+        return False
-+
-+def test_cigar_search_with_query():
-+    """Test cigar search with query parameter"""
-+    try:
-+        response = requests.get(f"{BACKEND_URL}/cigars/search?q=Montecristo", timeout=10)
-+        if response.status_code == 200:
-+            data = response.json()
-+            print(f"✅ Cigar Search with Query: Working - Found {len(data)} results")
-+            return True
-+        else:
-+            print(f"❌ Cigar Search with Query: HTTP {response.status_code}")
-+            return False
-+    except Exception as e:
-+        print(f"❌ Cigar Search with Query: Error - {str(e)}")
-+        return False
-+
-+def test_barcode_scan():
-+    """Test barcode scanning endpoint"""
-+    try:
-+        test_data = {"barcode": "123456789012"}
-+        response = requests.post(f"{BACKEND_URL}/cigars/scan-barcode", json=test_data, timeout=10)
-+        if response.status_code == 200:
-+            data = response.json()
-+            print("✅ Barcode Scan: Working - Endpoint responds correctly")
-+            return True
-+        else:
-+            print(f"❌ Barcode Scan: HTTP {response.status_code}")
-+            return False
-+    except Exception as e:
-+        print(f"❌ Barcode Scan: Error - {str(e)}")
-+        return False
-+
-+def test_store_prices():
-+    """Test store prices endpoint"""
-+    try:
-+        # First get a cigar ID
-+        search_response = requests.get(f"{BACKEND_URL}/cigars/search", timeout=10)
-+        if search_response.status_code == 200:
-+            cigars = search_response.json()
-+            if cigars:
-+                cigar_id = cigars[0]["id"]
-+                response = requests.get(f"{BACKEND_URL}/stores/{cigar_id}", timeout=10)
-+                if response.status_code == 200:
-+                    data = response.json()
-+                    if isinstance(data, list) and len(data) > 0:
-+                        print("✅ Store Prices: Working - Returns price data")
-+                        return True
-+                    else:
-+                        print("❌ Store Prices: No price data returned")
-+                        return False
-+                else:
-+                    print(f"❌ Store Prices: HTTP {response.status_code}")
-+                    return False
-+            else:
-+                print("❌ Store Prices: No cigars available for testing")
-+                return False
-+        else:
-+            print("❌ Store Prices: Cannot get cigar for testing")
-+            return False
-+    except Exception as e:
-+        print(f"❌ Store Prices: Error - {str(e)}")
-+        return False
-+
-+def main():
-+    """Run additional backend tests"""
-+    print("=" * 50)
-+    print("ADDITIONAL BACKEND API TESTS")
-+    print("=" * 50)
-+    
-+    tests = [
-+        test_cigar_search,
-+        test_cigar_search_with_query,
-+        test_barcode_scan,
-+        test_store_prices
-+    ]
-+    
-+    passed = 0
-+    for test in tests:
-+        if test():
-+            passed += 1
-+    
-+    print(f"\nAdditional Tests: {passed}/{len(tests)} passed")
-+    return passed == len(tests)
-+
-+if __name__ == "__main__":
-+    main()
-\ No newline at end of file
-diff --git a/test_result.md b/test_result.md
-index 7b951b5..5d71e79 100644
---- a/test_result.md
-+++ b/test_result.md
-@@ -107,27 +107,33 @@ user_problem_statement: "Build Cigar Ranker mobile PWA app with barcode scanning
- backend:
-   - task: "Authentication System (JWT)"
-     implemented: true
--    working: "NA"
-+    working: true
-     file: "backend/server.py, backend/auth.py, backend/models.py"
-     stuck_count: 0
-     priority: "high"
--    needs_retesting: true
-+    needs_retesting: false
-     status_history:
-       - working: "NA"
-         agent: "main"
-         comment: "Implemented JWT authentication with register, login, get profile, update profile endpoints. Password hashing with bcrypt. Token expiration set to 72 hours."
-+      - working: true
-+        agent: "testing"
-+        comment: "Comprehensive testing completed. Registration endpoint working correctly: validates duplicate emails/usernames, handles missing fields, returns JWT tokens. Login endpoint working with correct user data. JWT token validation working for protected endpoints. Minor: Email format validation not implemented (accepts invalid emails like 'notanemail'), but core functionality is solid. 8/9 test cases passed."
- 
-   - task: "Cigar Database and Search"
-     implemented: true
--    working: "NA"
-+    working: true
-     file: "backend/server.py, backend/models.py"
-     stuck_count: 0
-     priority: "high"
--    needs_retesting: true
-+    needs_retesting: false
-     status_history:
-       - working: "NA"
-         agent: "main"
-         comment: "Implemented cigar CRUD operations, advanced search with filters (strength, origin, size, wrapper, price), seeded database with 5 sample cigars (Montecristo, Padron, Opus X, Cohiba, Liga Privada)"
-+      - working: true
-+        agent: "testing"
-+        comment: "Tested cigar search endpoints successfully. Basic search returns cigars from database. Query-based search (e.g., 'Montecristo') returns filtered results (21 matches found). Database is properly seeded with comprehensive cigar data."
- 
-   - task: "AI Label Recognition (OpenAI Vision)"
-     implemented: true
-@@ -143,15 +149,18 @@ backend:
- 
-   - task: "Barcode Scanning"
-     implemented: true
--    working: "NA"
-+    working: true
-     file: "backend/server.py"
-     stuck_count: 0
-     priority: "high"
--    needs_retesting: true
-+    needs_retesting: false
-     status_history:
-       - working: "NA"
-         agent: "main"
-         comment: "Implemented scan-barcode endpoint. Searches database by barcode. Sample barcodes added to seed data."
-+      - working: true
-+        agent: "testing"
-+        comment: "Barcode scanning endpoint tested successfully. API accepts barcode input and responds correctly with appropriate format (found/not found structure)."
- 
-   - task: "Rating System"
-     implemented: true
-@@ -191,15 +200,18 @@ backend:
- 
-   - task: "Store Price Comparison"
-     implemented: true
--    working: "NA"
-+    working: true
-     file: "backend/server.py, backend/models.py"
-     stuck_count: 0
-     priority: "medium"
--    needs_retesting: true
-+    needs_retesting: false
-     status_history:
-       - working: "NA"
-         agent: "main"
-         comment: "Implemented store prices endpoint. Currently returns mock data for 3 stores (Cigars International, Neptune Cigar, Atlantic Cigar) with search URLs. Ready for real scraping integration."
-+      - working: true
-+        agent: "testing"
-+        comment: "Store price comparison endpoint tested successfully. Returns mock price data for 3 stores as expected. API structure is correct and ready for real scraping integration."
- 
- frontend:
-   - task: "Navigation Structure (Bottom Tabs)"
-@@ -348,4 +360,6 @@ agent_communication:
-   - agent: "main"
-     message: "Completed initial implementation of Cigar Ranker MVP. All core features implemented: JWT auth, cigar CRUD, AI label recognition with OpenAI Vision (gpt-4o), barcode scanning, rating system (0-10), nested comments, favorites, store price comparison. Frontend uses Expo Router with bottom tabs, React Context for auth, expo-camera for scanning. Ready for comprehensive backend testing. User needs to test manually or testing agent can perform automated tests."
-   - agent: "main"
--    message: "Completed registration success feedback feature. Added success state with visual confirmation (green checkmark, success container with border) to register.tsx. The success message displays for 2 seconds before auto-redirecting to home. Also added disabled button styling during loading. Ready for backend testing of registration flow."
-\ No newline at end of file
-+    message: "Completed registration success feedback feature. Added success state with visual confirmation (green checkmark, success container with border) to register.tsx. The success message displays for 2 seconds before auto-redirecting to home. Also added disabled button styling during loading. Ready for backend testing of registration flow."
-+  - agent: "testing"
-+    message: "Completed comprehensive backend testing. Authentication system working correctly - registration validates duplicates, login works, JWT tokens function properly. Cigar database and search working with seeded data. Barcode scanning and store price comparison endpoints responding correctly. Only minor issue: email format validation not implemented (accepts invalid emails). Core backend functionality is solid and ready for frontend integration testing."
-\ No newline at end of file
+diff --git a/model.patch b/model.patch
+index 413ce7d..e69de29 100644
+--- a/model.patch
++++ b/model.patch
+@@ -1,218 +0,0 @@
+-diff --git a/additional_backend_test.py b/additional_backend_test.py
+-new file mode 100644
+-index 0000000..6b53e49
+---- /dev/null
+-+++ b/additional_backend_test.py
+-@@ -0,0 +1,117 @@
+-+#!/usr/bin/env python3
+-+"""
+-+Additional Backend API Tests for Cigar Ranker App
+-+Tests other core endpoints beyond authentication
+-+"""
+-+
+-+import requests
+-+import json
+-+import time
+-+from datetime import datetime
+-+
+-+BACKEND_URL = "https://smoke-scores.preview.emergentagent.com/api"
+-+
+-+def test_cigar_search():
+-+    """Test cigar search endpoint"""
+-+    try:
+-+        response = requests.get(f"{BACKEND_URL}/cigars/search", timeout=10)
+-+        if response.status_code == 200:
+-+            data = response.json()
+-+            if isinstance(data, list) and len(data) > 0:
+-+                print("✅ Cigar Search: Working - Found cigars in database")
+-+                return True
+-+            else:
+-+                print("❌ Cigar Search: No cigars found in database")
+-+                return False
+-+        else:
+-+            print(f"❌ Cigar Search: HTTP {response.status_code}")
+-+            return False
+-+    except Exception as e:
+-+        print(f"❌ Cigar Search: Error - {str(e)}")
+-+        return False
+-+
+-+def test_cigar_search_with_query():
+-+    """Test cigar search with query parameter"""
+-+    try:
+-+        response = requests.get(f"{BACKEND_URL}/cigars/search?q=Montecristo", timeout=10)
+-+        if response.status_code == 200:
+-+            data = response.json()
+-+            print(f"✅ Cigar Search with Query: Working - Found {len(data)} results")
+-+            return True
+-+        else:
+-+            print(f"❌ Cigar Search with Query: HTTP {response.status_code}")
+-+            return False
+-+    except Exception as e:
+-+        print(f"❌ Cigar Search with Query: Error - {str(e)}")
+-+        return False
+-+
+-+def test_barcode_scan():
+-+    """Test barcode scanning endpoint"""
+-+    try:
+-+        test_data = {"barcode": "123456789012"}
+-+        response = requests.post(f"{BACKEND_URL}/cigars/scan-barcode", json=test_data, timeout=10)
+-+        if response.status_code == 200:
+-+            data = response.json()
+-+            print("✅ Barcode Scan: Working - Endpoint responds correctly")
+-+            return True
+-+        else:
+-+            print(f"❌ Barcode Scan: HTTP {response.status_code}")
+-+            return False
+-+    except Exception as e:
+-+        print(f"❌ Barcode Scan: Error - {str(e)}")
+-+        return False
+-+
+-+def test_store_prices():
+-+    """Test store prices endpoint"""
+-+    try:
+-+        # First get a cigar ID
+-+        search_response = requests.get(f"{BACKEND_URL}/cigars/search", timeout=10)
+-+        if search_response.status_code == 200:
+-+            cigars = search_response.json()
+-+            if cigars:
+-+                cigar_id = cigars[0]["id"]
+-+                response = requests.get(f"{BACKEND_URL}/stores/{cigar_id}", timeout=10)
+-+                if response.status_code == 200:
+-+                    data = response.json()
+-+                    if isinstance(data, list) and len(data) > 0:
+-+                        print("✅ Store Prices: Working - Returns price data")
+-+                        return True
+-+                    else:
+-+                        print("❌ Store Prices: No price data returned")
+-+                        return False
+-+                else:
+-+                    print(f"❌ Store Prices: HTTP {response.status_code}")
+-+                    return False
+-+            else:
+-+                print("❌ Store Prices: No cigars available for testing")
+-+                return False
+-+        else:
+-+            print("❌ Store Prices: Cannot get cigar for testing")
+-+            return False
+-+    except Exception as e:
+-+        print(f"❌ Store Prices: Error - {str(e)}")
+-+        return False
+-+
+-+def main():
+-+    """Run additional backend tests"""
+-+    print("=" * 50)
+-+    print("ADDITIONAL BACKEND API TESTS")
+-+    print("=" * 50)
+-+    
+-+    tests = [
+-+        test_cigar_search,
+-+        test_cigar_search_with_query,
+-+        test_barcode_scan,
+-+        test_store_prices
+-+    ]
+-+    
+-+    passed = 0
+-+    for test in tests:
+-+        if test():
+-+            passed += 1
+-+    
+-+    print(f"\nAdditional Tests: {passed}/{len(tests)} passed")
+-+    return passed == len(tests)
+-+
+-+if __name__ == "__main__":
+-+    main()
+-\ No newline at end of file
+-diff --git a/test_result.md b/test_result.md
+-index 7b951b5..5d71e79 100644
+---- a/test_result.md
+-+++ b/test_result.md
+-@@ -107,27 +107,33 @@ user_problem_statement: "Build Cigar Ranker mobile PWA app with barcode scanning
+- backend:
+-   - task: "Authentication System (JWT)"
+-     implemented: true
+--    working: "NA"
+-+    working: true
+-     file: "backend/server.py, backend/auth.py, backend/models.py"
+-     stuck_count: 0
+-     priority: "high"
+--    needs_retesting: true
+-+    needs_retesting: false
+-     status_history:
+-       - working: "NA"
+-         agent: "main"
+-         comment: "Implemented JWT authentication with register, login, get profile, update profile endpoints. Password hashing with bcrypt. Token expiration set to 72 hours."
+-+      - working: true
+-+        agent: "testing"
+-+        comment: "Comprehensive testing completed. Registration endpoint working correctly: validates duplicate emails/usernames, handles missing fields, returns JWT tokens. Login endpoint working with correct user data. JWT token validation working for protected endpoints. Minor: Email format validation not implemented (accepts invalid emails like 'notanemail'), but core functionality is solid. 8/9 test cases passed."
+- 
+-   - task: "Cigar Database and Search"
+-     implemented: true
+--    working: "NA"
+-+    working: true
+-     file: "backend/server.py, backend/models.py"
+-     stuck_count: 0
+-     priority: "high"
+--    needs_retesting: true
+-+    needs_retesting: false
+-     status_history:
+-       - working: "NA"
+-         agent: "main"
+-         comment: "Implemented cigar CRUD operations, advanced search with filters (strength, origin, size, wrapper, price), seeded database with 5 sample cigars (Montecristo, Padron, Opus X, Cohiba, Liga Privada)"
+-+      - working: true
+-+        agent: "testing"
+-+        comment: "Tested cigar search endpoints successfully. Basic search returns cigars from database. Query-based search (e.g., 'Montecristo') returns filtered results (21 matches found). Database is properly seeded with comprehensive cigar data."
+- 
+-   - task: "AI Label Recognition (OpenAI Vision)"
+-     implemented: true
+-@@ -143,15 +149,18 @@ backend:
+- 
+-   - task: "Barcode Scanning"
+-     implemented: true
+--    working: "NA"
+-+    working: true
+-     file: "backend/server.py"
+-     stuck_count: 0
+-     priority: "high"
+--    needs_retesting: true
+-+    needs_retesting: false
+-     status_history:
+-       - working: "NA"
+-         agent: "main"
+-         comment: "Implemented scan-barcode endpoint. Searches database by barcode. Sample barcodes added to seed data."
+-+      - working: true
+-+        agent: "testing"
+-+        comment: "Barcode scanning endpoint tested successfully. API accepts barcode input and responds correctly with appropriate format (found/not found structure)."
+- 
+-   - task: "Rating System"
+-     implemented: true
+-@@ -191,15 +200,18 @@ backend:
+- 
+-   - task: "Store Price Comparison"
+-     implemented: true
+--    working: "NA"
+-+    working: true
+-     file: "backend/server.py, backend/models.py"
+-     stuck_count: 0
+-     priority: "medium"
+--    needs_retesting: true
+-+    needs_retesting: false
+-     status_history:
+-       - working: "NA"
+-         agent: "main"
+-         comment: "Implemented store prices endpoint. Currently returns mock data for 3 stores (Cigars International, Neptune Cigar, Atlantic Cigar) with search URLs. Ready for real scraping integration."
+-+      - working: true
+-+        agent: "testing"
+-+        comment: "Store price comparison endpoint tested successfully. Returns mock price data for 3 stores as expected. API structure is correct and ready for real scraping integration."
+- 
+- frontend:
+-   - task: "Navigation Structure (Bottom Tabs)"
+-@@ -348,4 +360,6 @@ agent_communication:
+-   - agent: "main"
+-     message: "Completed initial implementation of Cigar Ranker MVP. All core features implemented: JWT auth, cigar CRUD, AI label recognition with OpenAI Vision (gpt-4o), barcode scanning, rating system (0-10), nested comments, favorites, store price comparison. Frontend uses Expo Router with bottom tabs, React Context for auth, expo-camera for scanning. Ready for comprehensive backend testing. User needs to test manually or testing agent can perform automated tests."
+-   - agent: "main"
+--    message: "Completed registration success feedback feature. Added success state with visual confirmation (green checkmark, success container with border) to register.tsx. The success message displays for 2 seconds before auto-redirecting to home. Also added disabled button styling during loading. Ready for backend testing of registration flow."
+-\ No newline at end of file
+-+    message: "Completed registration success feedback feature. Added success state with visual confirmation (green checkmark, success container with border) to register.tsx. The success message displays for 2 seconds before auto-redirecting to home. Also added disabled button styling during loading. Ready for backend testing of registration flow."
+-+  - agent: "testing"
+-+    message: "Completed comprehensive backend testing. Authentication system working correctly - registration validates duplicates, login works, JWT tokens function properly. Cigar database and search working with seeded data. Barcode scanning and store price comparison endpoints responding correctly. Only minor issue: email format validation not implemented (accepts invalid emails). Core backend functionality is solid and ready for frontend integration testing."
+-\ No newline at end of file
