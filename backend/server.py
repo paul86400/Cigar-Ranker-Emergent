@@ -319,7 +319,7 @@ async def add_user_cigar(
     user_id: str = Depends(get_current_user)
 ):
     """Allow users to add cigars to the database"""
-    # Check if cigar already exists
+    # Check if cigar already exists (case-insensitive exact match)
     existing = await db.cigars.find_one({
         "brand": {"$regex": f"^{brand}$", "$options": "i"},
         "name": {"$regex": f"^{name}$", "$options": "i"}
@@ -328,8 +328,10 @@ async def add_user_cigar(
     if existing:
         return {
             "success": False,
-            "message": "This cigar already exists in our database",
-            "cigar_id": str(existing["_id"])
+            "message": f"{brand} {name} already exists in our database. You can view it or add your rating!",
+            "cigar_id": str(existing["_id"]),
+            "existing_brand": existing.get("brand"),
+            "existing_name": existing.get("name")
         }
     
     # Create cigar document
