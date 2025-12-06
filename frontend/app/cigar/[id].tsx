@@ -275,7 +275,7 @@ export default function CigarDetailsScreen() {
           </View>
         </View>
 
-        <View style={styles.actionButtons}>
+        <View style={[styles.actionButtons, { paddingBottom: insets.bottom }]}>
           <TouchableOpacity
             style={styles.buyButton}
             onPress={() => router.push(`/stores/${id}`)}
