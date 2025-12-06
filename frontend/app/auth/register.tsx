@@ -23,6 +23,7 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleRegister = async () => {
     console.log('=== REGISTRATION FLOW START ===');
