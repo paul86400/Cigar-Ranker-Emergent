@@ -892,16 +892,18 @@ async def get_store_prices(cigar_id: str):
     return stores
 
 
-# Include the router in the main app
-app.include_router(api_router)
-
+# Add CORS middleware BEFORE including router
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
+
+# Include the router in the main app
+app.include_router(api_router)
 
 
 @app.on_event("shutdown")
