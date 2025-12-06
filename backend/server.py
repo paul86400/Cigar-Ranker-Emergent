@@ -747,9 +747,9 @@ async def get_comments(cigar_id: str):
 @api_router.get("/comments/my-comments")
 async def get_my_comments(user_id: str = Depends(get_current_user)):
     """Get all comments by the current user with cigar details"""
-    import sys
-    print(f"[MY-COMMENTS] Fetching comments for user: {user_id}", flush=True)
-    print(f"[MY-COMMENTS] Fetching comments for user: {user_id}", file=sys.stderr, flush=True)
+    logger.error(f"[MY-COMMENTS] USER_ID FROM JWT: {user_id}")
+    logger.error(f"[MY-COMMENTS] USER_ID TYPE: {type(user_id)}")
+    logger.error(f"[MY-COMMENTS] USER_ID LENGTH: {len(user_id)}")
     
     # Use aggregation to join comments with cigar details
     pipeline = [
