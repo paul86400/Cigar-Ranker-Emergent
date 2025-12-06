@@ -401,6 +401,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  scanResultContainer: {
+    backgroundColor: '#1a1a1a',
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: '#8B4513',
+  },
+  scanResultText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
   webNote: {
     flexDirection: 'row',
     alignItems: 'center',
