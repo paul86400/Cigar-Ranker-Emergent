@@ -157,7 +157,7 @@ export default function CommentsScreen() {
           </View>
         )}
 
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer, { paddingBottom: insets.bottom }]}>
           <TextInput
             style={styles.input}
             placeholder={user ? 'Write a comment...' : 'Sign in to comment'}
