@@ -70,7 +70,7 @@ export default function StoresScreen() {
           <View style={styles.infoBox}>
             <Ionicons name="information-circle" size={24} color="#8B4513" />
             <Text style={styles.infoText}>
-              Compare prices from multiple retailers
+              {loading ? 'Fetching real-time prices...' : 'Prices fetched from retailer websites'}
             </Text>
           </View>
 
