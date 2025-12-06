@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BACKEND_URL = "https://stogie-rater.preview.emergentagent.com/api"
+BACKEND_URL = "https://cigar-scout.preview.emergentagent.com/api"
 
 def test_cigar_search():
     """Test cigar search endpoint"""

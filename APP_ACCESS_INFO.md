@@ -3,7 +3,7 @@
 ## Web Preview (Recommended)
 The app is fully functional via web browser on any device:
 
-**URL:** https://stogie-rater.preview.emergentagent.com
+**URL:** https://cigar-scout.preview.emergentagent.com
 
 **Access from Phone:**
 1. Open your phone's web browser (Safari, Chrome, etc.)
