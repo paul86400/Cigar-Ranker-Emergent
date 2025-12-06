@@ -29,23 +29,26 @@ export default function RegisterScreen() {
     console.log('Register button clicked');
     console.log('Username:', username, 'Email:', email, 'Password length:', password.length);
     
+    // Clear any previous errors
+    setError('');
+    
     if (!username || !email || !password) {
       console.log('❌ Validation failed: Missing fields');
-      Alert.alert('Error', 'Please fill in all fields');
+      setError('Please fill in all fields');
       return;
     }
 
     // Basic email validation
     if (!email.includes('@')) {
       console.log('❌ Validation failed: Invalid email format');
-      Alert.alert('Error', 'Please enter a valid email address');
+      setError('Please enter a valid email address');
       return;
     }
 
     // Basic password validation
     if (password.length < 6) {
       console.log('❌ Validation failed: Password too short');
-      Alert.alert('Error', 'Password must be at least 6 characters');
+      setError('Password must be at least 6 characters');
       return;
     }
 
@@ -64,6 +67,7 @@ export default function RegisterScreen() {
       
       // Show success state
       setSuccess(true);
+      setError('');
       console.log('Success state set to:', true);
       
       // Wait a moment to show the success message, then navigate
@@ -81,6 +85,8 @@ export default function RegisterScreen() {
       });
       setSuccess(false);
       const errorMessage = error.response?.data?.detail || error.message || 'Registration failed. Please try again.';
+      setError(errorMessage);
+      // Also show alert for visibility
       Alert.alert('Registration Failed', errorMessage);
     } finally {
       console.log('Finally block - setting loading to false');
