@@ -85,61 +85,74 @@ export default function RegisterScreen() {
           <Text style={styles.title}>Create Account</Text>
           <Text style={styles.subtitle}>Join the cigar community</Text>
 
-          <View style={styles.form}>
-            <View style={styles.inputContainer}>
-              <Ionicons name="person" size={20} color="#888" />
-              <TextInput
-                style={styles.input}
-                placeholder="Username"
-                placeholderTextColor="#888"
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
-              />
+          {success && (
+            <View style={styles.successContainer}>
+              <Ionicons name="checkmark-circle" size={48} color="#4CAF50" />
+              <Text style={styles.successTitle}>Account Created!</Text>
+              <Text style={styles.successText}>Redirecting to home...</Text>
             </View>
+          )}
 
-            <View style={styles.inputContainer}>
-              <Ionicons name="mail" size={20} color="#888" />
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                placeholderTextColor="#888"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
+          {!success && (
+            <View style={styles.form}>
+              <View style={styles.inputContainer}>
+                <Ionicons name="person" size={20} color="#888" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Username"
+                  placeholderTextColor="#888"
+                  value={username}
+                  onChangeText={setUsername}
+                  autoCapitalize="none"
+                  editable={!loading}
+                />
+              </View>
 
-            <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed" size={20} color="#888" />
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                placeholderTextColor="#888"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-              />
-            </View>
+              <View style={styles.inputContainer}>
+                <Ionicons name="mail" size={20} color="#888" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Email"
+                  placeholderTextColor="#888"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  editable={!loading}
+                />
+              </View>
 
-            <TouchableOpacity
-              style={styles.registerButton}
-              onPress={handleRegister}
-              disabled={loading}
-            >
-              <Text style={styles.registerButtonText}>
-                {loading ? 'Creating Account...' : 'Sign Up'}
-              </Text>
-            </TouchableOpacity>
+              <View style={styles.inputContainer}>
+                <Ionicons name="lock-closed" size={20} color="#888" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  placeholderTextColor="#888"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  editable={!loading}
+                />
+              </View>
 
-            <View style={styles.loginContainer}>
-              <Text style={styles.loginText}>Already have an account? </Text>
-              <TouchableOpacity onPress={() => router.replace('/auth/login')}>
-                <Text style={styles.loginLink}>Sign In</Text>
+              <TouchableOpacity
+                style={[styles.registerButton, loading && styles.registerButtonDisabled]}
+                onPress={handleRegister}
+                disabled={loading}
+              >
+                <Text style={styles.registerButtonText}>
+                  {loading ? 'Creating Account...' : 'Sign Up'}
+                </Text>
               </TouchableOpacity>
+
+              <View style={styles.loginContainer}>
+                <Text style={styles.loginText}>Already have an account? </Text>
+                <TouchableOpacity onPress={() => router.replace('/auth/login')}>
+                  <Text style={styles.loginLink}>Sign In</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          )}
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
