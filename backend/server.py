@@ -784,17 +784,24 @@ async def get_my_comments(user_id: str = Depends(get_current_user)):
     ]
     
     comments = await db.comments.aggregate(pipeline).to_list(1000)
-    print(f"[MY-COMMENTS] Found {len(comments)} comments", file=sys.stderr, flush=True)
     
     if len(comments) > 0:
         # Convert datetime to ISO string for JSON serialization
         for comment in comments:
             if 'created_at' in comment and comment['created_at']:
                 comment['created_at'] = comment['created_at'].isoformat()
-        print(f"[MY-COMMENTS] First comment: {comments[0].get('text', '')} for {comments[0].get('cigar_brand', '')} {comments[0].get('cigar_name', '')}", file=sys.stderr, flush=True)
     
     serialized = [serialize_doc(comment) for comment in comments]
-    print(f"[MY-COMMENTS] Returning {len(serialized)} serialized comments", file=sys.stderr, flush=True)
+    
+    # TEMPORARY DEBUG: Return debug info as first item if no comments found
+    if len(serialized) == 0:
+        return [{
+            "_DEBUG_user_id": user_id,
+            "_DEBUG_user_id_type": str(type(user_id)),
+            "_DEBUG_user_id_length": len(user_id),
+            "_DEBUG_comments_found": len(comments),
+            "_DEBUG_message": "This is debug data - user_id doesn't match any comments"
+        }]
     
     return serialized
 
