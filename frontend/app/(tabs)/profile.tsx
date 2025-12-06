@@ -74,7 +74,10 @@ export default function ProfileScreen() {
             <Ionicons name="chevron-forward" size={20} color="#888" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity 
+            style={styles.menuItem}
+            onPress={() => router.push('/my-ratings')}
+          >
             <View style={styles.menuItemLeft}>
               <Ionicons name="star-outline" size={24} color="#fff" />
               <Text style={styles.menuItemText}>My Ratings</Text>
