@@ -267,6 +267,13 @@ async def upload_cigar_image(
         # Open image and resize if needed (max 800px width to keep size reasonable)
         image = Image.open(BytesIO(contents))
         
+        # Handle EXIF orientation to prevent rotation issues
+        try:
+            from PIL import ImageOps
+            image = ImageOps.exif_transpose(image)
+        except Exception:
+            pass  # If no EXIF data, just continue
+        
         # Convert to RGB if needed (handles RGBA, P, etc.)
         if image.mode != 'RGB':
             image = image.convert('RGB')
