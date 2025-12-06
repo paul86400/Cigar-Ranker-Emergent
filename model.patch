@@ -1,187 +1,291 @@
-diff --git a/frontend/app/cigar/[id].tsx b/frontend/app/cigar/[id].tsx
-index f94a07f..a30ff4c 100644
---- a/frontend/app/cigar/[id].tsx
-+++ b/frontend/app/cigar/[id].tsx
-@@ -140,6 +140,65 @@ export default function CigarDetailsScreen() {
-     }
-   };
+diff --git a/frontend/app/camera.tsx b/frontend/app/camera.tsx
+index 3e1d728..92860f2 100644
+--- a/frontend/app/camera.tsx
++++ b/frontend/app/camera.tsx
+@@ -10,7 +10,6 @@ import {
+   Platform,
+ } from 'react-native';
+ import { CameraView, useCameraPermissions } from 'expo-camera';
+-import { BarCodeScanningResult } from 'expo-camera/build/Camera.types';
+ import * as ImagePicker from 'expo-image-picker';
+ import { useRouter } from 'expo-router';
+ import { Ionicons } from '@expo/vector-icons';
+@@ -21,44 +20,67 @@ export default function CameraScreen() {
+   const [permission, requestPermission] = useCameraPermissions();
+   const [scanned, setScanned] = useState(false);
+   const [scanning, setScanning] = useState(false);
++  const [scanResult, setScanResult] = useState(null);
  
-+  const handleUploadImage = async () => {
-+    if (!user) {
-+      Alert.alert('Login Required', 'Please login to upload images');
-+      return;
-+    }
-+
-+    try {
-+      // Request permissions
-+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-+      if (status !== 'granted') {
-+        Alert.alert('Permission Denied', 'We need camera roll permissions to upload images');
-+        return;
-+      }
-+
-+      // Pick image
-+      const result = await ImagePicker.launchImageLibraryAsync({
-+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-+        allowsEditing: true,
-+        aspect: [4, 3],
+   const handlePickImage = async () => {
+     try {
++      console.log('Starting image picker...');
+       const result = await ImagePicker.launchImageLibraryAsync({
+         mediaTypes: ImagePicker.MediaTypeOptions.Images,
+         allowsEditing: true,
+-        aspect: [4, 3],
+-        quality: 0.5,
+         base64: true,
 +        quality: 0.8,
-+      });
+       });
+ 
++      console.log('Image picker result:', result.canceled);
 +
-+      if (!result.canceled && result.assets && result.assets[0]) {
-+        setUploadingImage(true);
-+        const imageUri = result.assets[0].uri;
-+
-+        // Create form data
-+        const formData = new FormData();
-+        const filename = imageUri.split('/').pop() || 'image.jpg';
-+        const match = /\.(\w+)$/.exec(filename);
-+        const type = match ? `image/${match[1]}` : 'image/jpeg';
-+
-+        formData.append('file', {
-+          uri: Platform.OS === 'web' ? imageUri : imageUri,
-+          name: filename,
-+          type: type,
-+        } as any);
-+
-+        // Upload to backend
-+        const response = await api.post(`/cigars/${id}/upload-image`, formData, {
-+          headers: {
-+            'Content-Type': 'multipart/form-data',
-+          },
-+        });
-+
-+        if (response.data.success) {
-+          // Update local cigar data
-+          setCigar(prev => prev ? { ...prev, image: response.data.image } : null);
-+          Alert.alert('Success', 'Image updated successfully!');
-+        }
-+      }
+       if (!result.canceled && result.assets[0].base64) {
++        console.log('Image selected, starting scan...');
+         setScanning(true);
+-        const response = await api.post('/cigars/scan-label', {
+-          image_base64: result.assets[0].base64,
+-        });
++        setScanResult(null);
++        
++        try {
++          const response = await api.post('/cigars/scan-label', {
++            image_base64: result.assets[0].base64,
++          });
+ 
+-        console.log('Scan response:', response.data);
++          console.log('Scan response received:', JSON.stringify(response.data, null, 2));
+ 
+-        if (response.data.identified && response.data.cigar) {
+-          router.replace(`/cigar/${response.data.cigar.id}`);
+-        } else {
+-          // Show what AI detected even if not in database
+-          let message = response.data.message || 'Could not identify cigar from label';
+-          
+-          if (response.data.ai_info) {
+-            const ai = response.data.ai_info;
+-            if (ai.brand || ai.name) {
+-              message = `AI detected: ${ai.brand || 'Unknown'} ${ai.name || ''}\n\nThis cigar is not in our database yet.`;
++          if (response.data.identified && response.data.cigar) {
++            console.log('Cigar found! ID:', response.data.cigar.id);
++            setScanResult(`Found: ${response.data.cigar.brand} ${response.data.cigar.name}`);
++            setTimeout(() => {
++              router.replace(`/cigar/${response.data.cigar.id}`);
++            }, 1000);
++          } else {
++            console.log('Cigar not in database');
++            // Show what AI detected even if not in database
++            let message = response.data.message || 'Could not identify cigar from label';
++            
++            if (response.data.ai_info) {
++              const ai = response.data.ai_info;
++              console.log('AI info:', ai);
++              if (ai.brand || ai.name) {
++                message = `AI detected:\n${ai.brand || 'Unknown'} ${ai.name || ''}\n\nThis cigar is not in our database yet.`;
++              }
+             }
++            
++            setScanResult(message);
++            Alert.alert('Not in Database', message, [
++              { text: 'OK', onPress: () => setScanResult(null) }
++            ]);
+           }
+-          
+-          Alert.alert('Not in Database', message);
++        } catch (apiError) {
++          console.error('API Error:', apiError);
++          const errorMsg = apiError.response?.data?.detail || apiError.message || 'Failed to scan label';
++          setScanResult(`Error: ${errorMsg}`);
++          Alert.alert('Error', errorMsg);
+         }
+       }
+-    } catch (error: any) {
 +    } catch (error) {
-+      console.error('Error uploading image:', error);
-+      Alert.alert('Error', 'Failed to upload image. Please try again.');
-+    } finally {
-+      setUploadingImage(false);
-+    }
-+  };
+       console.error('Error picking image:', error);
+-      const errorMsg = error.response?.data?.detail || error.message || 'Failed to scan label';
++      const errorMsg = error.message || 'Failed to pick image';
++      setScanResult(`Error: ${errorMsg}`);
+       Alert.alert('Error', errorMsg);
+     } finally {
+       setScanning(false);
+@@ -85,7 +107,7 @@ export default function CameraScreen() {
+           <Ionicons name="camera-outline" size={80} color="#8B4513" />
+           <Text style={styles.webTitle}>Camera not available on web</Text>
+           <Text style={styles.webSubtitle}>
+-            Upload an image of your cigar's label or barcode to identify it
++            Upload an image of your cigar&apos;s label or barcode to identify it
+           </Text>
+           
+           <TouchableOpacity
+@@ -106,6 +128,12 @@ export default function CameraScreen() {
+             </View>
+           )}
+ 
++          {scanResult && (
++            <View style={styles.scanResultContainer}>
++              <Text style={styles.scanResultText}>{scanResult}</Text>
++            </View>
++          )}
 +
-   if (loading) {
-     return (
-       <SafeAreaView style={styles.container}>
+           <View style={styles.webNote}>
+             <Ionicons name="information-circle" size={20} color="#888" />
+             <Text style={styles.webNoteText}>
+@@ -139,7 +167,7 @@ export default function CameraScreen() {
+     );
+   }
+ 
+-  const handleBarcodeScanned = async ({ data }: BarCodeScanningResult) => {
++  const handleBarcodeScanned = async ({ data }) => {
+     if (scanned || scanning) return;
+     
+     setScanned(true);
+@@ -198,6 +226,12 @@ export default function CameraScreen() {
+           </View>
+         )}
+ 
++        {scanResult && (
++          <View style={styles.scanResultContainer}>
++            <Text style={styles.scanResultText}>{scanResult}</Text>
++          </View>
++        )}
++
+         <View style={styles.actionButtons}>
+           <TouchableOpacity
+             style={styles.galleryButton}
+@@ -372,6 +406,20 @@ const styles = StyleSheet.create({
+     fontSize: 18,
+     fontWeight: 'bold',
+   },
++  scanResultContainer: {
++    backgroundColor: '#1a1a1a',
++    padding: 16,
++    borderRadius: 12,
++    marginTop: 16,
++    borderWidth: 1,
++    borderColor: '#8B4513',
++  },
++  scanResultText: {
++    color: '#fff',
++    fontSize: 16,
++    textAlign: 'center',
++    lineHeight: 22,
++  },
+   webNote: {
+     flexDirection: 'row',
+     alignItems: 'center',
 diff --git a/model.patch b/model.patch
-index e907036..e69de29 100644
+index b488c2f..2f2baff 100644
 --- a/model.patch
 +++ b/model.patch
-@@ -1,367 +0,0 @@
--diff --git a/frontend/app/auth/register.tsx b/frontend/app/auth/register.tsx
--index caeaac3..4f5276f 100644
----- a/frontend/app/auth/register.tsx
--+++ b/frontend/app/auth/register.tsx
--@@ -158,15 +158,28 @@ export default function RegisterScreen() {
+@@ -1,442 +0,0 @@
+-diff --git a/frontend/app/cigar/[id].tsx b/frontend/app/cigar/[id].tsx
+-index f94a07f..a30ff4c 100644
+---- a/frontend/app/cigar/[id].tsx
+-+++ b/frontend/app/cigar/[id].tsx
+-@@ -140,6 +140,65 @@ export default function CigarDetailsScreen() {
+-     }
+-   };
 - 
--               <View style={styles.inputContainer}>
--                 <Ionicons name="lock-closed" size={20} color="#888" />
---                <TextInput
---                  style={styles.input}
---                  placeholder="Password"
---                  placeholderTextColor="#888"
---                  value={password}
---                  onChangeText={setPassword}
---                  secureTextEntry
---                  editable={!loading}
---                />
--+                <View style={styles.passwordContainer}>
--+                  <TextInput
--+                    style={styles.passwordInput}
--+                    placeholder="Password"
--+                    placeholderTextColor="#888"
--+                    value={password}
--+                    onChangeText={setPassword}
--+                    secureTextEntry={!showPassword}
--+                    autoCapitalize="none"
--+                    editable={!loading}
--+                  />
--+                  <TouchableOpacity
--+                    style={styles.eyeButton}
--+                    onPress={() => setShowPassword(!showPassword)}
--+                  >
--+                    <Ionicons 
--+                      name={showPassword ? "eye-off" : "eye"} 
--+                      size={24} 
--+                      color="#888" 
--+                    />
--+                  </TouchableOpacity>
--+                </View>
--               </View>
-- 
--               <TouchableOpacity
--@@ -236,6 +249,20 @@ const styles = StyleSheet.create({
--     color: '#fff',
--     fontSize: 16,
--   },
--+  passwordContainer: {
--+    flex: 1,
--+    flexDirection: 'row',
--+    alignItems: 'center',
--+  },
--+  passwordInput: {
--+    flex: 1,
--+    height: 56,
--+    color: '#fff',
--+    fontSize: 16,
--+  },
--+  eyeButton: {
--+    padding: 8,
--+  },
--   registerButton: {
--     backgroundColor: '#8B4513',
--     borderRadius: 12,
+-+  const handleUploadImage = async () => {
+-+    if (!user) {
+-+      Alert.alert('Login Required', 'Please login to upload images');
+-+      return;
+-+    }
+-+
+-+    try {
+-+      // Request permissions
+-+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+-+      if (status !== 'granted') {
+-+        Alert.alert('Permission Denied', 'We need camera roll permissions to upload images');
+-+        return;
+-+      }
+-+
+-+      // Pick image
+-+      const result = await ImagePicker.launchImageLibraryAsync({
+-+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+-+        allowsEditing: true,
+-+        aspect: [4, 3],
+-+        quality: 0.8,
+-+      });
+-+
+-+      if (!result.canceled && result.assets && result.assets[0]) {
+-+        setUploadingImage(true);
+-+        const imageUri = result.assets[0].uri;
+-+
+-+        // Create form data
+-+        const formData = new FormData();
+-+        const filename = imageUri.split('/').pop() || 'image.jpg';
+-+        const match = /\.(\w+)$/.exec(filename);
+-+        const type = match ? `image/${match[1]}` : 'image/jpeg';
+-+
+-+        formData.append('file', {
+-+          uri: Platform.OS === 'web' ? imageUri : imageUri,
+-+          name: filename,
+-+          type: type,
+-+        } as any);
+-+
+-+        // Upload to backend
+-+        const response = await api.post(`/cigars/${id}/upload-image`, formData, {
+-+          headers: {
+-+            'Content-Type': 'multipart/form-data',
+-+          },
+-+        });
+-+
+-+        if (response.data.success) {
+-+          // Update local cigar data
+-+          setCigar(prev => prev ? { ...prev, image: response.data.image } : null);
+-+          Alert.alert('Success', 'Image updated successfully!');
+-+        }
+-+      }
+-+    } catch (error) {
+-+      console.error('Error uploading image:', error);
+-+      Alert.alert('Error', 'Failed to upload image. Please try again.');
+-+    } finally {
+-+      setUploadingImage(false);
+-+    }
+-+  };
+-+
+-   if (loading) {
+-     return (
+-       <SafeAreaView style={styles.container}>
 -diff --git a/model.patch b/model.patch
--index 722718b..e69de29 100644
+-index e907036..e69de29 100644
 ---- a/model.patch
 -+++ b/model.patch
--@@ -1,299 +0,0 @@
---diff --git a/frontend/app/auth/login.tsx b/frontend/app/auth/login.tsx
---index e11b533..734e997 100644
------ a/frontend/app/auth/login.tsx
---+++ b/frontend/app/auth/login.tsx
---@@ -134,14 +134,27 @@ export default function LoginScreen() {
+-@@ -1,367 +0,0 @@
+--diff --git a/frontend/app/auth/register.tsx b/frontend/app/auth/register.tsx
+--index caeaac3..4f5276f 100644
+----- a/frontend/app/auth/register.tsx
+--+++ b/frontend/app/auth/register.tsx
+--@@ -158,15 +158,28 @@ export default function RegisterScreen() {
 -- 
---             <View style={styles.inputContainer}>
---               <Ionicons name="lock-closed" size={20} color="#888" />
----              <TextInput
----                style={styles.input}
----                placeholder="Password"
----                placeholderTextColor="#888"
----                value={password}
----                onChangeText={setPassword}
----                secureTextEntry
----              />
---+              <View style={styles.passwordContainer}>
---+                <TextInput
---+                  style={styles.passwordInput}
---+                  placeholder="Password"
---+                  placeholderTextColor="#888"
---+                  value={password}
---+                  onChangeText={setPassword}
---+                  secureTextEntry={!showPassword}
---+                  autoCapitalize="none"
---+                />
---+                <TouchableOpacity
---+                  style={styles.eyeButton}
---+                  onPress={() => setShowPassword(!showPassword)}
---+                >
---+                  <Ionicons 
---+                    name={showPassword ? "eye-off" : "eye"} 
---+                    size={24} 
---+                    color="#888" 
+--               <View style={styles.inputContainer}>
+--                 <Ionicons name="lock-closed" size={20} color="#888" />
+---                <TextInput
+---                  style={styles.input}
+---                  placeholder="Password"
+---                  placeholderTextColor="#888"
+---                  value={password}
+---                  onChangeText={setPassword}
+---                  secureTextEntry
+---                  editable={!loading}
+---                />
+--+                <View style={styles.passwordContainer}>
+--+                  <TextInput
+--+                    style={styles.passwordInput}
+--+                    placeholder="Password"
+--+                    placeholderTextColor="#888"
+--+                    value={password}
+--+                    onChangeText={setPassword}
+--+                    secureTextEntry={!showPassword}
+--+                    autoCapitalize="none"
+--+                    editable={!loading}
 --+                  />
---+                </TouchableOpacity>
---+              </View>
---             </View>
+--+                  <TouchableOpacity
+--+                    style={styles.eyeButton}
+--+                    onPress={() => setShowPassword(!showPassword)}
+--+                  >
+--+                    <Ionicons 
+--+                      name={showPassword ? "eye-off" : "eye"} 
+--+                      size={24} 
+--+                      color="#888" 
+--+                    />
+--+                  </TouchableOpacity>
+--+                </View>
+--               </View>
 -- 
---             <TouchableOpacity
---@@ -211,6 +224,20 @@ const styles = StyleSheet.create({
+--               <TouchableOpacity
+--@@ -236,6 +249,20 @@ const styles = StyleSheet.create({
 --     color: '#fff',
 --     fontSize: 16,
 --   },
@@ -199,244 +303,310 @@ index e907036..e69de29 100644
 --+  eyeButton: {
 --+    padding: 8,
 --+  },
---   loginButton: {
+--   registerButton: {
 --     backgroundColor: '#8B4513',
 --     borderRadius: 12,
 --diff --git a/model.patch b/model.patch
---index f4f9a73..e69de29 100644
+--index 722718b..e69de29 100644
 ----- a/model.patch
 --+++ b/model.patch
---@@ -1,233 +0,0 @@
+--@@ -1,299 +0,0 @@
+---diff --git a/frontend/app/auth/login.tsx b/frontend/app/auth/login.tsx
+---index e11b533..734e997 100644
+------ a/frontend/app/auth/login.tsx
+---+++ b/frontend/app/auth/login.tsx
+---@@ -134,14 +134,27 @@ export default function LoginScreen() {
+--- 
+---             <View style={styles.inputContainer}>
+---               <Ionicons name="lock-closed" size={20} color="#888" />
+----              <TextInput
+----                style={styles.input}
+----                placeholder="Password"
+----                placeholderTextColor="#888"
+----                value={password}
+----                onChangeText={setPassword}
+----                secureTextEntry
+----              />
+---+              <View style={styles.passwordContainer}>
+---+                <TextInput
+---+                  style={styles.passwordInput}
+---+                  placeholder="Password"
+---+                  placeholderTextColor="#888"
+---+                  value={password}
+---+                  onChangeText={setPassword}
+---+                  secureTextEntry={!showPassword}
+---+                  autoCapitalize="none"
+---+                />
+---+                <TouchableOpacity
+---+                  style={styles.eyeButton}
+---+                  onPress={() => setShowPassword(!showPassword)}
+---+                >
+---+                  <Ionicons 
+---+                    name={showPassword ? "eye-off" : "eye"} 
+---+                    size={24} 
+---+                    color="#888" 
+---+                  />
+---+                </TouchableOpacity>
+---+              </View>
+---             </View>
+--- 
+---             <TouchableOpacity
+---@@ -211,6 +224,20 @@ const styles = StyleSheet.create({
+---     color: '#fff',
+---     fontSize: 16,
+---   },
+---+  passwordContainer: {
+---+    flex: 1,
+---+    flexDirection: 'row',
+---+    alignItems: 'center',
+---+  },
+---+  passwordInput: {
+---+    flex: 1,
+---+    height: 56,
+---+    color: '#fff',
+---+    fontSize: 16,
+---+  },
+---+  eyeButton: {
+---+    padding: 8,
+---+  },
+---   loginButton: {
+---     backgroundColor: '#8B4513',
+---     borderRadius: 12,
 ---diff --git a/model.patch b/model.patch
----index ce7c6f8..e69de29 100644
+---index f4f9a73..e69de29 100644
 ------ a/model.patch
 ---+++ b/model.patch
----@@ -1,228 +0,0 @@
+---@@ -1,233 +0,0 @@
 ----diff --git a/model.patch b/model.patch
-----index 1190f9b..e69de29 100644
+----index ce7c6f8..e69de29 100644
 ------- a/model.patch
 ----+++ b/model.patch
-----@@ -1,223 +0,0 @@
+----@@ -1,228 +0,0 @@
 -----diff --git a/model.patch b/model.patch
------index 413ce7d..e69de29 100644
+-----index 1190f9b..e69de29 100644
 -------- a/model.patch
 -----+++ b/model.patch
------@@ -1,218 +0,0 @@
-------diff --git a/additional_backend_test.py b/additional_backend_test.py
-------new file mode 100644
-------index 0000000..6b53e49
---------- /dev/null
-------+++ b/additional_backend_test.py
-------@@ -0,0 +1,117 @@
-------+#!/usr/bin/env python3
-------+"""
-------+Additional Backend API Tests for Cigar Ranker App
-------+Tests other core endpoints beyond authentication
-------+"""
-------+
-------+import requests
-------+import json
-------+import time
-------+from datetime import datetime
-------+
-------+BACKEND_URL = "https://stogie-rater.preview.emergentagent.com/api"
-------+
-------+def test_cigar_search():
-------+    """Test cigar search endpoint"""
-------+    try:
-------+        response = requests.get(f"{BACKEND_URL}/cigars/search", timeout=10)
-------+        if response.status_code == 200:
-------+            data = response.json()
-------+            if isinstance(data, list) and len(data) > 0:
-------+                print("✅ Cigar Search: Working - Found cigars in database")
-------+                return True
-------+            else:
-------+                print("❌ Cigar Search: No cigars found in database")
-------+                return False
-------+        else:
-------+            print(f"❌ Cigar Search: HTTP {response.status_code}")
-------+            return False
-------+    except Exception as e:
-------+        print(f"❌ Cigar Search: Error - {str(e)}")
-------+        return False
-------+
-------+def test_cigar_search_with_query():
-------+    """Test cigar search with query parameter"""
-------+    try:
-------+        response = requests.get(f"{BACKEND_URL}/cigars/search?q=Montecristo", timeout=10)
-------+        if response.status_code == 200:
-------+            data = response.json()
-------+            print(f"✅ Cigar Search with Query: Working - Found {len(data)} results")
-------+            return True
-------+        else:
-------+            print(f"❌ Cigar Search with Query: HTTP {response.status_code}")
-------+            return False
-------+    except Exception as e:
-------+        print(f"❌ Cigar Search with Query: Error - {str(e)}")
-------+        return False
-------+
-------+def test_barcode_scan():
-------+    """Test barcode scanning endpoint"""
-------+    try:
-------+        test_data = {"barcode": "123456789012"}
-------+        response = requests.post(f"{BACKEND_URL}/cigars/scan-barcode", json=test_data, timeout=10)
-------+        if response.status_code == 200:
-------+            data = response.json()
-------+            print("✅ Barcode Scan: Working - Endpoint responds correctly")
-------+            return True
-------+        else:
-------+            print(f"❌ Barcode Scan: HTTP {response.status_code}")
-------+            return False
-------+    except Exception as e:
-------+        print(f"❌ Barcode Scan: Error - {str(e)}")
-------+        return False
-------+
-------+def test_store_prices():
-------+    """Test store prices endpoint"""
-------+    try:
-------+        # First get a cigar ID
-------+        search_response = requests.get(f"{BACKEND_URL}/cigars/search", timeout=10)
-------+        if search_response.status_code == 200:
-------+            cigars = search_response.json()
-------+            if cigars:
-------+                cigar_id = cigars[0]["id"]
-------+                response = requests.get(f"{BACKEND_URL}/stores/{cigar_id}", timeout=10)
-------+                if response.status_code == 200:
-------+                    data = response.json()
-------+                    if isinstance(data, list) and len(data) > 0:
-------+                        print("✅ Store Prices: Working - Returns price data")
-------+                        return True
-------+                    else:
-------+                        print("❌ Store Prices: No price data returned")
-------+                        return False
-------+                else:
-------+                    print(f"❌ Store Prices: HTTP {response.status_code}")
-------+                    return False
-------+            else:
-------+                print("❌ Store Prices: No cigars available for testing")
-------+                return False
-------+        else:
-------+            print("❌ Store Prices: Cannot get cigar for testing")
-------+            return False
-------+    except Exception as e:
-------+        print(f"❌ Store Prices: Error - {str(e)}")
-------+        return False
-------+
-------+def main():
-------+    """Run additional backend tests"""
-------+    print("=" * 50)
-------+    print("ADDITIONAL BACKEND API TESTS")
-------+    print("=" * 50)
-------+    
-------+    tests = [
-------+        test_cigar_search,
-------+        test_cigar_search_with_query,
-------+        test_barcode_scan,
-------+        test_store_prices
-------+    ]
-------+    
-------+    passed = 0
-------+    for test in tests:
-------+        if test():
-------+            passed += 1
-------+    
-------+    print(f"\nAdditional Tests: {passed}/{len(tests)} passed")
-------+    return passed == len(tests)
-------+
-------+if __name__ == "__main__":
-------+    main()
-------\ No newline at end of file
-------diff --git a/test_result.md b/test_result.md
-------index 7b951b5..5d71e79 100644
---------- a/test_result.md
-------+++ b/test_result.md
-------@@ -107,27 +107,33 @@ user_problem_statement: "Build Cigar Ranker mobile PWA app with barcode scanning
------- backend:
-------   - task: "Authentication System (JWT)"
-------     implemented: true
--------    working: "NA"
-------+    working: true
-------     file: "backend/server.py, backend/auth.py, backend/models.py"
-------     stuck_count: 0
-------     priority: "high"
--------    needs_retesting: true
-------+    needs_retesting: false
-------     status_history:
-------       - working: "NA"
-------         agent: "main"
-------         comment: "Implemented JWT authentication with register, login, get profile, update profile endpoints. Password hashing with bcrypt. Token expiration set to 72 hours."
-------+      - working: true
-------+        agent: "testing"
-------+        comment: "Comprehensive testing completed. Registration endpoint working correctly: validates duplicate emails/usernames, handles missing fields, returns JWT tokens. Login endpoint working with correct user data. JWT token validation working for protected endpoints. Minor: Email format validation not implemented (accepts invalid emails like 'notanemail'), but core functionality is solid. 8/9 test cases passed."
------- 
-------   - task: "Cigar Database and Search"
-------     implemented: true
--------    working: "NA"
-------+    working: true
-------     file: "backend/server.py, backend/models.py"
-------     stuck_count: 0
-------     priority: "high"
--------    needs_retesting: true
-------+    needs_retesting: false
-------     status_history:
-------       - working: "NA"
-------         agent: "main"
-------         comment: "Implemented cigar CRUD operations, advanced search with filters (strength, origin, size, wrapper, price), seeded database with 5 sample cigars (Montecristo, Padron, Opus X, Cohiba, Liga Privada)"
-------+      - working: true
-------+        agent: "testing"
-------+        comment: "Tested cigar search endpoints successfully. Basic search returns cigars from database. Query-based search (e.g., 'Montecristo') returns filtered results (21 matches found). Database is properly seeded with comprehensive cigar data."
------- 
-------   - task: "AI Label Recognition (OpenAI Vision)"
-------     implemented: true
-------@@ -143,15 +149,18 @@ backend:
------- 
-------   - task: "Barcode Scanning"
-------     implemented: true
--------    working: "NA"
-------+    working: true
-------     file: "backend/server.py"
-------     stuck_count: 0
-------     priority: "high"
--------    needs_retesting: true
-------+    needs_retesting: false
-------     status_history:
-------       - working: "NA"
-------         agent: "main"
-------         comment: "Implemented scan-barcode endpoint. Searches database by barcode. Sample barcodes added to seed data."
-------+      - working: true
-------+        agent: "testing"
-------+        comment: "Barcode scanning endpoint tested successfully. API accepts barcode input and responds correctly with appropriate format (found/not found structure)."
------- 
-------   - task: "Rating System"
-------     implemented: true
-------@@ -191,15 +200,18 @@ backend:
------- 
-------   - task: "Store Price Comparison"
-------     implemented: true
--------    working: "NA"
-------+    working: true
-------     file: "backend/server.py, backend/models.py"
-------     stuck_count: 0
-------     priority: "medium"
--------    needs_retesting: true
-------+    needs_retesting: false
-------     status_history:
-------       - working: "NA"
-------         agent: "main"
-------         comment: "Implemented store prices endpoint. Currently returns mock data for 3 stores (Cigars International, Neptune Cigar, Atlantic Cigar) with search URLs. Ready for real scraping integration."
-------+      - working: true
-------+        agent: "testing"
-------+        comment: "Store price comparison endpoint tested successfully. Returns mock price data for 3 stores as expected. API structure is correct and ready for real scraping integration."
------- 
------- frontend:
-------   - task: "Navigation Structure (Bottom Tabs)"
-------@@ -348,4 +360,6 @@ agent_communication:
-------   - agent: "main"
-------     message: "Completed initial implementation of Cigar Ranker MVP. All core features implemented: JWT auth, cigar CRUD, AI label recognition with OpenAI Vision (gpt-4o), barcode scanning, rating system (0-10), nested comments, favorites, store price comparison. Frontend uses Expo Router with bottom tabs, React Context for auth, expo-camera for scanning. Ready for comprehensive backend testing. User needs to test manually or testing agent can perform automated tests."
-------   - agent: "main"
--------    message: "Completed registration success feedback feature. Added success state with visual confirmation (green checkmark, success container with border) to register.tsx. The success message displays for 2 seconds before auto-redirecting to home. Also added disabled button styling during loading. Ready for backend testing of registration flow."
-------\ No newline at end of file
-------+    message: "Completed registration success feedback feature. Added success state with visual confirmation (green checkmark, success container with border) to register.tsx. The success message displays for 2 seconds before auto-redirecting to home. Also added disabled button styling during loading. Ready for backend testing of registration flow."
-------+  - agent: "testing"
-------+    message: "Completed comprehensive backend testing. Authentication system working correctly - registration validates duplicates, login works, JWT tokens function properly. Cigar database and search working with seeded data. Barcode scanning and store price comparison endpoints responding correctly. Only minor issue: email format validation not implemented (accepts invalid emails). Core backend functionality is solid and ready for frontend integration testing."
-------\ No newline at end of file
+-----@@ -1,223 +0,0 @@
+------diff --git a/model.patch b/model.patch
+------index 413ce7d..e69de29 100644
+--------- a/model.patch
+------+++ b/model.patch
+------@@ -1,218 +0,0 @@
+-------diff --git a/additional_backend_test.py b/additional_backend_test.py
+-------new file mode 100644
+-------index 0000000..6b53e49
+---------- /dev/null
+-------+++ b/additional_backend_test.py
+-------@@ -0,0 +1,117 @@
+-------+#!/usr/bin/env python3
+-------+"""
+-------+Additional Backend API Tests for Cigar Ranker App
+-------+Tests other core endpoints beyond authentication
+-------+"""
+-------+
+-------+import requests
+-------+import json
+-------+import time
+-------+from datetime import datetime
+-------+
+-------+BACKEND_URL = "https://stogie-rater.preview.emergentagent.com/api"
+-------+
+-------+def test_cigar_search():
+-------+    """Test cigar search endpoint"""
+-------+    try:
+-------+        response = requests.get(f"{BACKEND_URL}/cigars/search", timeout=10)
+-------+        if response.status_code == 200:
+-------+            data = response.json()
+-------+            if isinstance(data, list) and len(data) > 0:
+-------+                print("✅ Cigar Search: Working - Found cigars in database")
+-------+                return True
+-------+            else:
+-------+                print("❌ Cigar Search: No cigars found in database")
+-------+                return False
+-------+        else:
+-------+            print(f"❌ Cigar Search: HTTP {response.status_code}")
+-------+            return False
+-------+    except Exception as e:
+-------+        print(f"❌ Cigar Search: Error - {str(e)}")
+-------+        return False
+-------+
+-------+def test_cigar_search_with_query():
+-------+    """Test cigar search with query parameter"""
+-------+    try:
+-------+        response = requests.get(f"{BACKEND_URL}/cigars/search?q=Montecristo", timeout=10)
+-------+        if response.status_code == 200:
+-------+            data = response.json()
+-------+            print(f"✅ Cigar Search with Query: Working - Found {len(data)} results")
+-------+            return True
+-------+        else:
+-------+            print(f"❌ Cigar Search with Query: HTTP {response.status_code}")
+-------+            return False
+-------+    except Exception as e:
+-------+        print(f"❌ Cigar Search with Query: Error - {str(e)}")
+-------+        return False
+-------+
+-------+def test_barcode_scan():
+-------+    """Test barcode scanning endpoint"""
+-------+    try:
+-------+        test_data = {"barcode": "123456789012"}
+-------+        response = requests.post(f"{BACKEND_URL}/cigars/scan-barcode", json=test_data, timeout=10)
+-------+        if response.status_code == 200:
+-------+            data = response.json()
+-------+            print("✅ Barcode Scan: Working - Endpoint responds correctly")
+-------+            return True
+-------+        else:
+-------+            print(f"❌ Barcode Scan: HTTP {response.status_code}")
+-------+            return False
+-------+    except Exception as e:
+-------+        print(f"❌ Barcode Scan: Error - {str(e)}")
+-------+        return False
+-------+
+-------+def test_store_prices():
+-------+    """Test store prices endpoint"""
+-------+    try:
+-------+        # First get a cigar ID
+-------+        search_response = requests.get(f"{BACKEND_URL}/cigars/search", timeout=10)
+-------+        if search_response.status_code == 200:
+-------+            cigars = search_response.json()
+-------+            if cigars:
+-------+                cigar_id = cigars[0]["id"]
+-------+                response = requests.get(f"{BACKEND_URL}/stores/{cigar_id}", timeout=10)
+-------+                if response.status_code == 200:
+-------+                    data = response.json()
+-------+                    if isinstance(data, list) and len(data) > 0:
+-------+                        print("✅ Store Prices: Working - Returns price data")
+-------+                        return True
+-------+                    else:
+-------+                        print("❌ Store Prices: No price data returned")
+-------+                        return False
+-------+                else:
+-------+                    print(f"❌ Store Prices: HTTP {response.status_code}")
+-------+                    return False
+-------+            else:
+-------+                print("❌ Store Prices: No cigars available for testing")
+-------+                return False
+-------+        else:
+-------+            print("❌ Store Prices: Cannot get cigar for testing")
+-------+            return False
+-------+    except Exception as e:
+-------+        print(f"❌ Store Prices: Error - {str(e)}")
+-------+        return False
+-------+
+-------+def main():
+-------+    """Run additional backend tests"""
+-------+    print("=" * 50)
+-------+    print("ADDITIONAL BACKEND API TESTS")
+-------+    print("=" * 50)
+-------+    
+-------+    tests = [
+-------+        test_cigar_search,
+-------+        test_cigar_search_with_query,
+-------+        test_barcode_scan,
+-------+        test_store_prices
+-------+    ]
+-------+    
+-------+    passed = 0
+-------+    for test in tests:
+-------+        if test():
+-------+            passed += 1
+-------+    
+-------+    print(f"\nAdditional Tests: {passed}/{len(tests)} passed")
+-------+    return passed == len(tests)
+-------+
+-------+if __name__ == "__main__":
+-------+    main()
+-------\ No newline at end of file
+-------diff --git a/test_result.md b/test_result.md
+-------index 7b951b5..5d71e79 100644
+---------- a/test_result.md
+-------+++ b/test_result.md
+-------@@ -107,27 +107,33 @@ user_problem_statement: "Build Cigar Ranker mobile PWA app with barcode scanning
+------- backend:
+-------   - task: "Authentication System (JWT)"
+-------     implemented: true
+--------    working: "NA"
+-------+    working: true
+-------     file: "backend/server.py, backend/auth.py, backend/models.py"
+-------     stuck_count: 0
+-------     priority: "high"
+--------    needs_retesting: true
+-------+    needs_retesting: false
+-------     status_history:
+-------       - working: "NA"
+-------         agent: "main"
+-------         comment: "Implemented JWT authentication with register, login, get profile, update profile endpoints. Password hashing with bcrypt. Token expiration set to 72 hours."
+-------+      - working: true
+-------+        agent: "testing"
+-------+        comment: "Comprehensive testing completed. Registration endpoint working correctly: validates duplicate emails/usernames, handles missing fields, returns JWT tokens. Login endpoint working with correct user data. JWT token validation working for protected endpoints. Minor: Email format validation not implemented (accepts invalid emails like 'notanemail'), but core functionality is solid. 8/9 test cases passed."
+------- 
+-------   - task: "Cigar Database and Search"
+-------     implemented: true
+--------    working: "NA"
+-------+    working: true
+-------     file: "backend/server.py, backend/models.py"
+-------     stuck_count: 0
+-------     priority: "high"
+--------    needs_retesting: true
+-------+    needs_retesting: false
+-------     status_history:
+-------       - working: "NA"
+-------         agent: "main"
+-------         comment: "Implemented cigar CRUD operations, advanced search with filters (strength, origin, size, wrapper, price), seeded database with 5 sample cigars (Montecristo, Padron, Opus X, Cohiba, Liga Privada)"
+-------+      - working: true
+-------+        agent: "testing"
+-------+        comment: "Tested cigar search endpoints successfully. Basic search returns cigars from database. Query-based search (e.g., 'Montecristo') returns filtered results (21 matches found). Database is properly seeded with comprehensive cigar data."
+------- 
+-------   - task: "AI Label Recognition (OpenAI Vision)"
+-------     implemented: true
+-------@@ -143,15 +149,18 @@ backend:
+------- 
+-------   - task: "Barcode Scanning"
+-------     implemented: true
+--------    working: "NA"
+-------+    working: true
+-------     file: "backend/server.py"
+-------     stuck_count: 0
+-------     priority: "high"
+--------    needs_retesting: true
+-------+    needs_retesting: false
+-------     status_history:
+-------       - working: "NA"
+-------         agent: "main"
+-------         comment: "Implemented scan-barcode endpoint. Searches database by barcode. Sample barcodes added to seed data."
+-------+      - working: true
+-------+        agent: "testing"
+-------+        comment: "Barcode scanning endpoint tested successfully. API accepts barcode input and responds correctly with appropriate format (found/not found structure)."
+------- 
+-------   - task: "Rating System"
+-------     implemented: true
+-------@@ -191,15 +200,18 @@ backend:
+------- 
+-------   - task: "Store Price Comparison"
+-------     implemented: true
+--------    working: "NA"
+-------+    working: true
+-------     file: "backend/server.py, backend/models.py"
+-------     stuck_count: 0
+-------     priority: "medium"
+--------    needs_retesting: true
+-------+    needs_retesting: false
+-------     status_history:
+-------       - working: "NA"
+-------         agent: "main"
+-------         comment: "Implemented store prices endpoint. Currently returns mock data for 3 stores (Cigars International, Neptune Cigar, Atlantic Cigar) with search URLs. Ready for real scraping integration."
+-------+      - working: true
+-------+        agent: "testing"
+-------+        comment: "Store price comparison endpoint tested successfully. Returns mock price data for 3 stores as expected. API structure is correct and ready for real scraping integration."
+------- 
+------- frontend:
+-------   - task: "Navigation Structure (Bottom Tabs)"
+-------@@ -348,4 +360,6 @@ agent_communication:
+-------   - agent: "main"
+-------     message: "Completed initial implementation of Cigar Ranker MVP. All core features implemented: JWT auth, cigar CRUD, AI label recognition with OpenAI Vision (gpt-4o), barcode scanning, rating system (0-10), nested comments, favorites, store price comparison. Frontend uses Expo Router with bottom tabs, React Context for auth, expo-camera for scanning. Ready for comprehensive backend testing. User needs to test manually or testing agent can perform automated tests."
+-------   - agent: "main"
+--------    message: "Completed registration success feedback feature. Added success state with visual confirmation (green checkmark, success container with border) to register.tsx. The success message displays for 2 seconds before auto-redirecting to home. Also added disabled button styling during loading. Ready for backend testing of registration flow."
+-------\ No newline at end of file
+-------+    message: "Completed registration success feedback feature. Added success state with visual confirmation (green checkmark, success container with border) to register.tsx. The success message displays for 2 seconds before auto-redirecting to home. Also added disabled button styling during loading. Ready for backend testing of registration flow."
+-------+  - agent: "testing"
+-------+    message: "Completed comprehensive backend testing. Authentication system working correctly - registration validates duplicates, login works, JWT tokens function properly. Cigar database and search working with seeded data. Barcode scanning and store price comparison endpoints responding correctly. Only minor issue: email format validation not implemented (accepts invalid emails). Core backend functionality is solid and ready for frontend integration testing."
+-------\ No newline at end of file
