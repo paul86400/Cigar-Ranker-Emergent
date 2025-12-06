@@ -307,6 +307,61 @@ async def upload_cigar_image(
         raise HTTPException(status_code=500, detail=f"Failed to upload image: {str(e)}")
 
 
+@api_router.post("/cigars/add")
+async def add_user_cigar(
+    brand: str = Form(...),
+    name: str = Form(...),
+    strength: str = Form(...),
+    origin: str = Form(...),
+    wrapper: str = Form(...),
+    size: str = Form(...),
+    price_range: str = Form(None),
+    user_id: str = Depends(get_current_user)
+):
+    """Allow users to add cigars to the database"""
+    # Check if cigar already exists
+    existing = await db.cigars.find_one({
+        "brand": {"$regex": f"^{brand}$", "$options": "i"},
+        "name": {"$regex": f"^{name}$", "$options": "i"}
+    })
+    
+    if existing:
+        return {
+            "success": False,
+            "message": "This cigar already exists in our database",
+            "cigar_id": str(existing["_id"])
+        }
+    
+    # Create cigar document
+    cigar_doc = {
+        "brand": brand,
+        "name": name,
+        "strength": strength,
+        "origin": origin,
+        "wrapper": wrapper,
+        "size": size,
+        "price_range": price_range or "8-13",
+        "binder": "Mixed",
+        "filler": "Mixed",
+        "flavor_notes": ["Tobacco", "Wood", "Spice"],
+        "average_rating": 5.0,
+        "rating_count": 0,
+        "barcode": "",
+        "images": [],
+        "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+        "created_at": datetime.utcnow(),
+        "added_by": user_id
+    }
+    
+    result = await db.cigars.insert_one(cigar_doc)
+    
+    return {
+        "success": True,
+        "message": "Cigar added successfully!",
+        "cigar_id": str(result.inserted_id)
+    }
+
+
 @api_router.post("/cigars", response_model=CigarResponse)
 async def create_cigar(cigar_data: CigarCreate, user_id: str = Depends(get_current_user)):
     """Create a new cigar entry (admin/authorized users)"""
