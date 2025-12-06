@@ -168,7 +168,7 @@ export default function CameraScreen() {
     );
   }
 
-  const handleBarcodeScanned = async ({ data }: BarCodeScanningResult) => {
+  const handleBarcodeScanned = async ({ data }: BarcodeScanningResult) => {
     if (scanned || scanning) return;
     
     setScanned(true);
