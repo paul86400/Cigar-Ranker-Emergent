@@ -221,7 +221,7 @@ export default function HomeScreen() {
       
       {/* Floating Action Button */}
       <TouchableOpacity
-        style={[styles.fab, { bottom: insets.bottom + 16 }]}
+        style={[styles.fab, { bottom: Math.max(insets.bottom, 16) + 16 }]}
         onPress={() => router.push('/add-cigar')}
         activeOpacity={0.8}
       >
