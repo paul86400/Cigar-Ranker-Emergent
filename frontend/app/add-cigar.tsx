@@ -74,10 +74,22 @@ export default function AddCigarScreen() {
           ]
         );
       } else {
-        Alert.alert('Already Exists', response.data.message);
-        if (response.data.cigar_id) {
-          router.replace(`/cigar/${response.data.cigar_id}`);
-        }
+        // Cigar already exists - show friendly message
+        Alert.alert(
+          'Cigar Already Exists',
+          response.data.message,
+          [
+            {
+              text: 'View Existing Cigar',
+              onPress: () => router.replace(`/cigar/${response.data.cigar_id}`)
+            },
+            {
+              text: 'Go Back',
+              style: 'cancel',
+              onPress: () => router.back()
+            }
+          ]
+        );
       }
     } catch (error: any) {
       console.error('Error adding cigar:', error);
