@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """
-Backend API Testing Suite for Cigar Ranker App
-Tests authentication endpoints with focus on registration flow
+Backend API Testing for Cigar Ranker App
+Focus: Add Cigar Feature Testing
 """
 
 import requests
 import json
+import sys
 import time
-import os
-from datetime import datetime
+from typing import Dict, Any, Optional
 
-# Get backend URL from frontend .env
+# Backend URL from frontend .env
 BACKEND_URL = "https://cigar-scout.preview.emergentagent.com/api"
 
-class CigarRankerAPITester:
+class CigarRankerTester:
     def __init__(self):
         self.base_url = BACKEND_URL
         self.session = requests.Session()
