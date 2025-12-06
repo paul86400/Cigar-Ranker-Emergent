@@ -108,8 +108,13 @@ export default function HomeScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Cigar Ranker</Text>
-        <TouchableOpacity onPress={() => router.push('/search')}>
-          <Ionicons name="filter" size={24} color="#fff" />
+        <TouchableOpacity 
+          onPress={() => router.push('/search')}
+          style={styles.cigarMenuButton}
+        >
+          <View style={styles.cigarLine} />
+          <View style={styles.cigarLine} />
+          <View style={styles.cigarLine} />
         </TouchableOpacity>
       </View>
 
