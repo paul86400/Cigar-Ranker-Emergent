@@ -40,10 +40,14 @@ export default function MyCommentsScreen() {
     try {
       setLoading(true);
       setError(null);
+      console.log('Fetching my comments...');
       const response = await api.get('/comments/my-comments');
+      console.log('My comments response:', response.data);
+      console.log('Number of comments:', response.data?.length || 0);
       setComments(response.data);
     } catch (error: any) {
       console.error('Error loading comments:', error);
+      console.error('Error response:', error.response?.data);
       setError('Failed to load your comments. Please try again.');
     } finally {
       setLoading(false);
