@@ -122,15 +122,18 @@ backend:
 
   - task: "Cigar Database and Search"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py, backend/models.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented cigar CRUD operations, advanced search with filters (strength, origin, size, wrapper, price), seeded database with 5 sample cigars (Montecristo, Padron, Opus X, Cohiba, Liga Privada)"
+      - working: true
+        agent: "testing"
+        comment: "Tested cigar search endpoints successfully. Basic search returns cigars from database. Query-based search (e.g., 'Montecristo') returns filtered results (21 matches found). Database is properly seeded with comprehensive cigar data."
 
   - task: "AI Label Recognition (OpenAI Vision)"
     implemented: true
