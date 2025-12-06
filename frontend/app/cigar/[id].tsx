@@ -457,10 +457,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
   },
+  submitRatingButtonDisabled: {
+    backgroundColor: '#5a2d0a',
+    opacity: 0.6,
+  },
   submitRatingButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  successBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a3d1a',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+    gap: 12,
+  },
+  successBannerText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#4CAF50',
+    fontWeight: '600',
   },
   actionButtons: {
     padding: 20,
