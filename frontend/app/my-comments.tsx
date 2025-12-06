@@ -25,14 +25,17 @@ interface UserComment {
 }
 
 export default function MyCommentsScreen() {
+  console.log('=== MyCommentsScreen RENDERED ===');
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
+  console.log('=== User:', user ? user.username : 'NOT LOGGED IN');
   const [comments, setComments] = useState<UserComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('=== useEffect triggered, calling loadMyComments ===');
     loadMyComments();
   }, []);
 
