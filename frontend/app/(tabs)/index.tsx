@@ -39,12 +39,22 @@ export default function HomeScreen() {
 
   useEffect(() => {
     // Check if there are advanced search parameters
-    if (params.q || params.strength || params.origin || params.wrapper || params.size || params.min_price || params.max_price) {
+    const hasSearchParams = params.q || params.strength || params.origin || params.wrapper || params.size || params.min_price || params.max_price;
+    
+    if (hasSearchParams) {
       performAdvancedSearch();
     } else {
       loadCigars();
     }
-  }, [params]);
+  }, [
+    params.q,
+    params.strength,
+    params.origin,
+    params.wrapper,
+    params.size,
+    params.min_price,
+    params.max_price
+  ]);
 
   const loadCigars = async () => {
     try {
