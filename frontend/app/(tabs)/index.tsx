@@ -198,6 +198,14 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
   },
+  cameraButton: {
+    width: 48,
+    height: 48,
+    backgroundColor: '#8B4513',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   searchBar: {
     flex: 1,
     flexDirection: 'row',
@@ -205,15 +213,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#1a1a1a',
     borderRadius: 12,
     paddingHorizontal: 16,
-    gap: 8,
   },
   searchInput: {
     flex: 1,
     height: 48,
     color: '#fff',
     fontSize: 16,
+    outlineStyle: 'none',
   },
-  cameraButton: {
+  searchButton: {
     width: 48,
     height: 48,
     backgroundColor: '#8B4513',
