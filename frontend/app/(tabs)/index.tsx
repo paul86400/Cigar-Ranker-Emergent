@@ -262,6 +262,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  addCigarButton: {
+    width: 48,
+    height: 48,
+    backgroundColor: '#4CAF50',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   searchBar: {
     flex: 1,
     flexDirection: 'row',
