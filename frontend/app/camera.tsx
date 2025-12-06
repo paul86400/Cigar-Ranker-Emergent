@@ -150,36 +150,6 @@ export default function CameraScreen() {
     }
   };
 
-  const handlePickImage = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.5,
-        base64: true,
-      });
-
-      if (!result.canceled && result.assets[0].base64) {
-        setScanning(true);
-        const response = await api.post('/cigars/scan-label', {
-          image_base64: result.assets[0].base64,
-        });
-
-        if (response.data.identified && response.data.cigar) {
-          router.replace(`/cigar/${response.data.cigar.id}`);
-        } else {
-          Alert.alert('Not Identified', response.data.message || 'Could not identify cigar from label');
-        }
-      }
-    } catch (error) {
-      console.error('Error picking image:', error);
-      Alert.alert('Error', 'Failed to scan label');
-    } finally {
-      setScanning(false);
-    }
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
