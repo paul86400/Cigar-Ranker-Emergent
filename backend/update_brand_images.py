@@ -95,8 +95,9 @@ async def update_brand_images():
     
     # Connect to MongoDB
     mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017")
+    db_name = os.getenv("DB_NAME", "test_database")
     client = AsyncIOMotorClient(mongo_url)
-    db = client.cigar_db
+    db = client[db_name]
     
     # Get all unique brands
     brands = await db.cigars.distinct("brand")
