@@ -47,7 +47,7 @@ export default function AdvancedSearchScreen() {
     <SafeAreaView style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity 
-          onPress={() => router.push('/(tabs)')}
+          onPress={() => router.back()}
           style={styles.closeButton}
           hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
         >
