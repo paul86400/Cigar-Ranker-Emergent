@@ -369,15 +369,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Authentication System (JWT)"
-    - "Cigar Database and Search"
-    - "AI Label Recognition (OpenAI Vision)"
-    - "Rating System"
-    - "Camera & Scanning Screen"
-    - "Home Screen with Search"
-    - "Cigar Details Screen"
+    - "User-Submitted Cigars (Add Cigar)"
+    - "Add Cigar Screen with FAB"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
