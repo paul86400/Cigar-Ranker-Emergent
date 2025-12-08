@@ -781,8 +781,8 @@ async def test_get_comments():
 @api_router.get("/comments/my-comments")
 async def get_my_comments(user_id: str = Depends(get_current_user)):
     """Get all comments by the current user with cigar details"""
-    # TEST: Verify this endpoint is actually being hit
-    raise Exception("HIT - MY-COMMENTS ENDPOINT IS RUNNING!")
+    # TEST: Return distinctive marker to verify new code is running
+    return [{"_TEST": "NEW_CODE_IS_RUNNING", "_timestamp": "2024-12-08_23:33:00"}]
     
     # HARDCODE for pmk9000 to test
     HARDCODED_USER_ID = "69337504102251c4fcf2a492"
