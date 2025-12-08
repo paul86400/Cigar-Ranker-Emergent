@@ -270,11 +270,22 @@ export default function HomeScreen() {
               style={styles.refreshButton}
               disabled={refreshing}
             >
-              <Ionicons 
-                name="refresh" 
-                size={24} 
-                color={refreshing ? "#888" : "#8B4513"} 
-              />
+              <Animated.View
+                style={{
+                  transform: [{
+                    rotate: spinValue.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0deg', '360deg']
+                    })
+                  }]
+                }}
+              >
+                <Ionicons 
+                  name="refresh" 
+                  size={24} 
+                  color={refreshing ? "#888" : "#8B4513"} 
+                />
+              </Animated.View>
             </TouchableOpacity>
           </View>
           {cigars.map(renderCigarCard)}
