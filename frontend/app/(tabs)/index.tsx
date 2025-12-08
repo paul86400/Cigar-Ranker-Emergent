@@ -39,6 +39,9 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Animation for refresh icon
+  const spinValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     // Check if there are advanced search parameters
