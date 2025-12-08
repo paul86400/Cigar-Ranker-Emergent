@@ -394,11 +394,19 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 32,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 16,
+  },
+  refreshButton: {
+    padding: 8,
   },
   cigarCard: {
     flexDirection: 'row',
