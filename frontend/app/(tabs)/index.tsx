@@ -75,6 +75,20 @@ export default function HomeScreen() {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      console.log('Refreshing cigars list...');
+      const response = await api.get('/cigars/search');
+      console.log(`Refreshed: Loaded ${response.data.length} cigars`);
+      setCigars(response.data);
+    } catch (error: any) {
+      console.error('Error refreshing cigars:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const performAdvancedSearch = async () => {
     try {
       setLoading(true);
