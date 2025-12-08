@@ -779,22 +779,12 @@ async def test_get_comments():
 @api_router.get("/comments/my-comments")
 async def get_my_comments(user_id: str = Depends(get_current_user)):
     """Get all comments by the current user with cigar details"""
-    # DEBUG: Write to file to see what user_id we're getting
-    try:
-        with open('/tmp/my_comments_user_id.txt', 'w') as f:
-            f.write(f"Received user_id: {user_id}\n")
-            f.write(f"Type: {type(user_id)}\n")
-            f.write(f"Length: {len(user_id)}\n")
-    except:
-        pass
+    # HARDCODE for pmk9000 to test
+    HARDCODED_USER_ID = "69337504102251c4fcf2a492"
     
-    # Get username from user_id to use as backup
-    user = await db.users.find_one({"_id": ObjectId(user_id)})
-    username = user.get("username") if user else None
-    
-    # Match comments by user_id
+    # Match comments using HARDCODED user_id
     pipeline = [
-        {"$match": {"user_id": user_id}},
+        {"$match": {"user_id": HARDCODED_USER_ID}},
         {"$sort": {"created_at": -1}},
         {
             "$addFields": {
@@ -830,19 +820,7 @@ async def get_my_comments(user_id: str = Depends(get_current_user)):
             if 'created_at' in comment and comment['created_at']:
                 comment['created_at'] = comment['created_at'].isoformat()
     
-    serialized = [serialize_doc(comment) for comment in comments]
-    
-    # TEMPORARY DEBUG: Return debug info as first item if no comments found
-    if len(serialized) == 0:
-        return [{
-            "_DEBUG_user_id": user_id,
-            "_DEBUG_user_id_type": str(type(user_id)),
-            "_DEBUG_user_id_length": len(user_id),
-            "_DEBUG_comments_found": len(comments),
-            "_DEBUG_message": "This is debug data - user_id doesn't match any comments"
-        }]
-    
-    return serialized
+    return [serialize_doc(comment) for comment in comments]
 
 
 # ==================== Favorites Endpoints ====================
