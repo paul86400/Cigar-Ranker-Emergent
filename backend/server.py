@@ -749,43 +749,31 @@ async def test_get_comments():
     """TEST endpoint - hardcoded for pmk9000"""
     user_id = "69337504102251c4fcf2a492"  # pmk9000's ID
     
-    pipeline = [
-        {"$match": {"user_id": user_id}},
-        {"$sort": {"created_at": -1}},
-        {
-            "$addFields": {
-                "cigar_oid": {"$toObjectId": "$cigar_id"}
-            }
-        },
-        {
-            "$lookup": {
-                "from": "cigars",
-                "localField": "cigar_oid",
-                "foreignField": "_id",
-                "as": "cigar_details"
-            }
-        },
-        {"$unwind": "$cigar_details"},
-        {
-            "$project": {
-                "text": 1,
-                "created_at": 1,
-                "cigar_id": {"$toString": "$cigar_oid"},
-                "cigar_name": "$cigar_details.name",
-                "cigar_brand": "$cigar_details.brand",
-                "cigar_image": "$cigar_details.image",
-            }
-        }
-    ]
-    
-    comments = await db.comments.aggregate(pipeline).to_list(1000)
-    
-    if len(comments) > 0:
-        for comment in comments:
-            if 'created_at' in comment and comment['created_at']:
-                comment['created_at'] = comment['created_at'].isoformat()
-    
-    return [serialize_doc(comment) for comment in comments]
+    try:
+        with open('/tmp/test_comments_log.txt', 'w') as f:
+            f.write(f"Endpoint called with user_id: {user_id}\n")
+            
+            # Simple query first - no aggregation
+            simple_comments = await db.comments.find({"user_id": user_id}).to_list(100)
+            f.write(f"Simple query found: {len(simple_comments)} comments\n")
+            
+            # Return simple version without aggregation
+            result = []
+            for comment in simple_comments:
+                result.append({
+                    "_id": str(comment["_id"]),
+                    "text": comment.get("text"),
+                    "cigar_id": comment.get("cigar_id"),
+                    "created_at": comment.get("created_at").isoformat() if comment.get("created_at") else None,
+                    "user_id": comment.get("user_id")
+                })
+            
+            f.write(f"Returning {len(result)} comments\n")
+            return result
+    except Exception as e:
+        with open('/tmp/test_comments_log.txt', 'w') as f:
+            f.write(f"ERROR: {str(e)}\n")
+        return []
 
 
 @api_router.get("/comments/my-comments")
