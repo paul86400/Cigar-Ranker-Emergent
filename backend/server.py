@@ -783,13 +783,9 @@ async def get_my_comments(user_id: str = Depends(get_current_user)):
     user = await db.users.find_one({"_id": ObjectId(user_id)})
     username = user.get("username") if user else None
     
-    # DEBUG: Try matching by BOTH user_id AND converting all comments to check
-    # First try direct match
+    # Match comments by user_id
     pipeline = [
-        {"$match": {"$or": [
-            {"user_id": user_id},
-            {"user_id": str(ObjectId(user_id))} if len(user_id) == 24 else {"user_id": "nomatch"}
-        ]}},
+        {"$match": {"user_id": user_id}},
         {"$sort": {"created_at": -1}},
         {
             "$addFields": {
