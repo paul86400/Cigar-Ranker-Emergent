@@ -79,8 +79,25 @@ export default function HomeScreen() {
     }
   };
 
+  const startSpin = () => {
+    spinValue.setValue(0);
+    Animated.loop(
+      Animated.timing(spinValue, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      })
+    ).start();
+  };
+
+  const stopSpin = () => {
+    spinValue.stopAnimation();
+    spinValue.setValue(0);
+  };
+
   const onRefresh = async () => {
     setRefreshing(true);
+    startSpin();
     try {
       console.log('Refreshing cigars list...');
       const response = await api.get('/cigars/search');
@@ -90,6 +107,7 @@ export default function HomeScreen() {
       console.error('Error refreshing cigars:', error);
     } finally {
       setRefreshing(false);
+      stopSpin();
     }
   };
 
