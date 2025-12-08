@@ -229,7 +229,18 @@ export default function HomeScreen() {
           <Text style={styles.emptySubtext}>Try a different search term</Text>
         </View>
       ) : (
-        <ScrollView style={styles.cigarList} contentContainerStyle={styles.cigarListContent}>
+        <ScrollView 
+          style={styles.cigarList} 
+          contentContainerStyle={styles.cigarListContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#8B4513']}
+              tintColor="#8B4513"
+            />
+          }
+        >
           <Text style={styles.sectionTitle}>Popular Cigars</Text>
           {cigars.map(renderCigarCard)}
         </ScrollView>
