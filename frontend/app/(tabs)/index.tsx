@@ -36,6 +36,7 @@ export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [cigars, setCigars] = useState<Cigar[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
