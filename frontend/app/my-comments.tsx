@@ -43,8 +43,8 @@ export default function MyCommentsScreen() {
     try {
       setLoading(true);
       setError(null);
-      console.log('Fetching my comments...');
-      const response = await api.get('/comments/my-comments');
+      console.log('Fetching my comments from v2 test endpoint...');
+      const response = await api.get('/comments/my-comments-v2-test');
       console.log('My comments response:', response.data);
       console.log('Number of comments:', response.data?.length || 0);
       setComments(response.data);
