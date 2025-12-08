@@ -747,6 +747,8 @@ async def get_comments(cigar_id: str):
 @api_router.get("/comments/test-comments")
 async def test_get_comments():
     """TEST endpoint - hardcoded for pmk9000"""
+    raise Exception("TEST-COMMENTS ENDPOINT HIT!")
+    
     user_id = "69337504102251c4fcf2a492"  # pmk9000's ID
     
     try:
