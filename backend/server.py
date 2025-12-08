@@ -1,3 +1,5 @@
+raise RuntimeError("BOOTED HERE - server.py is being executed!")
+
 from fastapi import FastAPI, APIRouter, Depends, HTTPException, File, UploadFile, Form
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
