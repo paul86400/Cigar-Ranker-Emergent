@@ -241,7 +241,20 @@ export default function HomeScreen() {
             />
           }
         >
-          <Text style={styles.sectionTitle}>Popular Cigars</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Popular Cigars</Text>
+            <TouchableOpacity 
+              onPress={onRefresh} 
+              style={styles.refreshButton}
+              disabled={refreshing}
+            >
+              <Ionicons 
+                name="refresh" 
+                size={24} 
+                color={refreshing ? "#888" : "#8B4513"} 
+              />
+            </TouchableOpacity>
+          </View>
           {cigars.map(renderCigarCard)}
         </ScrollView>
       )}
