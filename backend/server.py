@@ -779,6 +779,15 @@ async def test_get_comments():
 @api_router.get("/comments/my-comments")
 async def get_my_comments(user_id: str = Depends(get_current_user)):
     """Get all comments by the current user with cigar details"""
+    # DEBUG: Write to file to see what user_id we're getting
+    try:
+        with open('/tmp/my_comments_user_id.txt', 'w') as f:
+            f.write(f"Received user_id: {user_id}\n")
+            f.write(f"Type: {type(user_id)}\n")
+            f.write(f"Length: {len(user_id)}\n")
+    except:
+        pass
+    
     # Get username from user_id to use as backup
     user = await db.users.find_one({"_id": ObjectId(user_id)})
     username = user.get("username") if user else None
