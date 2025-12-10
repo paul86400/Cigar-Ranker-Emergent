@@ -455,6 +455,99 @@ async def create_cigar(cigar_data: CigarCreate, user_id: str = Depends(get_curre
     return cigar_doc
 
 
+@api_router.post("/cigars/ai-search")
+async def ai_search_cigar(request: dict):
+    """Search for a cigar using AI to find details"""
+    try:
+        search_query = request.get("query", "")
+        if not search_query:
+            raise HTTPException(status_code=400, detail="Search query is required")
+        
+        # Use AI to extract cigar details from the search query
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"cigar_search_{datetime.utcnow().timestamp()}",
+            system_message="""You are an expert cigar database assistant. Given a cigar search query, extract and return cigar details in a structured format.
+Return ONLY a JSON object with these fields:
+{
+  "brand": "cigar brand name",
+  "name": "cigar line/vitola name",
+  "strength": "mild/mild-medium/medium/medium-full/full",
+  "origin": "country of origin",
+  "wrapper": "wrapper type",
+  "size": "size in format like 'Toro (6 x 52)'",
+  "price_range": "estimated price range like '10-15'"
+}
+
+Use your knowledge about cigars to fill in accurate details. If you don't know a specific detail, leave it as an empty string."""
+        ).with_model("openai", "gpt-4o")
+        
+        user_message = UserMessage(
+            text=f"Find details for this cigar: {search_query}"
+        )
+        
+        response = await chat.send_message(user_message)
+        
+        # Parse the AI response
+        import json
+        import re
+        
+        try:
+            # Clean up response
+            cleaned_response = response.strip()
+            
+            # Remove markdown code blocks
+            if "```json" in cleaned_response:
+                cleaned_response = re.sub(r'```json\s*', '', cleaned_response)
+                cleaned_response = re.sub(r'\s*```', '', cleaned_response)
+            elif "```" in cleaned_response:
+                cleaned_response = re.sub(r'```\s*', '', cleaned_response)
+            
+            # Extract JSON
+            json_match = re.search(r'\{[^}]+\}', cleaned_response, re.DOTALL)
+            if json_match:
+                cleaned_response = json_match.group(0)
+            
+            cigar_info = json.loads(cleaned_response)
+            
+            # Check if cigar already exists in database
+            brand = cigar_info.get("brand", "")
+            name = cigar_info.get("name", "")
+            
+            if brand and name:
+                existing = await db.cigars.find_one({
+                    "brand": {"$regex": f"^{brand}$", "$options": "i"},
+                    "name": {"$regex": f"^{name}$", "$options": "i"}
+                })
+                
+                if existing:
+                    return {
+                        "found": True,
+                        "cigar_info": cigar_info,
+                        "exists_in_db": True,
+                        "existing_cigar": serialize_doc(existing),
+                        "message": "This cigar already exists in our database!"
+                    }
+            
+            return {
+                "found": True,
+                "cigar_info": cigar_info,
+                "exists_in_db": False,
+                "message": "Cigar details found! Review and add if correct."
+            }
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON decode error: {str(e)}, response: {response}")
+            return {
+                "found": False,
+                "message": f"Unable to find cigar details. AI returned: {response[:200]}"
+            }
+            
+    except Exception as e:
+        logger.error(f"Error searching cigar: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @api_router.post("/cigars/scan-label")
 async def scan_label(request: LabelScanRequest):
     """Scan cigar label using AI vision"""
