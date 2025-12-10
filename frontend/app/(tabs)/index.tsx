@@ -45,6 +45,11 @@ export default function HomeScreen() {
   const spinValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    // Load total count on mount
+    loadTotalCount();
+  }, []);
+
+  useEffect(() => {
     // Check if there are advanced search parameters
     const hasSearchParams = params.q || params.strength || params.origin || params.wrapper || params.size || params.min_price || params.max_price;
     
@@ -62,6 +67,15 @@ export default function HomeScreen() {
     params.min_price,
     params.max_price
   ]);
+
+  const loadTotalCount = async () => {
+    try {
+      const response = await api.get('/cigars/count');
+      setTotalCount(response.data.count);
+    } catch (error) {
+      console.error('Error loading total count:', error);
+    }
+  };
 
   const loadCigars = async () => {
     try {
