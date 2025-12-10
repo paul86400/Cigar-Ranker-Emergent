@@ -59,6 +59,7 @@ export default function CigarDetailsScreen() {
 
   useEffect(() => {
     loadCigarDetails();
+    loadUserNote();
   }, [id]);
 
   const loadCigarDetails = async () => {
@@ -85,6 +86,25 @@ export default function CigarDetailsScreen() {
       Alert.alert('Error', 'Failed to load cigar details');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadUserNote = async () => {
+    if (!user) return;
+    
+    try {
+      setLoadingNote(true);
+      const response = await api.get(`/cigars/${id}/my-note`);
+      if (response.data && response.data.note_text) {
+        setNoteText(response.data.note_text);
+      } else {
+        setNoteText('');
+      }
+    } catch (error) {
+      console.error('Error loading note:', error);
+      setNoteText('');
+    } finally {
+      setLoadingNote(false);
     }
   };
 
