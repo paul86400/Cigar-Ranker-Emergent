@@ -210,7 +210,8 @@ async def search_cigars(
         ]
     
     if strength:
-        query["strength"] = {"$regex": strength, "$options": "i"}
+        # Exact match for strength (case-insensitive)
+        query["strength"] = {"$regex": f"^{strength}$", "$options": "i"}
     
     if origin:
         query["origin"] = {"$regex": origin, "$options": "i"}
