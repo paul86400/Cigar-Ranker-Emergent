@@ -299,7 +299,9 @@ export default function HomeScreen() {
           }
         >
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Popular Cigars</Text>
+            <Text style={styles.sectionTitle}>
+              Popular Cigars {totalCount > 0 && `(${totalCount})`}
+            </Text>
             <TouchableOpacity 
               onPress={onRefresh} 
               style={styles.refreshButton}
