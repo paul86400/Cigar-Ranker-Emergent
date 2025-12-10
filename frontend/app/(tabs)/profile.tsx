@@ -228,6 +228,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#333',
   },
+  profileImageWrapper: {
+    position: 'relative',
+    marginBottom: 16,
+  },
   profileImageContainer: {
     width: 96,
     height: 96,
@@ -235,12 +239,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#1a1a1a',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
   },
   profileImage: {
     width: 96,
     height: 96,
     borderRadius: 48,
+  },
+  cameraButton: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#8B4513',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#0c0c0c',
   },
   username: {
     fontSize: 24,
