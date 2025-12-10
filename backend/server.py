@@ -189,6 +189,17 @@ async def update_profile(update_data: UserUpdate, user_id: str = Depends(get_cur
 
 # ==================== Cigar Endpoints ====================
 
+@api_router.get("/cigars/count")
+async def get_cigars_count():
+    """Get total count of cigars in database"""
+    try:
+        count = await db.cigars.count_documents({})
+        return {"count": count}
+    except Exception as e:
+        logger.error(f"Error getting cigar count: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get cigar count")
+
+
 @api_router.get("/cigars/search")
 async def search_cigars(
     q: Optional[str] = None,
