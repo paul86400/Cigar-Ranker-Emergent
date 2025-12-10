@@ -98,12 +98,15 @@ export default function CigarDetailsScreen() {
       const response = await api.get(`/cigars/${id}/my-note`);
       if (response.data && response.data.note_text) {
         setNoteText(response.data.note_text);
+        setOriginalNoteText(response.data.note_text);
       } else {
         setNoteText('');
+        setOriginalNoteText('');
       }
     } catch (error) {
       console.error('Error loading note:', error);
       setNoteText('');
+      setOriginalNoteText('');
     } finally {
       setLoadingNote(false);
     }
