@@ -41,7 +41,8 @@ interface Cigar {
 
 export default function CigarDetailsScreen() {
   const router = useRouter();
-  const { id } = useLocalSearchParams();
+  const params = useLocalSearchParams();
+  const { id } = params;
   const { user, refreshUser } = useAuth();
   const insets = useSafeAreaInsets();
   const [cigar, setCigar] = useState<Cigar | null>(null);
