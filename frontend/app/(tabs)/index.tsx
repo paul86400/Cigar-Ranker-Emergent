@@ -39,6 +39,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState<number>(0);
   
   // Animation for refresh icon
   const spinValue = useRef(new Animated.Value(0)).current;
