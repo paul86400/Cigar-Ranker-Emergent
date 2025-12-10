@@ -479,8 +479,82 @@ export default function CigarDetailsScreen() {
             <Ionicons name="chatbubbles" size={20} color="#fff" />
             <Text style={styles.commentsButtonText}>Discussions</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.notesButton}
+            onPress={handleOpenNoteModal}
+          >
+            <Ionicons 
+              name={noteText ? "document-text" : "document-text-outline"} 
+              size={20} 
+              color="#fff" 
+            />
+            <Text style={styles.notesButtonText}>
+              {noteText ? 'View/Edit Note' : 'Add Note'}
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Note Modal */}
+      <Modal
+        visible={showNoteModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowNoteModal(false)}
+      >
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalContainer}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>My Note</Text>
+              <TouchableOpacity onPress={() => setShowNoteModal(false)}>
+                <Ionicons name="close" size={28} color="#fff" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.noteInputContainer}>
+              <TextInput
+                style={styles.noteInput}
+                value={noteText}
+                onChangeText={setNoteText}
+                placeholder="Write your personal notes about this cigar..."
+                placeholderTextColor="#666"
+                multiline
+                maxLength={1000}
+                textAlignVertical="top"
+              />
+              <Text style={styles.characterCount}>
+                {noteText.length}/1000 characters
+              </Text>
+            </View>
+
+            <View style={styles.modalActions}>
+              {noteText.length > 0 && (
+                <TouchableOpacity
+                  style={styles.clearButton}
+                  onPress={handleClearNote}
+                >
+                  <Text style={styles.clearButtonText}>Clear</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                style={[styles.saveButton, savingNote && styles.saveButtonDisabled]}
+                onPress={handleSaveNote}
+                disabled={savingNote}
+              >
+                {savingNote ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.saveButtonText}>Save Note</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </SafeAreaView>
   );
 }
