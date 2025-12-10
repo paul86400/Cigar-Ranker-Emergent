@@ -135,3 +135,16 @@ class StorePrice(BaseModel):
     price: float
     url: str
     in_stock: bool
+
+
+# Note Models
+class NoteCreate(BaseModel):
+    note_text: str
+
+class NoteResponse(BaseModel):
+    id: str
+    user_id: str
+    cigar_id: str
+    note_text: str
+    created_at: datetime
+    updated_at: datetime
