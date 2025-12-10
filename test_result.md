@@ -228,6 +228,21 @@ backend:
         agent: "testing"
         comment: "Comprehensive testing completed. Add Cigar endpoint working correctly: successfully adds new cigars with all required fields, handles optional price_range field, validates missing fields (422 error), requires authentication (403 error for unauthorized), detects duplicates case-insensitively, newly added cigars are searchable, cigars have default image placeholder. 9/11 test cases passed. Minor: Authentication returns 403 instead of 401 (both are valid for unauthorized access). Core functionality is solid and working as expected."
 
+  - task: "Private Notes System"
+    implemented: true
+    working: true
+    file: "backend/server.py, backend/models.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented private notes feature with three endpoints: GET /api/cigars/{cigar_id}/my-note (retrieve user's note), POST /api/cigars/{cigar_id}/my-note (create/update note with 1000 character limit), DELETE /api/cigars/{cigar_id}/my-note (delete note). Notes are private to each user and stored in user_notes collection. Includes proper validation and error handling."
+      - working: true
+        agent: "testing"
+        comment: "Comprehensive testing completed with 100% success rate (11/11 tests passed). All Private Notes endpoints working correctly: GET returns empty note initially and saved notes after creation, POST creates and updates notes successfully with proper 1000 character limit validation, DELETE removes notes and returns 404 for non-existent notes, invalid cigar IDs return 404 errors, all endpoints properly require JWT authentication. Feature is fully functional and ready for production use."
+
 frontend:
   - task: "Navigation Structure (Bottom Tabs)"
     implemented: true
