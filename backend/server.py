@@ -873,6 +873,112 @@ async def get_my_comments(user_id: str = Depends(get_current_user)):
     return [serialize_doc(comment) for comment in comments]
 
 
+# ==================== Notes Endpoints ====================
+
+@api_router.get("/cigars/{cigar_id}/my-note")
+async def get_user_note(cigar_id: str, user_id: str = Depends(get_current_user)):
+    """Get user's note for a specific cigar"""
+    try:
+        # Find the note for this user and cigar
+        note = await db.user_notes.find_one({
+            "user_id": user_id,
+            "cigar_id": cigar_id
+        })
+        
+        if not note:
+            return {"note_text": ""}
+        
+        return serialize_doc(note)
+        
+    except Exception as e:
+        logger.error(f"Error getting user note: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get note")
+
+
+@api_router.post("/cigars/{cigar_id}/my-note")
+async def save_user_note(
+    cigar_id: str,
+    note_data: NoteCreate,
+    user_id: str = Depends(get_current_user)
+):
+    """Create or update user's note for a specific cigar"""
+    try:
+        # Validate cigar exists
+        cigar = await db.cigars.find_one({"_id": ObjectId(cigar_id)})
+        if not cigar:
+            raise HTTPException(status_code=404, detail="Cigar not found")
+        
+        # Validate note length
+        if len(note_data.note_text) > 1000:
+            raise HTTPException(status_code=400, detail="Note exceeds 1000 character limit")
+        
+        now = datetime.utcnow()
+        
+        # Check if note already exists
+        existing_note = await db.user_notes.find_one({
+            "user_id": user_id,
+            "cigar_id": cigar_id
+        })
+        
+        if existing_note:
+            # Update existing note
+            result = await db.user_notes.update_one(
+                {"_id": existing_note["_id"]},
+                {
+                    "$set": {
+                        "note_text": note_data.note_text,
+                        "updated_at": now
+                    }
+                }
+            )
+            
+            if result.modified_count == 0:
+                raise HTTPException(status_code=500, detail="Failed to update note")
+            
+            updated_note = await db.user_notes.find_one({"_id": existing_note["_id"]})
+            return serialize_doc(updated_note)
+        else:
+            # Create new note
+            note_doc = {
+                "user_id": user_id,
+                "cigar_id": cigar_id,
+                "note_text": note_data.note_text,
+                "created_at": now,
+                "updated_at": now
+            }
+            
+            result = await db.user_notes.insert_one(note_doc)
+            saved_note = await db.user_notes.find_one({"_id": result.inserted_id})
+            return serialize_doc(saved_note)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error saving user note: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to save note")
+
+
+@api_router.delete("/cigars/{cigar_id}/my-note")
+async def delete_user_note(cigar_id: str, user_id: str = Depends(get_current_user)):
+    """Delete user's note for a specific cigar"""
+    try:
+        result = await db.user_notes.delete_one({
+            "user_id": user_id,
+            "cigar_id": cigar_id
+        })
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Note not found")
+        
+        return {"success": True, "message": "Note deleted"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting user note: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete note")
+
+
 # ==================== Favorites Endpoints ====================
 
 @api_router.post("/favorites/{cigar_id}")
