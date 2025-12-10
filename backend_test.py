@@ -409,6 +409,330 @@ class CigarRankerTester:
                 
         except Exception as e:
             self.log_result("Edge Case Long Strings", False, f"Request error: {str(e)}")
+
+    # ==================== PRIVATE NOTES TESTS ====================
+    
+    def get_test_cigar_id(self):
+        """Get a cigar ID for testing notes"""
+        try:
+            response = self.make_request("GET", "/cigars/search?q=Montecristo")
+            if response.status_code == 200:
+                cigars = response.json()
+                if cigars:
+                    return cigars[0]['id']
+            return None
+        except Exception:
+            return None
+    
+    def test_private_notes_get_empty(self):
+        """Test GET /api/cigars/{cigar_id}/my-note - should return empty note initially"""
+        print("\n📝 Testing Private Notes - GET Empty Note...")
+        
+        cigar_id = self.get_test_cigar_id()
+        if not cigar_id:
+            self.log_result("Private Notes GET Empty", False, "No test cigar available")
+            return
+        
+        try:
+            response = self.make_request("GET", f"/cigars/{cigar_id}/my-note")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('note_text') == '':
+                    self.log_result("Private Notes GET Empty", True, 
+                                  "Correctly returned empty note")
+                else:
+                    self.log_result("Private Notes GET Empty", False, 
+                                  f"Expected empty note, got: {data}")
+            else:
+                self.log_result("Private Notes GET Empty", False, 
+                              f"Request failed with status {response.status_code}", 
+                              response.text)
+                
+        except Exception as e:
+            self.log_result("Private Notes GET Empty", False, f"Request error: {str(e)}")
+    
+    def test_private_notes_create(self):
+        """Test POST /api/cigars/{cigar_id}/my-note - create a new note"""
+        print("\n📝 Testing Private Notes - POST Create Note...")
+        
+        cigar_id = self.get_test_cigar_id()
+        if not cigar_id:
+            self.log_result("Private Notes POST Create", False, "No test cigar available")
+            return
+        
+        note_data = {
+            "note_text": "This is my private note about this cigar. Great flavor profile with hints of cedar and spice."
+        }
+        
+        try:
+            response = self.make_request("POST", f"/cigars/{cigar_id}/my-note", json=note_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('note_text') == note_data['note_text']:
+                    self.log_result("Private Notes POST Create", True, 
+                                  "Successfully created note")
+                else:
+                    self.log_result("Private Notes POST Create", False, 
+                                  f"Note text mismatch. Expected: {note_data['note_text']}, Got: {data.get('note_text')}")
+            else:
+                self.log_result("Private Notes POST Create", False, 
+                              f"Request failed with status {response.status_code}", 
+                              response.text)
+                
+        except Exception as e:
+            self.log_result("Private Notes POST Create", False, f"Request error: {str(e)}")
+    
+    def test_private_notes_get_existing(self):
+        """Test GET /api/cigars/{cigar_id}/my-note - should return the saved note"""
+        print("\n📝 Testing Private Notes - GET Existing Note...")
+        
+        cigar_id = self.get_test_cigar_id()
+        if not cigar_id:
+            self.log_result("Private Notes GET Existing", False, "No test cigar available")
+            return
+        
+        try:
+            response = self.make_request("GET", f"/cigars/{cigar_id}/my-note")
+            
+            if response.status_code == 200:
+                data = response.json()
+                expected_text = "This is my private note about this cigar. Great flavor profile with hints of cedar and spice."
+                if data.get('note_text') == expected_text:
+                    self.log_result("Private Notes GET Existing", True, 
+                                  "Correctly returned saved note")
+                else:
+                    self.log_result("Private Notes GET Existing", False, 
+                                  f"Note text mismatch. Expected: {expected_text}, Got: {data.get('note_text')}")
+            else:
+                self.log_result("Private Notes GET Existing", False, 
+                              f"Request failed with status {response.status_code}", 
+                              response.text)
+                
+        except Exception as e:
+            self.log_result("Private Notes GET Existing", False, f"Request error: {str(e)}")
+    
+    def test_private_notes_update(self):
+        """Test POST /api/cigars/{cigar_id}/my-note - update existing note"""
+        print("\n📝 Testing Private Notes - POST Update Note...")
+        
+        cigar_id = self.get_test_cigar_id()
+        if not cigar_id:
+            self.log_result("Private Notes POST Update", False, "No test cigar available")
+            return
+        
+        updated_note_data = {
+            "note_text": "Updated note: This cigar has excellent construction and burns evenly. Perfect for evening relaxation."
+        }
+        
+        try:
+            response = self.make_request("POST", f"/cigars/{cigar_id}/my-note", json=updated_note_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('note_text') == updated_note_data['note_text']:
+                    self.log_result("Private Notes POST Update", True, 
+                                  "Successfully updated note")
+                else:
+                    self.log_result("Private Notes POST Update", False, 
+                                  f"Updated note text mismatch. Expected: {updated_note_data['note_text']}, Got: {data.get('note_text')}")
+            else:
+                self.log_result("Private Notes POST Update", False, 
+                              f"Request failed with status {response.status_code}", 
+                              response.text)
+                
+        except Exception as e:
+            self.log_result("Private Notes POST Update", False, f"Request error: {str(e)}")
+    
+    def test_private_notes_character_limit(self):
+        """Test POST /api/cigars/{cigar_id}/my-note - should fail with 1001 characters"""
+        print("\n📝 Testing Private Notes - Character Limit Validation...")
+        
+        cigar_id = self.get_test_cigar_id()
+        if not cigar_id:
+            self.log_result("Private Notes Character Limit", False, "No test cigar available")
+            return
+        
+        # Create a note with exactly 1001 characters
+        long_note = "A" * 1001
+        note_data = {"note_text": long_note}
+        
+        try:
+            response = self.make_request("POST", f"/cigars/{cigar_id}/my-note", json=note_data)
+            
+            if response.status_code == 400:
+                error_data = response.json()
+                if "1000 character limit" in error_data.get('detail', ''):
+                    self.log_result("Private Notes Character Limit", True, 
+                                  "Correctly rejected 1001 characters")
+                else:
+                    self.log_result("Private Notes Character Limit", False, 
+                                  f"Wrong error message. Expected character limit error, got: {error_data}")
+            else:
+                self.log_result("Private Notes Character Limit", False, 
+                              f"Expected 400, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Private Notes Character Limit", False, f"Request error: {str(e)}")
+    
+    def test_private_notes_invalid_cigar(self):
+        """Test POST /api/cigars/{invalid_id}/my-note - should fail with invalid cigar_id"""
+        print("\n📝 Testing Private Notes - Invalid Cigar ID...")
+        
+        invalid_cigar_id = "507f1f77bcf86cd799439011"  # Valid ObjectId format but non-existent
+        note_data = {"note_text": "This should fail"}
+        
+        try:
+            response = self.make_request("POST", f"/cigars/{invalid_cigar_id}/my-note", json=note_data)
+            
+            if response.status_code == 404:
+                error_data = response.json()
+                if "Cigar not found" in error_data.get('detail', ''):
+                    self.log_result("Private Notes Invalid Cigar", True, 
+                                  "Correctly returned 404 for invalid cigar")
+                else:
+                    self.log_result("Private Notes Invalid Cigar", False, 
+                                  f"Wrong error message. Expected 'Cigar not found', got: {error_data}")
+            else:
+                self.log_result("Private Notes Invalid Cigar", False, 
+                              f"Expected 404, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Private Notes Invalid Cigar", False, f"Request error: {str(e)}")
+    
+    def test_private_notes_delete(self):
+        """Test DELETE /api/cigars/{cigar_id}/my-note - delete the note"""
+        print("\n📝 Testing Private Notes - DELETE Note...")
+        
+        cigar_id = self.get_test_cigar_id()
+        if not cigar_id:
+            self.log_result("Private Notes DELETE", False, "No test cigar available")
+            return
+        
+        try:
+            response = self.make_request("DELETE", f"/cigars/{cigar_id}/my-note")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and "deleted" in data.get('message', '').lower():
+                    self.log_result("Private Notes DELETE", True, 
+                                  "Successfully deleted note")
+                else:
+                    self.log_result("Private Notes DELETE", False, 
+                                  f"Unexpected response: {data}")
+            else:
+                self.log_result("Private Notes DELETE", False, 
+                              f"Request failed with status {response.status_code}", 
+                              response.text)
+                
+        except Exception as e:
+            self.log_result("Private Notes DELETE", False, f"Request error: {str(e)}")
+    
+    def test_private_notes_get_after_delete(self):
+        """Test GET /api/cigars/{cigar_id}/my-note - should return empty note after deletion"""
+        print("\n📝 Testing Private Notes - GET After Delete...")
+        
+        cigar_id = self.get_test_cigar_id()
+        if not cigar_id:
+            self.log_result("Private Notes GET After Delete", False, "No test cigar available")
+            return
+        
+        try:
+            response = self.make_request("GET", f"/cigars/{cigar_id}/my-note")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('note_text') == '':
+                    self.log_result("Private Notes GET After Delete", True, 
+                                  "Correctly returned empty note after deletion")
+                else:
+                    self.log_result("Private Notes GET After Delete", False, 
+                                  f"Expected empty note after delete, got: {data}")
+            else:
+                self.log_result("Private Notes GET After Delete", False, 
+                              f"Request failed with status {response.status_code}", 
+                              response.text)
+                
+        except Exception as e:
+            self.log_result("Private Notes GET After Delete", False, f"Request error: {str(e)}")
+    
+    def test_private_notes_delete_nonexistent(self):
+        """Test DELETE /api/cigars/{cigar_id}/my-note - should return 404 for non-existent note"""
+        print("\n📝 Testing Private Notes - DELETE Non-existent Note...")
+        
+        cigar_id = self.get_test_cigar_id()
+        if not cigar_id:
+            self.log_result("Private Notes DELETE Non-existent", False, "No test cigar available")
+            return
+        
+        try:
+            response = self.make_request("DELETE", f"/cigars/{cigar_id}/my-note")
+            
+            if response.status_code == 404:
+                error_data = response.json()
+                if "Note not found" in error_data.get('detail', ''):
+                    self.log_result("Private Notes DELETE Non-existent", True, 
+                                  "Correctly returned 404 for non-existent note")
+                else:
+                    self.log_result("Private Notes DELETE Non-existent", False, 
+                                  f"Wrong error message. Expected 'Note not found', got: {error_data}")
+            else:
+                self.log_result("Private Notes DELETE Non-existent", False, 
+                              f"Expected 404, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Private Notes DELETE Non-existent", False, f"Request error: {str(e)}")
+    
+    def test_private_notes_auth_required(self):
+        """Test that all notes endpoints require authentication"""
+        print("\n📝 Testing Private Notes - Authentication Required...")
+        
+        cigar_id = self.get_test_cigar_id()
+        if not cigar_id:
+            self.log_result("Private Notes Auth Required", False, "No test cigar available")
+            return
+        
+        # Temporarily remove auth token
+        original_token = self.auth_token
+        self.auth_token = None
+        
+        endpoints_to_test = [
+            ('GET', f"/cigars/{cigar_id}/my-note"),
+            ('POST', f"/cigars/{cigar_id}/my-note"),
+            ('DELETE', f"/cigars/{cigar_id}/my-note")
+        ]
+        
+        all_passed = True
+        
+        for method, endpoint in endpoints_to_test:
+            try:
+                if method == 'GET':
+                    response = self.make_request("GET", endpoint)
+                elif method == 'POST':
+                    response = self.make_request("POST", endpoint, json={"note_text": "test"})
+                elif method == 'DELETE':
+                    response = self.make_request("DELETE", endpoint)
+                    
+                if response.status_code in [401, 403]:
+                    pass  # Good, requires auth
+                else:
+                    all_passed = False
+                    break
+                    
+            except Exception:
+                all_passed = False
+                break
+        
+        # Restore auth token
+        self.auth_token = original_token
+        
+        if all_passed:
+            self.log_result("Private Notes Auth Required", True, 
+                          "All endpoints properly require authentication")
+        else:
+            self.log_result("Private Notes Auth Required", False, 
+                          "Some endpoints don't require authentication")
     
     def run_all_tests(self):
         """Run all tests for Add Cigar feature"""
