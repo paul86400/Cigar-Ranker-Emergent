@@ -95,15 +95,28 @@ export default function ProfileScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.content}>
         <View style={styles.header}>
-          <View style={styles.profileImageContainer}>
-            {user.profile_pic ? (
-              <Image
-                source={{ uri: `data:image/png;base64,${user.profile_pic}` }}
-                style={styles.profileImage}
-              />
-            ) : (
-              <Ionicons name="person" size={48} color="#888" />
-            )}
+          <View style={styles.profileImageWrapper}>
+            <View style={styles.profileImageContainer}>
+              {user.profile_pic ? (
+                <Image
+                  source={{ uri: `data:image/png;base64,${user.profile_pic}` }}
+                  style={styles.profileImage}
+                />
+              ) : (
+                <Ionicons name="person" size={48} color="#888" />
+              )}
+            </View>
+            <TouchableOpacity 
+              style={styles.cameraButton}
+              onPress={handleUploadPhoto}
+              disabled={uploadingPhoto}
+            >
+              {uploadingPhoto ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Ionicons name="camera" size={20} color="#fff" />
+              )}
+            </TouchableOpacity>
           </View>
           <Text style={styles.username}>{user.username}</Text>
           <Text style={styles.email}>{user.email}</Text>
