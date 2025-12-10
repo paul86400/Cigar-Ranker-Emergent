@@ -17,7 +17,8 @@ from models import (
     UserCreate, UserLogin, UserProfile, UserUpdate,
     CigarCreate, CigarResponse, RatingCreate, RatingResponse,
     CommentCreate, CommentResponse, SearchQuery,
-    LabelScanRequest, BarcodeScanRequest, StorePrice
+    LabelScanRequest, BarcodeScanRequest, StorePrice,
+    NoteCreate, NoteResponse
 )
 from auth import hash_password, verify_password, create_access_token, get_current_user
 
