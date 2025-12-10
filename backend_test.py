@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Backend API Testing for Cigar Ranker App
-Focus: Add Cigar Feature Testing
+Focus: Private Notes Feature Testing
 """
 
 import requests
