@@ -239,7 +239,27 @@ export default function CigarDetailsScreen() {
     <SafeAreaView style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity 
-          onPress={() => router.push('/(tabs)')}
+          onPress={() => {
+            // Check if we have return params (from advanced search)
+            const hasReturnParams = params.returnQ || params.returnStrength || params.returnOrigin || 
+                                   params.returnWrapper || params.returnSize || params.returnMinPrice || params.returnMaxPrice;
+            
+            if (hasReturnParams) {
+              // Restore the search parameters
+              const searchParams = new URLSearchParams();
+              if (params.returnQ) searchParams.append('q', params.returnQ as string);
+              if (params.returnStrength) searchParams.append('strength', params.returnStrength as string);
+              if (params.returnOrigin) searchParams.append('origin', params.returnOrigin as string);
+              if (params.returnWrapper) searchParams.append('wrapper', params.returnWrapper as string);
+              if (params.returnSize) searchParams.append('size', params.returnSize as string);
+              if (params.returnMinPrice) searchParams.append('min_price', params.returnMinPrice as string);
+              if (params.returnMaxPrice) searchParams.append('max_price', params.returnMaxPrice as string);
+              
+              router.push(`/(tabs)?${searchParams.toString()}`);
+            } else {
+              router.push('/(tabs)');
+            }
+          }}
           style={styles.backButton}
           hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
         >
