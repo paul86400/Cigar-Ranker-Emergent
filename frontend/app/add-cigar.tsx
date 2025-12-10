@@ -193,6 +193,49 @@ export default function AddCigarScreen() {
           </View>
         )}
 
+        {existingCigar && (
+          <View style={styles.resultsSection}>
+            <View style={styles.resultHeader}>
+              <Ionicons name="information-circle" size={32} color="#FFA500" />
+              <Text style={[styles.resultTitle, { color: '#FFA500' }]}>Already in Database!</Text>
+            </View>
+            
+            <Text style={styles.resultDescription}>
+              This cigar already exists in our database. You can view it below.
+            </Text>
+
+            <View style={styles.detailsCard}>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Brand:</Text>
+                <Text style={styles.detailValue}>{existingCigar.brand}</Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Name:</Text>
+                <Text style={styles.detailValue}>{existingCigar.name}</Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Rating:</Text>
+                <Text style={styles.detailValue}>⭐ {existingCigar.average_rating.toFixed(1)} ({existingCigar.rating_count} ratings)</Text>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={styles.viewButton}
+              onPress={() => router.replace(`/cigar/${existingCigar.id}`)}
+            >
+              <Ionicons name="eye" size={24} color="#fff" />
+              <Text style={styles.viewButtonText}>View Cigar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.searchAnotherButton}
+              onPress={handleSearchAnother}
+            >
+              <Text style={styles.searchAnotherText}>Search Another Cigar</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {cigarInfo && (
           <View style={styles.resultsSection}>
             <View style={styles.resultHeader}>
