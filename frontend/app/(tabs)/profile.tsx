@@ -303,6 +303,12 @@ const styles = StyleSheet.create({
     color: '#4CAF50',
     fontWeight: 'bold',
   },
+  disabledMenuItem: {
+    opacity: 0.4,
+  },
+  disabledText: {
+    color: '#555',
+  },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
