@@ -82,25 +82,41 @@ export default function AddCigarScreen() {
   const handleAddCigar = async () => {
     if (!cigarInfo) return;
 
+    // Validate required fields
+    const requiredFields = ['brand', 'name', 'strength', 'origin', 'wrapper', 'size'];
+    const missingFields = requiredFields.filter(field => !cigarInfo[field] || cigarInfo[field].trim() === '');
+    
+    if (missingFields.length > 0) {
+      Alert.alert(
+        'Missing Information',
+        `The AI couldn't find all details. Missing: ${missingFields.join(', ')}. Please try searching again with more specific information.`
+      );
+      return;
+    }
+
     try {
       setSubmitting(true);
+      console.log('Submitting cigar:', cigarInfo);
       
       const formData = new FormData();
-      formData.append('brand', cigarInfo.brand || '');
-      formData.append('name', cigarInfo.name || '');
-      formData.append('strength', (cigarInfo.strength || 'medium').toLowerCase());
-      formData.append('origin', cigarInfo.origin || '');
-      formData.append('wrapper', cigarInfo.wrapper || '');
-      formData.append('size', cigarInfo.size || '');
+      formData.append('brand', cigarInfo.brand.trim());
+      formData.append('name', cigarInfo.name.trim());
+      formData.append('strength', cigarInfo.strength.toLowerCase().trim());
+      formData.append('origin', cigarInfo.origin.trim());
+      formData.append('wrapper', cigarInfo.wrapper.trim());
+      formData.append('size', cigarInfo.size.trim());
       if (cigarInfo.price_range) {
         formData.append('price_range', cigarInfo.price_range);
       }
 
+      console.log('Calling API to add cigar...');
       const response = await api.post('/cigars/add', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
+
+      console.log('API response:', response.data);
 
       if (response.data.success) {
         Alert.alert(
@@ -131,7 +147,8 @@ export default function AddCigarScreen() {
       }
     } catch (error: any) {
       console.error('Error adding cigar:', error);
-      Alert.alert('Error', error.response?.data?.detail || 'Failed to add cigar');
+      console.error('Error response:', error.response?.data);
+      Alert.alert('Error', error.response?.data?.detail || error.message || 'Failed to add cigar. Please try again.');
     } finally {
       setSubmitting(false);
     }
