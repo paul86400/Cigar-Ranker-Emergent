@@ -68,16 +68,16 @@ export default function AddCigarScreen() {
   };
 
   const handleAddCigar = async () => {
-    if (!cigarInfo) return;
+    if (!cigarInfo) {
+      console.log('No cigar info available');
+      return;
+    }
 
-    // Validate required fields
-    const requiredFields = ['brand', 'name', 'strength', 'origin', 'wrapper', 'size'];
-    const missingFields = requiredFields.filter(field => !cigarInfo[field] || cigarInfo[field].trim() === '');
-    
-    if (missingFields.length > 0) {
+    // Validate at least brand and name are present
+    if (!cigarInfo.brand || !cigarInfo.name) {
       Alert.alert(
         'Missing Information',
-        `The AI couldn't find all details. Missing: ${missingFields.join(', ')}. Please try searching again with more specific information.`
+        'Brand and name are required. Please try searching again.'
       );
       return;
     }
@@ -87,12 +87,12 @@ export default function AddCigarScreen() {
       console.log('Submitting cigar:', cigarInfo);
       
       const formData = new FormData();
-      formData.append('brand', cigarInfo.brand.trim());
-      formData.append('name', cigarInfo.name.trim());
-      formData.append('strength', cigarInfo.strength.toLowerCase().trim());
-      formData.append('origin', cigarInfo.origin.trim());
-      formData.append('wrapper', cigarInfo.wrapper.trim());
-      formData.append('size', cigarInfo.size.trim());
+      formData.append('brand', (cigarInfo.brand || '').trim());
+      formData.append('name', (cigarInfo.name || '').trim());
+      formData.append('strength', (cigarInfo.strength || 'medium').toLowerCase().trim());
+      formData.append('origin', (cigarInfo.origin || 'Unknown').trim());
+      formData.append('wrapper', (cigarInfo.wrapper || 'Unknown').trim());
+      formData.append('size', (cigarInfo.size || 'Standard').trim());
       if (cigarInfo.price_range) {
         formData.append('price_range', cigarInfo.price_range);
       }
@@ -105,13 +105,15 @@ export default function AddCigarScreen() {
       });
 
       console.log('API response:', response.data);
+      console.log('Cigar ID:', response.data.cigar_id);
 
-      if (response.data.success) {
-        // Automatically navigate to the newly added cigar
+      // Always navigate to the cigar page (whether new or existing)
+      if (response.data.cigar_id) {
+        console.log('Navigating to cigar:', response.data.cigar_id);
         router.replace(`/cigar/${response.data.cigar_id}`);
       } else {
-        // If it already exists (duplicate), navigate to existing cigar
-        router.replace(`/cigar/${response.data.cigar_id}`);
+        console.error('No cigar_id in response');
+        Alert.alert('Error', 'Cigar was added but could not navigate to it.');
       }
     } catch (error: any) {
       console.error('Error adding cigar:', error);
