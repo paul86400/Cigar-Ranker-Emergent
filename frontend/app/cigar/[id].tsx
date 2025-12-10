@@ -515,7 +515,7 @@ export default function CigarDetailsScreen() {
         visible={showNoteModal}
         animationType="slide"
         transparent={true}
-        onRequestClose={() => setShowNoteModal(false)}
+        onRequestClose={handleCloseModal}
       >
         <KeyboardAvoidingView 
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -524,7 +524,7 @@ export default function CigarDetailsScreen() {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>My Note</Text>
-              <TouchableOpacity onPress={() => setShowNoteModal(false)}>
+              <TouchableOpacity onPress={handleCloseModal}>
                 <Ionicons name="close" size={28} color="#fff" />
               </TouchableOpacity>
             </View>
