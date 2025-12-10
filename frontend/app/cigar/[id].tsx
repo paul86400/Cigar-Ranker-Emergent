@@ -11,6 +11,8 @@ import {
   TextInput,
   Alert,
   Platform,
+  Modal,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
