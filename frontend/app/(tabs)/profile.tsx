@@ -140,21 +140,21 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Settings</Text>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <View style={[styles.menuItem, styles.disabledMenuItem]}>
             <View style={styles.menuItemLeft}>
-              <Ionicons name="settings-outline" size={24} color="#fff" />
-              <Text style={styles.menuItemText}>Preferences</Text>
+              <Ionicons name="settings-outline" size={24} color="#555" />
+              <Text style={[styles.menuItemText, styles.disabledText]}>Preferences</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#888" />
-          </TouchableOpacity>
+            <Ionicons name="chevron-forward" size={20} color="#555" />
+          </View>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <View style={[styles.menuItem, styles.disabledMenuItem]}>
             <View style={styles.menuItemLeft}>
-              <Ionicons name="notifications-outline" size={24} color="#fff" />
-              <Text style={styles.menuItemText}>Notifications</Text>
+              <Ionicons name="notifications-outline" size={24} color="#555" />
+              <Text style={[styles.menuItemText, styles.disabledText]}>Notifications</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#888" />
-          </TouchableOpacity>
+            <Ionicons name="chevron-forward" size={20} color="#555" />
+          </View>
 
           <TouchableOpacity 
             style={styles.menuItem}
