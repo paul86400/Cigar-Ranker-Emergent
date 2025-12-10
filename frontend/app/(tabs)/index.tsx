@@ -163,11 +163,31 @@ export default function HomeScreen() {
     }
   };
 
+  const handleCigarPress = (cigarId: string) => {
+    // Save current search params to pass back context
+    const hasSearchParams = params.q || params.strength || params.origin || params.wrapper || params.size || params.min_price || params.max_price;
+    if (hasSearchParams) {
+      // Build the query string to include in the cigar detail URL
+      const queryParams = new URLSearchParams();
+      if (params.q) queryParams.append('returnQ', params.q as string);
+      if (params.strength) queryParams.append('returnStrength', params.strength as string);
+      if (params.origin) queryParams.append('returnOrigin', params.origin as string);
+      if (params.wrapper) queryParams.append('returnWrapper', params.wrapper as string);
+      if (params.size) queryParams.append('returnSize', params.size as string);
+      if (params.min_price) queryParams.append('returnMinPrice', params.min_price as string);
+      if (params.max_price) queryParams.append('returnMaxPrice', params.max_price as string);
+      
+      router.push(`/cigar/${cigarId}?${queryParams.toString()}`);
+    } else {
+      router.push(`/cigar/${cigarId}`);
+    }
+  };
+
   const renderCigarCard = (cigar: Cigar) => (
     <TouchableOpacity
       key={cigar.id}
       style={styles.cigarCard}
-      onPress={() => router.push(`/cigar/${cigar.id}`)}
+      onPress={() => handleCigarPress(cigar.id)}
     >
       <View style={styles.cigarImageContainer}>
         <Image
