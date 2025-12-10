@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,10 +7,15 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Image,
+  Alert,
+  ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../../contexts/AuthContext';
+import api from '../../utils/api';
 
 export default function ProfileScreen() {
   const router = useRouter();
