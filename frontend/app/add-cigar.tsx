@@ -48,25 +48,13 @@ export default function AddCigarScreen() {
 
       if (response.data.found) {
         if (response.data.exists_in_db) {
-          // Cigar already exists
+          // Cigar already exists - show in UI
           setExistingCigar(response.data.existing_cigar);
-          Alert.alert(
-            'Cigar Found!',
-            'This cigar already exists in our database.',
-            [
-              {
-                text: 'View Cigar',
-                onPress: () => router.replace(`/cigar/${response.data.existing_cigar.id}`)
-              },
-              {
-                text: 'Search Again',
-                style: 'cancel'
-              }
-            ]
-          );
+          setCigarInfo(null);
         } else {
           // New cigar - show details for review
           setCigarInfo(response.data.cigar_info);
+          setExistingCigar(null);
         }
       } else {
         Alert.alert('Not Found', response.data.message || 'Could not find cigar details');
