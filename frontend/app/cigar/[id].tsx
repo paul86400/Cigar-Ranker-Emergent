@@ -199,6 +199,8 @@ export default function CigarDetailsScreen() {
         note_text: noteText
       });
       
+      // Update the original note text to the saved version
+      setOriginalNoteText(noteText);
       setShowNoteModal(false);
       Alert.alert('Success', 'Note saved successfully!');
     } catch (error: any) {
