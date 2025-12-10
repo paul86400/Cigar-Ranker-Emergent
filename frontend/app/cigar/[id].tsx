@@ -210,36 +210,8 @@ export default function CigarDetailsScreen() {
   };
 
   const handleClearNote = () => {
-    Alert.alert(
-      'Clear Note',
-      'Are you sure you want to clear your note?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Clear',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              setSavingNote(true);
-              // Save empty note to database
-              await api.post(`/cigars/${id}/my-note`, {
-                note_text: ''
-              });
-              
-              setNoteText('');
-              setOriginalNoteText('');
-              setShowNoteModal(false);
-              Alert.alert('Success', 'Note cleared successfully!');
-            } catch (error: any) {
-              console.error('Error clearing note:', error);
-              Alert.alert('Error', 'Failed to clear note. Please try again.');
-            } finally {
-              setSavingNote(false);
-            }
-          }
-        }
-      ]
-    );
+    // Simply clear the text in the UI
+    setNoteText('');
   };
 
   if (loading) {
