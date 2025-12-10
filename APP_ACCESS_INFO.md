@@ -3,7 +3,7 @@
 ## Web Preview (Recommended)
 The app is fully functional via web browser on any device:
 
-**URL:** https://cigar-scout.preview.emergentagent.com
+**URL:** https://puff-tracker-2.preview.emergentagent.com
 
 **Access from Phone:**
 1. Open your phone's web browser (Safari, Chrome, etc.)
