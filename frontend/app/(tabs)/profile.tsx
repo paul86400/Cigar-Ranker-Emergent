@@ -19,7 +19,56 @@ import api from '../../utils/api';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, logout, refreshUser } = useAuth();
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  const handleUploadPhoto = async () => {
+    try {
+      // Request permissions
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'We need camera roll permissions to upload photos');
+        return;
+      }
+
+      // Pick image
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+        base64: true,
+      });
+
+      if (!result.canceled && result.assets && result.assets[0]) {
+        setUploadingPhoto(true);
+        
+        const imageAsset = result.assets[0];
+        
+        if (!imageAsset.base64) {
+          Alert.alert('Error', 'Could not read image data');
+          return;
+        }
+
+        // Update profile with base64 image
+        const response = await api.put('/auth/profile', {
+          profile_pic: imageAsset.base64
+        });
+
+        if (response.data) {
+          // Refresh user data to show new profile picture
+          await refreshUser();
+          Alert.alert('Success', 'Profile picture updated successfully!');
+        }
+      }
+    } catch (error: any) {
+      console.error('Error uploading photo:', error);
+      Alert.alert('Error', error.response?.data?.detail || 'Failed to upload photo. Please try again.');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   if (!user) {
     return (
