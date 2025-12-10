@@ -107,31 +107,11 @@ export default function AddCigarScreen() {
       console.log('API response:', response.data);
 
       if (response.data.success) {
-        Alert.alert(
-          'Success!',
-          'Cigar has been added to the database.',
-          [
-            {
-              text: 'View Cigar',
-              onPress: () => router.replace(`/cigar/${response.data.cigar_id}`)
-            }
-          ]
-        );
+        // Automatically navigate to the newly added cigar
+        router.replace(`/cigar/${response.data.cigar_id}`);
       } else {
-        Alert.alert(
-          'Already Exists',
-          response.data.message,
-          [
-            {
-              text: 'View Existing',
-              onPress: () => router.replace(`/cigar/${response.data.cigar_id}`)
-            },
-            {
-              text: 'OK',
-              style: 'cancel'
-            }
-          ]
-        );
+        // If it already exists (duplicate), navigate to existing cigar
+        router.replace(`/cigar/${response.data.cigar_id}`);
       }
     } catch (error: any) {
       console.error('Error adding cigar:', error);
