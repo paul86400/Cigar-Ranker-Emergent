@@ -166,6 +166,52 @@ export default function CigarDetailsScreen() {
     }
   };
 
+  const handleOpenNoteModal = () => {
+    if (!user) {
+      Alert.alert('Sign in required', 'Please sign in to add notes');
+      router.push('/auth/login');
+      return;
+    }
+    setShowNoteModal(true);
+  };
+
+  const handleSaveNote = async () => {
+    if (!user) {
+      Alert.alert('Sign in required', 'Please sign in to add notes');
+      return;
+    }
+
+    try {
+      setSavingNote(true);
+      await api.post(`/cigars/${id}/my-note`, {
+        note_text: noteText
+      });
+      
+      setShowNoteModal(false);
+      Alert.alert('Success', 'Note saved successfully!');
+    } catch (error: any) {
+      console.error('Error saving note:', error);
+      Alert.alert('Error', error.response?.data?.detail || 'Failed to save note');
+    } finally {
+      setSavingNote(false);
+    }
+  };
+
+  const handleClearNote = () => {
+    Alert.alert(
+      'Clear Note',
+      'Are you sure you want to clear your note?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Clear',
+          style: 'destructive',
+          onPress: () => setNoteText('')
+        }
+      ]
+    );
+  };
+
   const handleUploadImage = async () => {
     console.log('Upload image button clicked');
     
