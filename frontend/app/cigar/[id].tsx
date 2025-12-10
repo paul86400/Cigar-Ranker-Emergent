@@ -176,7 +176,15 @@ export default function CigarDetailsScreen() {
       router.push('/auth/login');
       return;
     }
+    // Store the original note text when opening modal
+    setOriginalNoteText(noteText);
     setShowNoteModal(true);
+  };
+
+  const handleCloseModal = () => {
+    // Restore original note text when canceling
+    setNoteText(originalNoteText);
+    setShowNoteModal(false);
   };
 
   const handleSaveNote = async () => {
