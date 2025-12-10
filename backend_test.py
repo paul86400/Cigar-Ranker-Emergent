@@ -735,8 +735,8 @@ class CigarRankerTester:
                           "Some endpoints don't require authentication")
     
     def run_all_tests(self):
-        """Run all tests for Add Cigar feature"""
-        print("🚀 Starting Add Cigar Feature Tests...")
+        """Run all tests for Private Notes feature"""
+        print("🚀 Starting Private Notes Feature Tests...")
         print(f"Backend URL: {self.base_url}")
         
         # Step 1: Register user for authentication
@@ -744,42 +744,40 @@ class CigarRankerTester:
             print("❌ Cannot proceed without authentication")
             return False
         
-        # Step 2: Test successful cigar addition
-        cigar_id = self.test_add_cigar_success()
-        if cigar_id:
-            # Get the cigar details for search testing
-            try:
-                response = self.make_request("GET", f"/cigars/{cigar_id}")
-                if response.status_code == 200:
-                    cigar_data = response.json()
-                    brand = cigar_data.get("brand", "")
-                    name = cigar_data.get("name", "")
-                    
-                    # Test search functionality
-                    self.test_search_newly_added_cigar(cigar_id, brand, name)
-                    
-                    # Test get cigar details
-                    self.test_get_cigar_details(cigar_id)
-            except Exception as e:
-                print(f"Error getting cigar details for further testing: {e}")
+        # Private Notes Test Flow (as requested in review)
+        print("\n" + "="*60)
+        print("🔥 PRIVATE NOTES FEATURE TESTING")
+        print("="*60)
         
-        # Step 3: Test with optional fields
-        self.test_add_cigar_with_optional_fields()
+        # Step 1: Test GET empty note initially
+        self.test_private_notes_get_empty()
         
-        # Step 4: Test validation
-        self.test_add_cigar_missing_fields()
+        # Step 2: Test POST create note
+        self.test_private_notes_create()
         
-        # Step 5: Test authentication requirement
-        self.test_add_cigar_no_auth()
+        # Step 3: Test GET existing note
+        self.test_private_notes_get_existing()
         
-        # Step 6: Test duplicate detection
-        self.test_duplicate_detection()
+        # Step 4: Test POST update note
+        self.test_private_notes_update()
         
-        # Step 7: Test case-insensitive duplicate detection
-        self.test_case_insensitive_duplicate()
+        # Step 5: Test character limit validation (1001 chars should fail)
+        self.test_private_notes_character_limit()
         
-        # Step 8: Test edge cases
-        self.test_edge_cases()
+        # Step 6: Test invalid cigar ID
+        self.test_private_notes_invalid_cigar()
+        
+        # Step 7: Test DELETE note
+        self.test_private_notes_delete()
+        
+        # Step 8: Test GET after delete (should be empty)
+        self.test_private_notes_get_after_delete()
+        
+        # Step 9: Test DELETE non-existent note (should return 404)
+        self.test_private_notes_delete_nonexistent()
+        
+        # Step 10: Test authentication required
+        self.test_private_notes_auth_required()
         
         # Summary
         self.print_summary()
