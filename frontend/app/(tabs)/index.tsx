@@ -300,7 +300,7 @@ export default function HomeScreen() {
         >
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>
-              Popular Cigars {totalCount > 0 && `(${totalCount})`}
+              Popular Cigars {totalCount > 0 && `(total: ${totalCount})`}
             </Text>
             <TouchableOpacity 
               onPress={onRefresh} 
