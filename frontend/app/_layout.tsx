@@ -41,7 +41,7 @@ function AppContent() {
       // Fade out animation
       Animated.timing(fadeAnim, {
         toValue: 0,
-        duration: 600,
+        duration: 300,
         useNativeDriver: true,
       }).start(() => {
         setShowSplash(false);
