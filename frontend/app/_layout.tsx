@@ -20,12 +20,12 @@ function AppContent() {
         // Fade in animation
         Animated.timing(fadeAnim, {
           toValue: 1,
-          duration: 800,
+          duration: 400,
           useNativeDriver: true,
         }).start();
 
-        // Wait for minimum display time (2 seconds after fade in)
-        await new Promise(resolve => setTimeout(resolve, 2800));
+        // Wait for minimum display time (1 second after fade in)
+        await new Promise(resolve => setTimeout(resolve, 1400));
         setMinTimeElapsed(true);
       } catch (e) {
         console.warn(e);
