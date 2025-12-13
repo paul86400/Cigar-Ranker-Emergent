@@ -117,11 +117,23 @@ export default function CommentsScreen() {
   const renderComment = (comment: Comment, depth: number = 0) => (
     <View key={comment.id} style={[styles.commentContainer, { marginLeft: depth * 20 }]}>
       <View style={styles.commentHeader}>
-        <View style={styles.avatar}>
-          <Ionicons name="person" size={16} color="#888" />
-        </View>
+        <TouchableOpacity 
+          style={styles.avatar}
+          onPress={() => router.push(`/user/${comment.user_id}`)}
+        >
+          {comment.profile_pic ? (
+            <Image
+              source={{ uri: `data:image/png;base64,${comment.profile_pic}` }}
+              style={styles.avatarImage}
+            />
+          ) : (
+            <Ionicons name="person" size={16} color="#888" />
+          )}
+        </TouchableOpacity>
         <View style={styles.commentInfo}>
-          <Text style={styles.username}>{comment.username}</Text>
+          <TouchableOpacity onPress={() => router.push(`/user/${comment.user_id}`)}>
+            <Text style={styles.username}>{comment.username}</Text>
+          </TouchableOpacity>
           <Text style={styles.timestamp}>
             {new Date(comment.created_at).toLocaleDateString()}
           </Text>
