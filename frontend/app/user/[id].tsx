@@ -14,13 +14,25 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import api from '../../utils/api';
 
+interface Cigar {
+  id: string;
+  brand: string;
+  name: string;
+  image?: string;
+  average_rating: number;
+  rating_count: number;
+  user_rating?: number;
+}
+
 interface UserProfile {
   id: string;
   username: string;
-  email: string;
+  email?: string;
   profile_pic?: string;
   favorites?: string[];
   created_at: string;
+  added_cigars: Cigar[];
+  rated_cigars: Cigar[];
 }
 
 export default function UserProfileScreen() {
