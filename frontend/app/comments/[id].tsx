@@ -119,9 +119,19 @@ export default function CommentsScreen() {
     );
   };
 
-  const renderComment = (comment: Comment, depth: number = 0) => (
-    <View key={comment.id} style={[styles.commentContainer, { marginLeft: depth * 20 }]}>
-      <View style={styles.commentHeader}>
+  const renderComment = (comment: Comment, depth: number = 0) => {
+    const isHighlighted = highlightedComment === comment.id;
+    
+    return (
+      <View 
+        key={comment.id} 
+        style={[
+          styles.commentContainer, 
+          { marginLeft: depth * 20 },
+          isHighlighted && styles.highlightedComment
+        ]}
+      >
+        <View style={styles.commentHeader}>
         <TouchableOpacity 
           style={styles.avatar}
           onPress={() => router.push(`/user/${comment.user_id}`)}
