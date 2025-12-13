@@ -217,6 +217,70 @@ export default function CigarDetailsScreen() {
     setNoteText('');
   };
 
+  const handleUploadImage = async () => {
+    if (!user) {
+      Alert.alert('Login Required', 'Please login to upload images');
+      return;
+    }
+
+    try {
+      // Request permissions
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'We need camera roll permissions to upload images');
+        return;
+      }
+
+      // Pick image
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+        base64: true,
+      });
+
+      if (!result.canceled && result.assets && result.assets[0]) {
+        setUploadingImage(true);
+        
+        const imageAsset = result.assets[0];
+        
+        if (!imageAsset.base64) {
+          Alert.alert('Error', 'Could not read image data');
+          return;
+        }
+
+        // Use base64 upload (works for both web and mobile)
+        const response = await api.post(`/cigars/${id}/upload-image-base64`, {
+          image_base64: imageAsset.base64,
+        });
+
+        if (response.data.success) {
+          setCigar(prev => prev ? { ...prev, image: response.data.image } : null);
+          Alert.alert('Success', 'Image uploaded successfully!');
+        } else {
+          Alert.alert('Error', response.data.message || 'Failed to upload image');
+        }
+      }
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      const errorMessage = error.response?.data?.detail || error.message || 'Failed to upload image';
+      
+      if (errorMessage.includes('inappropriate content')) {
+        Alert.alert(
+          'Content Rejected',
+          'The image was rejected by our AI moderation system. Please ensure the image is appropriate and related to cigars.',
+          [{ text: 'OK' }]
+        );
+      } else {
+        Alert.alert('Error', errorMessage);
+      }
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
