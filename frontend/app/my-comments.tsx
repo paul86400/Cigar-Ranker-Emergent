@@ -104,7 +104,7 @@ export default function MyCommentsScreen() {
             <TouchableOpacity
               key={comment.id}
               style={styles.commentCard}
-              onPress={() => router.push(`/cigar/${comment.cigar_id}`)}
+              onPress={() => router.push(`/comments/${comment.cigar_id}?highlight=${comment.id}`)}
             >
               <View style={styles.cigarInfo}>
                 <View style={styles.cigarImageContainer}>
