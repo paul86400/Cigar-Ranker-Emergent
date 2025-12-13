@@ -187,13 +187,15 @@ export default function CommentsScreen() {
           <TouchableOpacity
             style={styles.deleteButton}
             onPress={() => {
-              console.log('=== DELETE BUTTON CLICKED ===');
-              console.log('Delete button clicked for comment:', comment.id);
-              console.log('Comment user_id:', comment.user_id, 'Type:', typeof comment.user_id);
-              console.log('Current user id:', user.id, 'Type:', typeof user.id);
-              console.log('Match:', String(comment.user_id) === String(user.id));
-              Alert.alert('Debug', `About to delete comment: ${comment.id}`);
-              handleDeleteComment(comment.id);
+              try {
+                console.log('=== DELETE BUTTON CLICKED ===');
+                console.log('Comment ID:', comment.id);
+                alert('Delete button clicked!');
+                handleDeleteComment(comment.id);
+              } catch (error) {
+                console.error('Error in delete button:', error);
+                alert('Error: ' + error);
+              }
             }}
           >
             <Ionicons name="trash-outline" size={16} color="#FF3B30" />
