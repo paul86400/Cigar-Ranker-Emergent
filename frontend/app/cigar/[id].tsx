@@ -644,6 +644,71 @@ export default function CigarDetailsScreen() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* Flavor Notes Modal */}
+      <Modal
+        visible={showFlavorModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowFlavorModal(false)}
+      >
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalContainer}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Edit Flavor Notes</Text>
+              <TouchableOpacity onPress={() => setShowFlavorModal(false)}>
+                <Ionicons name="close" size={28} color="#fff" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.flavorModalScroll}>
+              {editingFlavors.map((flavor, index) => (
+                <View key={index} style={styles.flavorEditItem}>
+                  <Text style={styles.flavorEditText}>{flavor}</Text>
+                  <TouchableOpacity onPress={() => handleRemoveFlavor(index)}>
+                    <Ionicons name="close-circle" size={24} color="#FF3B30" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
+
+            <View style={styles.addFlavorContainer}>
+              <TextInput
+                style={styles.addFlavorInput}
+                value={newFlavor}
+                onChangeText={setNewFlavor}
+                placeholder="Add new flavor note..."
+                placeholderTextColor="#666"
+                maxLength={50}
+                onSubmitEditing={handleAddFlavor}
+                returnKeyType="done"
+              />
+              <TouchableOpacity onPress={handleAddFlavor} style={styles.addFlavorButton}>
+                <Ionicons name="add-circle" size={32} color="#4CAF50" />
+              </TouchableOpacity>
+            </View>
+            
+            <Text style={styles.flavorCount}>
+              {editingFlavors.length}/20 flavor notes
+            </Text>
+
+            <TouchableOpacity
+              style={[styles.saveButton, savingFlavors && styles.saveButtonDisabled]}
+              onPress={handleSaveFlavors}
+              disabled={savingFlavors}
+            >
+              {savingFlavors ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.saveButtonText}>Save Changes</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </SafeAreaView>
   );
 }
