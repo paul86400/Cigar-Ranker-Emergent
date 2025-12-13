@@ -885,10 +885,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   flavorNote: {
-    backgroundColor: '#8B4513',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    backgroundColor: '#2a2a2a',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#444',
   },
   flavorNoteText: {
     color: '#fff',
