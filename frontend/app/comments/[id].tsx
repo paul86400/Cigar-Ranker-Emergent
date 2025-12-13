@@ -87,6 +87,32 @@ export default function CommentsScreen() {
     }
   };
 
+  const handleDeleteComment = async (commentId: string) => {
+    Alert.alert(
+      'Delete Comment',
+      'Are you sure you want to delete this comment? This will also delete all replies.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await api.delete(`/comments/${commentId}`);
+              
+              // Refresh comments after deletion
+              await new Promise(resolve => setTimeout(resolve, 500));
+              await loadComments();
+            } catch (error: any) {
+              console.error('Error deleting comment:', error);
+              Alert.alert('Error', error.response?.data?.detail || 'Failed to delete comment');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const renderComment = (comment: Comment, depth: number = 0) => (
     <View key={comment.id} style={[styles.commentContainer, { marginLeft: depth * 20 }]}>
       <View style={styles.commentHeader}>
