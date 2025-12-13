@@ -284,6 +284,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     padding: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
   },
   statItem: {
     alignItems: 'center',
@@ -297,5 +299,70 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  section: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 16,
+  },
+  cigarCard: {
+    flexDirection: 'row',
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+  cigarImageContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginRight: 12,
+  },
+  cigarImage: {
+    width: '100%',
+    height: '100%',
+  },
+  cigarImagePlaceholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#2a2a2a',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cigarInfo: {
+    flex: 1,
+  },
+  cigarBrand: {
+    fontSize: 14,
+    color: '#888',
+    marginBottom: 2,
+  },
+  cigarName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  cigarRating: {
+    fontSize: 12,
+    color: '#FFD700',
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'center',
+  },
+  userRating: {
+    fontSize: 12,
+    color: '#8B4513',
+    fontWeight: '600',
   },
 });
