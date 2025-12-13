@@ -719,6 +719,29 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
   },
+  addedByContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  addedByAvatar: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#2a2a2a',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  addedByAvatarImage: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+  },
+  addedByUsername: {
+    color: '#8B4513',
+    fontWeight: '600',
+  },
   flavorSection: {
     padding: 20,
     borderBottomWidth: 1,
