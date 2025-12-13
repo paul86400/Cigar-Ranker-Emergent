@@ -159,13 +159,45 @@ async def get_user_profile(user_id: str):
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         
+        # Get cigars added by this user
+        added_cigars = await db.cigars.find(
+            {"added_by": user_id},
+            {"brand": 1, "name": 1, "image": 1, "average_rating": 1, "rating_count": 1}
+        ).sort("created_at", -1).limit(10).to_list(10)
+        
+        # Get cigars rated by this user
+        user_ratings = await db.ratings.find(
+            {"user_id": user_id}
+        ).sort("created_at", -1).limit(10).to_list(10)
+        
+        # Get cigar details for rated cigars
+        rated_cigar_ids = [ObjectId(r["cigar_id"]) for r in user_ratings]
+        rated_cigars_data = await db.cigars.find(
+            {"_id": {"$in": rated_cigar_ids}},
+            {"brand": 1, "name": 1, "image": 1, "average_rating": 1, "rating_count": 1}
+        ).to_list(len(rated_cigar_ids))
+        
+        # Create a map of cigar_id to rating
+        rating_map = {r["cigar_id"]: r["rating"] for r in user_ratings}
+        
+        # Combine cigar data with user ratings
+        rated_cigars = []
+        for cigar in rated_cigars_data:
+            cigar_id = str(cigar["_id"])
+            rated_cigars.append({
+                **serialize_doc(cigar),
+                "user_rating": rating_map.get(cigar_id, 0)
+            })
+        
         # Return only public information
         return {
             "id": str(user["_id"]),
             "username": user["username"],
             "profile_pic": user.get("profile_pic"),
             "favorites": user.get("favorites", []),
-            "created_at": user.get("created_at", datetime.utcnow()).isoformat()
+            "created_at": user.get("created_at", datetime.utcnow()).isoformat(),
+            "added_cigars": [serialize_doc(c) for c in added_cigars],
+            "rated_cigars": rated_cigars
         }
     except HTTPException:
         raise
