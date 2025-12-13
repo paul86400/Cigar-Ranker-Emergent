@@ -342,11 +342,36 @@ export default function CigarDetailsScreen() {
 
       <ScrollView style={styles.content}>
         <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: `data:image/jpeg;base64,${cigar.image}` }}
-            style={styles.image}
-            resizeMode="contain"
-          />
+          {cigar.image ? (
+            <Image
+              source={{ uri: `data:image/jpeg;base64,${cigar.image}` }}
+              style={styles.image}
+              resizeMode="contain"
+            />
+          ) : (
+            <View style={styles.placeholderContainer}>
+              <Ionicons name="image-outline" size={64} color="#555" />
+              <Text style={styles.placeholderText}>
+                No cigar image yet.{'\n'}Feel free to upload your own.
+              </Text>
+            </View>
+          )}
+          <TouchableOpacity 
+            style={styles.uploadButton}
+            onPress={handleUploadImage}
+            disabled={uploadingImage}
+          >
+            {uploadingImage ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <>
+                <Ionicons name="camera" size={20} color="#fff" />
+                <Text style={styles.uploadButtonText}>
+                  {cigar.image ? 'Change Photo' : 'Upload Photo'}
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
         </View>
 
         <View style={styles.infoSection}>
