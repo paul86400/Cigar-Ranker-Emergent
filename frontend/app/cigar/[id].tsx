@@ -877,7 +877,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 12,
   },
   flavorNotes: {
     flexDirection: 'row',
