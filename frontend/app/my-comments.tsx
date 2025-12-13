@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  SafeAreaView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,33 +26,23 @@ interface UserComment {
 }
 
 export default function MyCommentsScreen() {
-  console.log('=== MyCommentsScreen RENDERED ===');
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
-  console.log('=== User:', user ? user.username : 'NOT LOGGED IN');
   const [comments, setComments] = useState<UserComment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('=== useEffect triggered, calling loadMyComments ===');
     loadMyComments();
   }, []);
 
   const loadMyComments = async () => {
     try {
       setLoading(true);
-      setError(null);
-      console.log('Fetching my comments from v2 test endpoint...');
-      const response = await api.get('/comments/my-comments-v2-test');
-      console.log('My comments response:', response.data);
-      console.log('Number of comments:', response.data?.length || 0);
+      const response = await api.get('/comments/my-all-comments');
       setComments(response.data);
     } catch (error: any) {
       console.error('Error loading comments:', error);
-      console.error('Error response:', error.response?.data);
-      setError('Failed to load your comments. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -59,55 +50,35 @@ export default function MyCommentsScreen() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
     });
   };
 
-  const renderCommentCard = (comment: UserComment) => (
-    <TouchableOpacity
-      key={comment.id}
-      style={styles.commentCard}
-      onPress={() => router.push(`/cigar/${comment.cigar_id}`)}
-    >
-      <View style={styles.cigarImageContainer}>
-        <Image
-          source={{ uri: `data:image/jpeg;base64,${comment.cigar_image}` }}
-          style={styles.cigarImage}
-          resizeMode="contain"
-        />
-      </View>
-      
-      <View style={styles.commentInfo}>
-        <Text style={styles.cigarBrand}>{comment.cigar_brand}</Text>
-        <Text style={styles.cigarName} numberOfLines={1}>{comment.cigar_name}</Text>
-        
-        <View style={styles.commentTextContainer}>
-          <Text style={styles.commentText} numberOfLines={3}>
-            {comment.text}
-          </Text>
+  if (!user) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.header, { paddingTop: insets.top }]}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>My Comments</Text>
+          <View style={styles.placeholder} />
         </View>
-
-        <View style={styles.commentFooter}>
-          <View style={styles.dateContainer}>
-            <Ionicons name="time-outline" size={14} color="#888" />
-            <Text style={styles.commentDate}>{formatDate(comment.created_at)}</Text>
-          </View>
-          <View style={styles.viewButton}>
-            <Text style={styles.viewButtonText}>View Cigar</Text>
-            <Ionicons name="chevron-forward" size={16} color="#8B4513" />
-          </View>
+        <View style={styles.centered}>
+          <Ionicons name="chatbubble-outline" size={64} color="#888" />
+          <Text style={styles.emptyText}>Please sign in to view your comments</Text>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} style={styles.backButton}>
+    <SafeAreaView style={styles.container}>
+      <View style={[styles.header, { paddingTop: insets.top }]}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Comments</Text>
@@ -115,45 +86,54 @@ export default function MyCommentsScreen() {
       </View>
 
       {loading ? (
-        <View style={styles.loadingContainer}>
+        <View style={styles.centered}>
           <ActivityIndicator size="large" color="#8B4513" />
-          <Text style={styles.loadingText}>Loading your comments...</Text>
-        </View>
-      ) : error ? (
-        <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={48} color="#FF6B6B" />
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={loadMyComments}>
-            <Text style={styles.retryButtonText}>Retry</Text>
-          </TouchableOpacity>
         </View>
       ) : comments.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Ionicons name="chatbubbles-outline" size={64} color="#888" />
-          <Text style={styles.emptyTitle}>No Comments Yet</Text>
+        <View style={styles.centered}>
+          <Ionicons name="chatbubble-outline" size={64} color="#888" />
+          <Text style={styles.emptyText}>You haven't made any comments yet</Text>
           <Text style={styles.emptySubtext}>
-            Start commenting on cigars to see them here!
+            Visit cigars and join the discussion!
           </Text>
-          <TouchableOpacity 
-            style={styles.browseButton}
-            onPress={() => router.push('/(tabs)')}
-          >
-            <Text style={styles.browseButtonText}>Browse Cigars</Text>
-          </TouchableOpacity>
         </View>
       ) : (
-        <ScrollView style={styles.commentsList} contentContainerStyle={styles.commentsListContent}>
-          <View style={styles.statsContainer}>
-            <View style={styles.statBoxSingle}>
-              <Text style={styles.statValue}>{comments.length}</Text>
-              <Text style={styles.statLabel}>Total Comments</Text>
-            </View>
-          </View>
-
-          {comments.map(renderCommentCard)}
+        <ScrollView style={styles.content}>
+          <Text style={styles.count}>{comments.length} comment{comments.length !== 1 ? 's' : ''}</Text>
+          {comments.map((comment) => (
+            <TouchableOpacity
+              key={comment.id}
+              style={styles.commentCard}
+              onPress={() => router.push(`/cigar/${comment.cigar_id}`)}
+            >
+              <View style={styles.cigarInfo}>
+                <View style={styles.cigarImageContainer}>
+                  {comment.cigar_image ? (
+                    <Image
+                      source={{ uri: `data:image/jpeg;base64,${comment.cigar_image}` }}
+                      style={styles.cigarImage}
+                    />
+                  ) : (
+                    <View style={styles.imagePlaceholder}>
+                      <Ionicons name="image-outline" size={24} color="#555" />
+                    </View>
+                  )}
+                </View>
+                <View style={styles.cigarDetails}>
+                  <Text style={styles.cigarBrand}>{comment.cigar_brand}</Text>
+                  <Text style={styles.cigarName}>{comment.cigar_name}</Text>
+                </View>
+              </View>
+              
+              <View style={styles.commentContent}>
+                <Text style={styles.commentText}>{comment.text}</Text>
+                <Text style={styles.commentDate}>{formatDate(comment.created_at)}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -164,8 +144,8 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
@@ -182,165 +162,89 @@ const styles = StyleSheet.create({
   placeholder: {
     width: 32,
   },
-  loadingContainer: {
+  centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 16,
+    padding: 32,
   },
-  loadingText: {
+  emptyText: {
+    fontSize: 18,
     color: '#888',
-    fontSize: 16,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 32,
-    gap: 16,
-  },
-  errorText: {
-    color: '#FF6B6B',
-    fontSize: 16,
+    marginTop: 16,
     textAlign: 'center',
-  },
-  retryButton: {
-    backgroundColor: '#8B4513',
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    borderRadius: 12,
-    marginTop: 16,
-  },
-  retryButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 32,
-    gap: 16,
-  },
-  emptyTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginTop: 16,
   },
   emptySubtext: {
-    fontSize: 16,
-    color: '#888',
+    fontSize: 14,
+    color: '#666',
+    marginTop: 8,
     textAlign: 'center',
   },
-  browseButton: {
-    backgroundColor: '#8B4513',
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    borderRadius: 12,
-    marginTop: 16,
-  },
-  browseButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  commentsList: {
+  content: {
     flex: 1,
   },
-  commentsListContent: {
-    padding: 16,
-    paddingBottom: 32,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  statBoxSingle: {
-    backgroundColor: '#1a1a1a',
-    padding: 20,
-    borderRadius: 12,
-    alignItems: 'center',
-    minWidth: 200,
-  },
-  statValue: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#8B4513',
-    marginBottom: 4,
-  },
-  statLabel: {
+  count: {
     fontSize: 14,
     color: '#888',
+    padding: 16,
+    paddingBottom: 8,
   },
   commentCard: {
-    flexDirection: 'row',
     backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 12,
+    marginHorizontal: 16,
     marginBottom: 12,
+    borderRadius: 12,
+    padding: 16,
+  },
+  cigarInfo: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
   },
   cigarImageContainer: {
-    width: 80,
-    height: 80,
-    backgroundColor: '#2a2a2a',
+    width: 60,
+    height: 60,
     borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
     overflow: 'hidden',
+    marginRight: 12,
   },
   cigarImage: {
     width: '100%',
     height: '100%',
   },
-  commentInfo: {
+  imagePlaceholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#2a2a2a',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cigarDetails: {
     flex: 1,
-    marginLeft: 12,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   cigarBrand: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#888',
+    marginBottom: 4,
   },
   cigarName: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
-    marginTop: 2,
   },
-  commentTextContainer: {
-    marginTop: 8,
-    marginBottom: 8,
+  commentContent: {
+    gap: 8,
   },
   commentText: {
     fontSize: 14,
-    color: '#ccc',
+    color: '#fff',
     lineHeight: 20,
-  },
-  commentFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  dateContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
   },
   commentDate: {
     fontSize: 12,
     color: '#888',
-  },
-  viewButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  viewButtonText: {
-    fontSize: 12,
-    color: '#8B4513',
-    fontWeight: '600',
   },
 });
