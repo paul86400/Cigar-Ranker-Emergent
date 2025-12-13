@@ -75,7 +75,10 @@ export default function CommentsScreen() {
 
       setCommentText('');
       setReplyingTo(null);
-      loadComments();
+      
+      // Add small delay to ensure DB write completes before refreshing
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await loadComments();
     } catch (error) {
       console.error('Error submitting comment:', error);
       Alert.alert('Error', 'Failed to submit comment');
