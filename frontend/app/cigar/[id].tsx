@@ -221,6 +221,54 @@ export default function CigarDetailsScreen() {
     setNoteText('');
   };
 
+  const handleOpenFlavorModal = () => {
+    if (!user) {
+      Alert.alert('Login Required', 'Please login to edit flavor notes');
+      return;
+    }
+    setEditingFlavors([...(cigar?.flavor_notes || [])]);
+    setNewFlavor('');
+    setShowFlavorModal(true);
+  };
+
+  const handleAddFlavor = () => {
+    if (!newFlavor.trim()) {
+      Alert.alert('Error', 'Please enter a flavor note');
+      return;
+    }
+    if (newFlavor.length > 50) {
+      Alert.alert('Error', 'Flavor note must be 50 characters or less');
+      return;
+    }
+    if (editingFlavors.length >= 20) {
+      Alert.alert('Error', 'Maximum 20 flavor notes allowed');
+      return;
+    }
+    setEditingFlavors([...editingFlavors, newFlavor.trim()]);
+    setNewFlavor('');
+  };
+
+  const handleRemoveFlavor = (index: number) => {
+    setEditingFlavors(editingFlavors.filter((_, i) => i !== index));
+  };
+
+  const handleSaveFlavors = async () => {
+    try {
+      setSavingFlavors(true);
+      await api.put(`/cigars/${id}/flavor-notes`, editingFlavors);
+      
+      // Update local cigar data
+      setCigar(prev => prev ? { ...prev, flavor_notes: editingFlavors } : null);
+      setShowFlavorModal(false);
+      Alert.alert('Success', 'Flavor notes updated successfully!');
+    } catch (error: any) {
+      console.error('Error saving flavor notes:', error);
+      Alert.alert('Error', error.response?.data?.detail || 'Failed to update flavor notes');
+    } finally {
+      setSavingFlavors(false);
+    }
+  };
+
   const handleUploadImage = async () => {
     if (!user) {
       Alert.alert('Login Required', 'Please login to upload images');
