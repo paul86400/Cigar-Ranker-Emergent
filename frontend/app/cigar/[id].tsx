@@ -58,6 +58,10 @@ export default function CigarDetailsScreen() {
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [savingNote, setSavingNote] = useState(false);
   const [loadingNote, setLoadingNote] = useState(false);
+  const [showFlavorModal, setShowFlavorModal] = useState(false);
+  const [editingFlavors, setEditingFlavors] = useState<string[]>([]);
+  const [newFlavor, setNewFlavor] = useState('');
+  const [savingFlavors, setSavingFlavors] = useState(false);
 
   useEffect(() => {
     loadCigarDetails();
