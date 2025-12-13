@@ -150,6 +150,30 @@ async def get_me(user_id: str = Depends(get_current_user)):
     }
 
 
+@api_router.get("/users/{user_id}")
+async def get_user_profile(user_id: str):
+    """Get public user profile by ID"""
+    try:
+        user = await db.users.find_one({"_id": ObjectId(user_id)})
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Return only public information
+        return {
+            "id": str(user["_id"]),
+            "username": user["username"],
+            "profile_pic": user.get("profile_pic"),
+            "favorites": user.get("favorites", []),
+            "created_at": user.get("created_at", datetime.utcnow()).isoformat()
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting user profile: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get user profile")
+
+
 @api_router.put("/auth/profile")
 async def update_profile(update_data: UserUpdate, user_id: str = Depends(get_current_user)):
     """Update user profile"""
