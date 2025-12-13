@@ -504,6 +504,12 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  cigarImagePlaceholder: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#1a1a1a',
+  },
   cigarInfo: {
     flex: 1,
     marginLeft: 12,
