@@ -214,11 +214,23 @@ async def search_cigars(
     query = {}
     
     if q:
-        query["$or"] = [
-            {"name": {"$regex": q, "$options": "i"}},
-            {"brand": {"$regex": q, "$options": "i"}},
-            {"flavor_notes": {"$regex": q, "$options": "i"}}
-        ]
+        # Split search query into words and search for all of them
+        search_words = q.strip().split()
+        
+        if len(search_words) == 1:
+            # Single word search - use OR across fields
+            query["$or"] = [
+                {"name": {"$regex": q, "$options": "i"}},
+                {"brand": {"$regex": q, "$options": "i"}},
+                {"flavor_notes": {"$regex": q, "$options": "i"}}
+            ]
+        else:
+            # Multiple words - match all words across brand + name combined
+            word_patterns = [{"$or": [
+                {"name": {"$regex": word, "$options": "i"}},
+                {"brand": {"$regex": word, "$options": "i"}}
+            ]} for word in search_words]
+            query["$and"] = word_patterns
     
     if strength:
         # Exact match for strength (case-insensitive)
