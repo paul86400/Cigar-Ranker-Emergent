@@ -469,13 +469,14 @@ async def add_user_cigar(
         "binder": "Mixed",
         "filler": "Mixed",
         "flavor_notes": ["Tobacco", "Wood", "Spice"],
-        "average_rating": 5.0,
+        "average_rating": 0.0,
         "rating_count": 0,
         "barcode": "",
         "images": [],
-        "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+        "image": "",  # Empty string so placeholder will show
         "created_at": datetime.utcnow(),
-        "added_by": user_id
+        "added_by": user_id,
+        "user_submitted": True
     }
     
     result = await db.cigars.insert_one(cigar_doc)
