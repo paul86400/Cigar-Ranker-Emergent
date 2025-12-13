@@ -897,6 +897,40 @@ async def get_comments(cigar_id: str):
     return root_comments
 
 
+@api_router.delete("/comments/{comment_id}")
+async def delete_comment(comment_id: str, user_id: str = Depends(get_current_user)):
+    """Delete a comment (only if it belongs to the user)"""
+    try:
+        # Find the comment
+        comment = await db.comments.find_one({"_id": ObjectId(comment_id)})
+        
+        if not comment:
+            raise HTTPException(status_code=404, detail="Comment not found")
+        
+        # Check if the comment belongs to the user
+        if comment['user_id'] != user_id:
+            raise HTTPException(status_code=403, detail="You can only delete your own comments")
+        
+        # Delete the comment
+        result = await db.comments.delete_one({"_id": ObjectId(comment_id)})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Comment not found")
+        
+        # Also delete all replies to this comment
+        await db.comments.delete_many({"parent_id": comment_id})
+        
+        logger.info(f"Deleted comment {comment_id} and its replies by user {user_id}")
+        
+        return {"success": True, "message": "Comment deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting comment: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete comment")
+
+
 @api_router.get("/comments/test-comments")
 async def test_get_comments():
     """TEST endpoint - hardcoded for pmk9000"""
