@@ -205,11 +205,17 @@ export default function HomeScreen() {
       onPress={() => handleCigarPress(cigar.id)}
     >
       <View style={styles.cigarImageContainer}>
-        <Image
-          source={{ uri: `data:image/jpeg;base64,${cigar.image}` }}
-          style={styles.cigarImage}
-          resizeMode="contain"
-        />
+        {cigar.image ? (
+          <Image
+            source={{ uri: `data:image/jpeg;base64,${cigar.image}` }}
+            style={styles.cigarImage}
+            resizeMode="contain"
+          />
+        ) : (
+          <View style={styles.cigarImagePlaceholder}>
+            <Ionicons name="image-outline" size={32} color="#555" />
+          </View>
+        )}
       </View>
       <View style={styles.cigarInfo}>
         <Text style={styles.cigarBrand}>{cigar.brand}</Text>
