@@ -309,6 +309,32 @@ export default function CommentsScreen() {
           )}
         </View>
       </KeyboardAvoidingView>
+
+      {/* Custom Delete Confirmation Modal */}
+      {deleteConfirm.visible && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Delete Comment</Text>
+            <Text style={styles.modalMessage}>
+              Are you sure you want to delete this comment? This will also delete all replies.
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={cancelDelete}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.deleteModalButton]}
+                onPress={confirmDelete}
+              >
+                <Text style={styles.deleteModalButtonText}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
