@@ -127,13 +127,25 @@ export default function CommentsScreen() {
         </View>
       </View>
       <Text style={styles.commentText}>{comment.text}</Text>
-      <TouchableOpacity
-        style={styles.replyButton}
-        onPress={() => setReplyingTo(comment.id)}
-      >
-        <Ionicons name="arrow-undo" size={16} color="#8B4513" />
-        <Text style={styles.replyButtonText}>Reply</Text>
-      </TouchableOpacity>
+      <View style={styles.commentActions}>
+        <TouchableOpacity
+          style={styles.replyButton}
+          onPress={() => setReplyingTo(comment.id)}
+        >
+          <Ionicons name="arrow-undo" size={16} color="#8B4513" />
+          <Text style={styles.replyButtonText}>Reply</Text>
+        </TouchableOpacity>
+        
+        {user && comment.user_id === user.id && (
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => handleDeleteComment(comment.id)}
+          >
+            <Ionicons name="trash-outline" size={16} color="#FF3B30" />
+            <Text style={styles.deleteButtonText}>Delete</Text>
+          </TouchableOpacity>
+        )}
+      </View>
 
       {comment.replies && comment.replies.length > 0 && (
         <View style={styles.repliesContainer}>
