@@ -31,7 +31,8 @@ interface Comment {
 
 export default function CommentsScreen() {
   const router = useRouter();
-  const { id } = useLocalSearchParams();
+  const params = useLocalSearchParams();
+  const { id, highlight } = params;
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const [comments, setComments] = useState<Comment[]>([]);
@@ -39,6 +40,9 @@ export default function CommentsScreen() {
   const [commentText, setCommentText] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [highlightedComment, setHighlightedComment] = useState<string | null>(
+    highlight ? String(highlight) : null
+  );
 
   useEffect(() => {
     loadComments();
