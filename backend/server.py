@@ -973,6 +973,43 @@ async def get_comments(cigar_id: str):
     return root_comments
 
 
+@api_router.put("/cigars/{cigar_id}/flavor-notes")
+async def update_flavor_notes(cigar_id: str, flavor_notes: list[str], user_id: str = Depends(get_current_user)):
+    """Update flavor notes for a cigar"""
+    try:
+        # Validate cigar exists
+        cigar = await db.cigars.find_one({"_id": ObjectId(cigar_id)})
+        if not cigar:
+            raise HTTPException(status_code=404, detail="Cigar not found")
+        
+        # Validate flavor notes (max 20 notes, each max 50 chars)
+        if len(flavor_notes) > 20:
+            raise HTTPException(status_code=400, detail="Maximum 20 flavor notes allowed")
+        
+        for note in flavor_notes:
+            if len(note) > 50:
+                raise HTTPException(status_code=400, detail="Each flavor note must be 50 characters or less")
+        
+        # Update flavor notes
+        result = await db.cigars.update_one(
+            {"_id": ObjectId(cigar_id)},
+            {"$set": {"flavor_notes": flavor_notes}}
+        )
+        
+        if result.modified_count == 0 and result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Cigar not found")
+        
+        logger.info(f"Updated flavor notes for cigar {cigar_id} by user {user_id}")
+        
+        return {"success": True, "flavor_notes": flavor_notes}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating flavor notes: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update flavor notes")
+
+
 @api_router.delete("/comments/{comment_id}")
 async def delete_comment(comment_id: str, user_id: str = Depends(get_current_user)):
     """Delete a comment (only if it belongs to the user)"""
