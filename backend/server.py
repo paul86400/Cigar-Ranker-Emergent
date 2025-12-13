@@ -867,13 +867,13 @@ async def get_comments(cigar_id: str):
     projection = {"user_id": 1, "text": 1, "parent_id": 1, "images": 1, "created_at": 1}
     all_comments = await db.comments.find({"cigar_id": cigar_id}, projection).sort("created_at", -1).limit(100).to_list(100)
     
-    # Get user info for all comments with projection
+    # Get user info for all comments with projection (including profile_pic)
     user_ids = list(set([c['user_id'] for c in all_comments]))
     users = await db.users.find(
         {"_id": {"$in": [ObjectId(uid) for uid in user_ids]}}, 
-        {"username": 1}
+        {"username": 1, "profile_pic": 1}
     ).to_list(len(user_ids))
-    user_map = {str(u['_id']): u['username'] for u in users}
+    user_map = {str(u['_id']): {'username': u['username'], 'profile_pic': u.get('profile_pic')} for u in users}
     
     # Build comment tree
     comment_map = {}
@@ -881,7 +881,9 @@ async def get_comments(cigar_id: str):
     
     for comment in all_comments:
         comment_obj = serialize_doc(comment)
-        comment_obj['username'] = user_map.get(comment['user_id'], 'Unknown')
+        user_info = user_map.get(comment['user_id'], {'username': 'Unknown', 'profile_pic': None})
+        comment_obj['username'] = user_info['username']
+        comment_obj['profile_pic'] = user_info['profile_pic']
         comment_obj['replies'] = []
         comment_map[comment_obj['id']] = comment_obj
         
