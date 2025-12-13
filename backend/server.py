@@ -934,6 +934,45 @@ async def create_comment(comment_data: CommentCreate, user_id: str = Depends(get
     return response
 
 
+@api_router.get("/comments/my-all-comments")
+async def get_my_all_comments(user_id: str = Depends(get_current_user)):
+    """Get all comments made by the current user across all cigars"""
+    try:
+        # Get all comments by this user
+        comments_cursor = db.comments.find({"user_id": user_id}).sort("created_at", -1)
+        all_comments = await comments_cursor.to_list(length=None)
+        
+        # Get cigar details for all comments
+        cigar_ids = list(set([c["cigar_id"] for c in all_comments]))
+        cigars = await db.cigars.find(
+            {"_id": {"$in": [ObjectId(cid) for cid in cigar_ids]}},
+            {"brand": 1, "name": 1, "image": 1}
+        ).to_list(len(cigar_ids))
+        
+        cigar_map = {str(c["_id"]): c for c in cigars}
+        
+        # Build response with cigar details
+        result = []
+        for comment in all_comments:
+            cigar = cigar_map.get(comment["cigar_id"])
+            if cigar:
+                result.append({
+                    "id": str(comment["_id"]),
+                    "text": comment["text"],
+                    "created_at": comment["created_at"].isoformat(),
+                    "cigar_id": comment["cigar_id"],
+                    "cigar_brand": cigar["brand"],
+                    "cigar_name": cigar["name"],
+                    "cigar_image": cigar.get("image", "")
+                })
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error getting user comments: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get comments")
+
+
 @api_router.get("/comments/{cigar_id}")
 async def get_comments(cigar_id: str):
     """Get all comments for a cigar (nested structure)"""
