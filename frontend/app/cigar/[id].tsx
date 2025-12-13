@@ -868,9 +868,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   flavorSection: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
+    padding: 16,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 18,
