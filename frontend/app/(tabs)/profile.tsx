@@ -166,6 +166,17 @@ export default function ProfileScreen() {
             </View>
             <Ionicons name="chevron-forward" size={20} color="#888" />
           </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.menuItem}
+            onPress={() => router.push('/my-comments')}
+          >
+            <View style={styles.menuItemLeft}>
+              <Ionicons name="chatbubble-outline" size={24} color="#fff" />
+              <Text style={styles.menuItemText}>My Comments</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#888" />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.section}>
