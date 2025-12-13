@@ -203,7 +203,15 @@ export default function CommentsScreen() {
             onPress={() => {
               console.log('=== DELETE BUTTON CLICKED ===');
               console.log('Comment ID:', comment.id);
-              handleDeleteComment(comment.id);
+              console.log('User ID:', user.id);
+              console.log('Comment User ID:', comment.user_id);
+              console.log('About to call handleDeleteComment');
+              try {
+                handleDeleteComment(comment.id);
+                console.log('handleDeleteComment called successfully');
+              } catch (err) {
+                console.error('Error calling handleDeleteComment:', err);
+              }
             }}
           >
             <Ionicons name="trash-outline" size={16} color="#FF3B30" />
