@@ -330,6 +330,11 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginBottom: 8,
   },
+  commentActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
   replyButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -338,6 +343,16 @@ const styles = StyleSheet.create({
   replyButtonText: {
     fontSize: 12,
     color: '#8B4513',
+    fontWeight: '600',
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  deleteButtonText: {
+    fontSize: 12,
+    color: '#FF3B30',
     fontWeight: '600',
   },
   repliesContainer: {
