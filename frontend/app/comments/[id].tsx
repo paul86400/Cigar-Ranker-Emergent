@@ -327,6 +327,11 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
   },
+  highlightedComment: {
+    backgroundColor: '#2a2010',
+    borderWidth: 2,
+    borderColor: '#8B4513',
+  },
   commentHeader: {
     flexDirection: 'row',
     alignItems: 'center',
