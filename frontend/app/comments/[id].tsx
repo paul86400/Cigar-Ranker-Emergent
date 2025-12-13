@@ -43,6 +43,10 @@ export default function CommentsScreen() {
   const [highlightedComment, setHighlightedComment] = useState<string | null>(
     highlight ? String(highlight) : null
   );
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    visible: boolean;
+    commentId: string | null;
+  }>({ visible: false, commentId: null });
 
   useEffect(() => {
     loadComments();
