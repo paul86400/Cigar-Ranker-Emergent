@@ -349,6 +349,40 @@ async def upload_cigar_image_base64(
         image_data = base64.b64decode(image_base64)
         image = Image.open(BytesIO(image_data))
         
+        # AI Moderation Check - Check for inappropriate content
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=EMERGENT_LLM_KEY)
+            
+            # OpenAI moderation requires base64 with data URI format
+            moderation_response = client.moderations.create(
+                model="omni-moderation-latest",
+                input=[
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{image_base64}"
+                        }
+                    }
+                ]
+            )
+            
+            # Check if content is flagged
+            if moderation_response.results[0].flagged:
+                categories = moderation_response.results[0].categories
+                flagged_categories = [cat for cat, flagged in categories.__dict__.items() if flagged]
+                logger.warning(f"Image flagged for: {flagged_categories}")
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Image contains inappropriate content: {', '.join(flagged_categories)}"
+                )
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Error in image moderation: {str(e)}")
+            # If moderation fails, we'll allow the upload but log the error
+            pass
+        
         # Handle EXIF orientation to prevent rotation issues
         try:
             from PIL import ImageOps
