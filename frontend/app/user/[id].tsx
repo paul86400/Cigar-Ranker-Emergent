@@ -118,7 +118,90 @@ export default function UserProfileScreen() {
             <Text style={styles.statLabel}>Favorites</Text>
             <Text style={styles.statValue}>{profile.favorites?.length || 0}</Text>
           </View>
+          <View style={styles.statItem}>
+            <Ionicons name="add-circle" size={32} color="#4CAF50" />
+            <Text style={styles.statLabel}>Added</Text>
+            <Text style={styles.statValue}>{profile.added_cigars?.length || 0}</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Ionicons name="star-half" size={32} color="#FFD700" />
+            <Text style={styles.statLabel}>Rated</Text>
+            <Text style={styles.statValue}>{profile.rated_cigars?.length || 0}</Text>
+          </View>
         </View>
+
+        {profile.added_cigars && profile.added_cigars.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Cigars Added</Text>
+            {profile.added_cigars.map((cigar) => (
+              <TouchableOpacity
+                key={cigar.id}
+                style={styles.cigarCard}
+                onPress={() => router.push(`/cigar/${cigar.id}`)}
+              >
+                <View style={styles.cigarImageContainer}>
+                  {cigar.image ? (
+                    <Image
+                      source={{ uri: `data:image/jpeg;base64,${cigar.image}` }}
+                      style={styles.cigarImage}
+                    />
+                  ) : (
+                    <View style={styles.cigarImagePlaceholder}>
+                      <Ionicons name="image-outline" size={24} color="#555" />
+                    </View>
+                  )}
+                </View>
+                <View style={styles.cigarInfo}>
+                  <Text style={styles.cigarBrand}>{cigar.brand}</Text>
+                  <Text style={styles.cigarName}>{cigar.name}</Text>
+                  <Text style={styles.cigarRating}>
+                    ⭐ {cigar.average_rating.toFixed(1)} ({cigar.rating_count})
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#888" />
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {profile.rated_cigars && profile.rated_cigars.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Cigars Rated</Text>
+            {profile.rated_cigars.map((cigar) => (
+              <TouchableOpacity
+                key={cigar.id}
+                style={styles.cigarCard}
+                onPress={() => router.push(`/cigar/${cigar.id}`)}
+              >
+                <View style={styles.cigarImageContainer}>
+                  {cigar.image ? (
+                    <Image
+                      source={{ uri: `data:image/jpeg;base64,${cigar.image}` }}
+                      style={styles.cigarImage}
+                    />
+                  ) : (
+                    <View style={styles.cigarImagePlaceholder}>
+                      <Ionicons name="image-outline" size={24} color="#555" />
+                    </View>
+                  )}
+                </View>
+                <View style={styles.cigarInfo}>
+                  <Text style={styles.cigarBrand}>{cigar.brand}</Text>
+                  <Text style={styles.cigarName}>{cigar.name}</Text>
+                  <View style={styles.ratingRow}>
+                    <Text style={styles.cigarRating}>
+                      ⭐ {cigar.average_rating.toFixed(1)} ({cigar.rating_count})
+                    </Text>
+                    <Text style={styles.userRating}>
+                      Your rating: {cigar.user_rating?.toFixed(1) || 'N/A'}
+                    </Text>
+                  </View>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#888" />
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
