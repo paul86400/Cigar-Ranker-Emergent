@@ -181,7 +181,8 @@ export default function CommentsScreen() {
         </View>
       )}
     </View>
-  );
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
