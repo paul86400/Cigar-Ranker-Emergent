@@ -294,7 +294,25 @@ async def get_cigar(cigar_id: str):
     if not cigar:
         raise HTTPException(status_code=404, detail="Cigar not found")
     
-    return serialize_doc(cigar)
+    cigar_data = serialize_doc(cigar)
+    
+    # If cigar was added by a user, include their info
+    if cigar.get("added_by"):
+        try:
+            user = await db.users.find_one(
+                {"_id": ObjectId(cigar["added_by"])},
+                {"username": 1, "profile_pic": 1}
+            )
+            if user:
+                cigar_data["added_by_user"] = {
+                    "id": str(user["_id"]),
+                    "username": user["username"],
+                    "profile_pic": user.get("profile_pic")
+                }
+        except Exception as e:
+            logger.error(f"Error fetching user who added cigar: {str(e)}")
+    
+    return cigar_data
 
 
 @api_router.post("/cigars/{cigar_id}/upload-image")
