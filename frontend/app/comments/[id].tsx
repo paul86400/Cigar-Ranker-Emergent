@@ -186,7 +186,12 @@ export default function CommentsScreen() {
         {user && comment.user_id === user.id && (
           <TouchableOpacity
             style={styles.deleteButton}
-            onPress={() => handleDeleteComment(comment.id)}
+            onPress={() => {
+              console.log('Delete button clicked for comment:', comment.id);
+              console.log('Comment user_id:', comment.user_id);
+              console.log('Current user id:', user.id);
+              handleDeleteComment(comment.id);
+            }}
           >
             <Ionicons name="trash-outline" size={16} color="#FF3B30" />
             <Text style={styles.deleteButtonText}>Delete</Text>
