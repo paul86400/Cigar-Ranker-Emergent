@@ -183,13 +183,14 @@ export default function CommentsScreen() {
           <Text style={styles.replyButtonText}>Reply</Text>
         </TouchableOpacity>
         
-        {user && comment.user_id === user.id && (
+        {user && String(comment.user_id) === String(user.id) && (
           <TouchableOpacity
             style={styles.deleteButton}
             onPress={() => {
               console.log('Delete button clicked for comment:', comment.id);
-              console.log('Comment user_id:', comment.user_id);
-              console.log('Current user id:', user.id);
+              console.log('Comment user_id:', comment.user_id, 'Type:', typeof comment.user_id);
+              console.log('Current user id:', user.id, 'Type:', typeof user.id);
+              console.log('Match:', String(comment.user_id) === String(user.id));
               handleDeleteComment(comment.id);
             }}
           >
