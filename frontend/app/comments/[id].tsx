@@ -22,6 +22,7 @@ interface Comment {
   id: string;
   user_id: string;
   username: string;
+  profile_pic?: string;
   text: string;
   created_at: string;
   replies: Comment[];
