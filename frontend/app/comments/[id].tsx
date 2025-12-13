@@ -94,48 +94,48 @@ export default function CommentsScreen() {
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    Alert.alert(
-      'Delete Comment',
-      'Are you sure you want to delete this comment? This will also delete all replies.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              console.log('Deleting comment:', commentId);
-              const response = await api.delete(`/comments/${commentId}`);
-              console.log('Delete response:', response.data);
-              
-              // Optimistically remove from UI first
-              setComments(prevComments => {
-                const removeComment = (comments: Comment[]): Comment[] => {
-                  return comments.filter(c => {
-                    if (c.id === commentId) return false;
-                    if (c.replies && c.replies.length > 0) {
-                      c.replies = removeComment(c.replies);
-                    }
-                    return true;
-                  });
-                };
-                return removeComment(prevComments);
-              });
-              
-              // Then refresh from server to be sure
-              await new Promise(resolve => setTimeout(resolve, 300));
-              await loadComments();
-            } catch (error: any) {
-              console.error('Error deleting comment:', error);
-              console.error('Error details:', error.response?.data);
-              Alert.alert('Error', error.response?.data?.detail || 'Failed to delete comment');
-              // Reload comments to restore UI if delete failed
-              await loadComments();
+    console.log('handleDeleteComment called with ID:', commentId);
+    
+    try {
+      const confirmed = window.confirm('Are you sure you want to delete this comment? This will also delete all replies.');
+      
+      if (!confirmed) {
+        console.log('User cancelled delete');
+        return;
+      }
+      
+      console.log('User confirmed, proceeding with delete...');
+      console.log('Calling DELETE /comments/' + commentId);
+      
+      const response = await api.delete(`/comments/${commentId}`);
+      console.log('Delete response:', response.data);
+      
+      // Optimistically remove from UI first
+      setComments(prevComments => {
+        const removeComment = (comments: Comment[]): Comment[] => {
+          return comments.filter(c => {
+            if (c.id === commentId) return false;
+            if (c.replies && c.replies.length > 0) {
+              c.replies = removeComment(c.replies);
             }
-          }
-        }
-      ]
-    );
+            return true;
+          });
+        };
+        return removeComment(prevComments);
+      });
+      
+      // Then refresh from server to be sure
+      await new Promise(resolve => setTimeout(resolve, 300));
+      await loadComments();
+      
+      console.log('Delete completed successfully');
+    } catch (error: any) {
+      console.error('Error deleting comment:', error);
+      console.error('Error details:', error.response?.data);
+      window.alert('Error: ' + (error.response?.data?.detail || 'Failed to delete comment'));
+      // Reload comments to restore UI if delete failed
+      await loadComments();
+    }
   };
 
   const renderComment = (comment: Comment, depth: number = 0) => {
