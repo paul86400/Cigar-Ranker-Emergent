@@ -485,7 +485,15 @@ export default function CigarDetailsScreen() {
         </View>
 
         <View style={styles.flavorSection}>
-          <Text style={styles.sectionTitle}>Flavor Notes</Text>
+          <View style={styles.flavorHeader}>
+            <Text style={styles.sectionTitle}>Flavor Notes</Text>
+            {user && (
+              <TouchableOpacity onPress={handleOpenFlavorModal} style={styles.editButton}>
+                <Ionicons name="create-outline" size={20} color="#8B4513" />
+                <Text style={styles.editButtonText}>Edit</Text>
+              </TouchableOpacity>
+            )}
+          </View>
           <View style={styles.flavorNotes}>
             {cigar.flavor_notes && cigar.flavor_notes.length > 0 ? (
               cigar.flavor_notes.map((note, index) => (
