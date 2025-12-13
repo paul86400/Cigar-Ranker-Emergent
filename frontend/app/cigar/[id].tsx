@@ -406,6 +406,30 @@ export default function CigarDetailsScreen() {
             <Text style={styles.detailLabel}>Price Range:</Text>
             <Text style={styles.detailValue}>${cigar.price_range}</Text>
           </View>
+          {cigar.added_by_user && (
+            <TouchableOpacity 
+              style={styles.detailRow}
+              onPress={() => router.push(`/user/${cigar.added_by_user.id}`)}
+            >
+              <Text style={styles.detailLabel}>Added by:</Text>
+              <View style={styles.addedByContainer}>
+                <View style={styles.addedByAvatar}>
+                  {cigar.added_by_user.profile_pic ? (
+                    <Image
+                      source={{ uri: `data:image/png;base64,${cigar.added_by_user.profile_pic}` }}
+                      style={styles.addedByAvatarImage}
+                    />
+                  ) : (
+                    <Ionicons name="person" size={12} color="#888" />
+                  )}
+                </View>
+                <Text style={[styles.detailValue, styles.addedByUsername]}>
+                  {cigar.added_by_user.username}
+                </Text>
+                <Ionicons name="chevron-forward" size={16} color="#8B4513" />
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={styles.flavorSection}>
