@@ -52,6 +52,7 @@ export default function CigarDetailsScreen() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
   const [submittingRating, setSubmittingRating] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [noteText, setNoteText] = useState<string>('');
   const [originalNoteText, setOriginalNoteText] = useState<string>('');
   const [showNoteModal, setShowNoteModal] = useState(false);
