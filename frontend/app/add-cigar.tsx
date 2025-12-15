@@ -243,6 +243,133 @@ export default function AddCigarScreen() {
           </View>
         )}
 
+        {showCustomForm && (
+          <View style={styles.customFormSection}>
+            <View style={styles.resultHeader}>
+              <Ionicons name="create" size={32} color="#8B4513" />
+              <Text style={[styles.resultTitle, { color: '#8B4513' }]}>Custom Entry</Text>
+            </View>
+
+            <Text style={styles.resultDescription}>
+              Manually enter cigar details below
+            </Text>
+
+            <View style={styles.formContainer}>
+              <View style={styles.formGroup}>
+                <Text style={styles.formLabel}>Brand *</Text>
+                <TextInput
+                  style={styles.formInput}
+                  placeholder="e.g., Padron"
+                  placeholderTextColor="#888"
+                  value={customCigar.brand}
+                  onChangeText={(text) => setCustomCigar({...customCigar, brand: text})}
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.formLabel}>Name *</Text>
+                <TextInput
+                  style={styles.formInput}
+                  placeholder="e.g., 1964 Anniversary"
+                  placeholderTextColor="#888"
+                  value={customCigar.name}
+                  onChangeText={(text) => setCustomCigar({...customCigar, name: text})}
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.formLabel}>Strength</Text>
+                <View style={styles.strengthButtons}>
+                  {['Mild', 'Medium', 'Full'].map((strength) => (
+                    <TouchableOpacity
+                      key={strength}
+                      style={[
+                        styles.strengthButton,
+                        customCigar.strength.toLowerCase() === strength.toLowerCase() && styles.strengthButtonActive
+                      ]}
+                      onPress={() => setCustomCigar({...customCigar, strength: strength.toLowerCase()})}
+                    >
+                      <Text style={[
+                        styles.strengthButtonText,
+                        customCigar.strength.toLowerCase() === strength.toLowerCase() && styles.strengthButtonTextActive
+                      ]}>
+                        {strength}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.formLabel}>Origin</Text>
+                <TextInput
+                  style={styles.formInput}
+                  placeholder="e.g., Nicaragua"
+                  placeholderTextColor="#888"
+                  value={customCigar.origin}
+                  onChangeText={(text) => setCustomCigar({...customCigar, origin: text})}
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.formLabel}>Wrapper</Text>
+                <TextInput
+                  style={styles.formInput}
+                  placeholder="e.g., Maduro"
+                  placeholderTextColor="#888"
+                  value={customCigar.wrapper}
+                  onChangeText={(text) => setCustomCigar({...customCigar, wrapper: text})}
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.formLabel}>Size</Text>
+                <TextInput
+                  style={styles.formInput}
+                  placeholder="e.g., Robusto"
+                  placeholderTextColor="#888"
+                  value={customCigar.size}
+                  onChangeText={(text) => setCustomCigar({...customCigar, size: text})}
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.formLabel}>Price Range</Text>
+                <TextInput
+                  style={styles.formInput}
+                  placeholder="e.g., 15-20"
+                  placeholderTextColor="#888"
+                  value={customCigar.price_range}
+                  onChangeText={(text) => setCustomCigar({...customCigar, price_range: text})}
+                  keyboardType="numeric"
+                />
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.addButton, submitting && styles.addButtonDisabled]}
+              onPress={handleCustomAdd}
+              disabled={submitting}
+            >
+              {submitting ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <>
+                  <Ionicons name="add-circle" size={24} color="#fff" />
+                  <Text style={styles.addButtonText}>Add Cigar</Text>
+                </>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.searchAnotherButton}
+              onPress={handleSearchAnother}
+            >
+              <Text style={styles.searchAnotherText}>Back to Search</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {existingCigar && (
           <View style={styles.resultsSection}>
             <View style={styles.resultHeader}>
