@@ -96,18 +96,12 @@ export default function HomeScreen() {
 
   const startSpin = () => {
     spinValue.setValue(0);
-    Animated.loop(
-      Animated.timing(spinValue, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      })
-    ).start();
-  };
-
-  const stopSpin = () => {
-    spinValue.stopAnimation();
-    spinValue.setValue(0);
+    // Spin 10 times (3600 degrees total)
+    Animated.timing(spinValue, {
+      toValue: 10,
+      duration: 2000, // 2 seconds for 10 full rotations
+      useNativeDriver: true,
+    }).start();
   };
 
   const onRefresh = async () => {
@@ -122,7 +116,8 @@ export default function HomeScreen() {
       console.error('Error refreshing cigars:', error);
     } finally {
       setRefreshing(false);
-      stopSpin();
+      // Reset spin value after animation completes
+      setTimeout(() => spinValue.setValue(0), 100);
     }
   };
 
