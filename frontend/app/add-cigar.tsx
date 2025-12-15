@@ -25,6 +25,16 @@ export default function AddCigarScreen() {
   const [cigarInfo, setCigarInfo] = useState<any>(null);
   const [existingCigar, setExistingCigar] = useState<any>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [showCustomForm, setShowCustomForm] = useState(false);
+  const [customCigar, setCustomCigar] = useState({
+    brand: '',
+    name: '',
+    strength: 'medium',
+    origin: '',
+    wrapper: '',
+    size: '',
+    price_range: '',
+  });
 
   const handleSearch = async () => {
     if (!user) {
