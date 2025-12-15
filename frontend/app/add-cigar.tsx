@@ -648,4 +648,86 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#333',
+  },
+  dividerText: {
+    color: '#888',
+    paddingHorizontal: 16,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  customSearchButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+    padding: 16,
+    borderRadius: 12,
+    gap: 8,
+    borderWidth: 2,
+    borderColor: '#8B4513',
+  },
+  customSearchButtonText: {
+    color: '#8B4513',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  customFormSection: {
+    marginTop: 8,
+  },
+  formContainer: {
+    gap: 16,
+    marginBottom: 24,
+  },
+  formGroup: {
+    gap: 8,
+  },
+  formLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  formInput: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 16,
+    color: '#fff',
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#333',
+    outlineStyle: 'none',
+  },
+  strengthButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  strengthButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#1a1a1a',
+    borderWidth: 1,
+    borderColor: '#333',
+    alignItems: 'center',
+  },
+  strengthButtonActive: {
+    backgroundColor: '#8B4513',
+    borderColor: '#8B4513',
+  },
+  strengthButtonText: {
+    color: '#888',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  strengthButtonTextActive: {
+    color: '#fff',
+  },
 });
