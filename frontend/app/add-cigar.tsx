@@ -226,6 +226,20 @@ export default function AddCigarScreen() {
                 </>
               )}
             </TouchableOpacity>
+
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>OR</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <TouchableOpacity
+              style={styles.customSearchButton}
+              onPress={() => setShowCustomForm(true)}
+            >
+              <Ionicons name="create-outline" size={24} color="#8B4513" />
+              <Text style={styles.customSearchButtonText}>Custom Search</Text>
+            </TouchableOpacity>
           </View>
         )}
 
