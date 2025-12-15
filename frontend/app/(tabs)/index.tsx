@@ -312,7 +312,7 @@ export default function HomeScreen() {
                 style={{
                   transform: [{
                     rotate: spinValue.interpolate({
-                      inputRange: [0, 1],
+                      inputRange: [0, 10],
                       outputRange: ['0deg', '3600deg']
                     })
                   }]
