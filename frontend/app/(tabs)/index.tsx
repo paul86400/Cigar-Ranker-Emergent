@@ -95,30 +95,40 @@ export default function HomeScreen() {
   };
 
   const startSpin = () => {
-    spinValue.setValue(0);
-    // Spin 10 times (3600 degrees total)
-    Animated.timing(spinValue, {
-      toValue: 10,
-      duration: 2000, // 2 seconds for 10 full rotations
-      useNativeDriver: true,
-    }).start();
+    return new Promise<void>((resolve) => {
+      spinValue.setValue(0);
+      // Spin 10 times (3600 degrees total)
+      Animated.timing(spinValue, {
+        toValue: 10,
+        duration: 2000, // 2 seconds for 10 full rotations
+        useNativeDriver: true,
+      }).start(() => {
+        // Animation completed
+        spinValue.setValue(0);
+        resolve();
+      });
+    });
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
-    startSpin();
-    try {
-      console.log('Refreshing cigars list...');
-      const response = await api.get('/cigars/search');
-      console.log(`Refreshed: Loaded ${response.data.length} cigars`);
-      setCigars(response.data);
-    } catch (error: any) {
-      console.error('Error refreshing cigars:', error);
-    } finally {
-      setRefreshing(false);
-      // Reset spin value after animation completes
-      setTimeout(() => spinValue.setValue(0), 100);
-    }
+    
+    // Start both the animation and the API call
+    const [_, apiResult] = await Promise.all([
+      startSpin(), // Wait for full 10 rotations
+      (async () => {
+        try {
+          console.log('Refreshing cigars list...');
+          const response = await api.get('/cigars/search');
+          console.log(`Refreshed: Loaded ${response.data.length} cigars`);
+          setCigars(response.data);
+        } catch (error: any) {
+          console.error('Error refreshing cigars:', error);
+        }
+      })()
+    ]);
+    
+    setRefreshing(false);
   };
 
   const performAdvancedSearch = async () => {
