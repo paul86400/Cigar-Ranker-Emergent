@@ -138,6 +138,50 @@ export default function AddCigarScreen() {
     setSearchQuery('');
     setCigarInfo(null);
     setExistingCigar(null);
+    setShowCustomForm(false);
+  };
+
+  const handleCustomAdd = async () => {
+    if (!user) {
+      Alert.alert('Login Required', 'Please login to add cigars');
+      return;
+    }
+
+    if (!customCigar.brand.trim() || !customCigar.name.trim()) {
+      Alert.alert('Missing Information', 'Brand and name are required');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const formData = new FormData();
+      formData.append('brand', customCigar.brand.trim());
+      formData.append('name', customCigar.name.trim());
+      formData.append('strength', customCigar.strength.toLowerCase().trim());
+      formData.append('origin', customCigar.origin.trim() || 'Unknown');
+      formData.append('wrapper', customCigar.wrapper.trim() || 'Unknown');
+      formData.append('size', customCigar.size.trim() || 'Standard');
+      if (customCigar.price_range) {
+        formData.append('price_range', customCigar.price_range);
+      }
+
+      const response = await api.post('/cigars/add', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data.cigar_id) {
+        router.replace(`/cigar/${response.data.cigar_id}`);
+      } else {
+        Alert.alert('Error', 'Cigar was added but could not navigate to it.');
+      }
+    } catch (error: any) {
+      console.error('Error adding cigar:', error);
+      Alert.alert('Error', error.response?.data?.detail || 'Failed to add cigar');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
